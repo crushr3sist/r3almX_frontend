@@ -7,10 +7,12 @@ import ProfilePage from "./pages/personal/profile";
 import Socket from "./pages/chat/main";
 import { useDispatch } from "react-redux";
 import ConnectionSocket from "./utils/ConnectionSocket.ts";
+
 import {
   clearWebsocketInstance,
   setupWebsocketInstance,
 } from "./state/connectionSlice.ts";
+
 import { fetchToken } from "./utils/login.ts";
 
 const BrowserComponent = () => {
@@ -30,12 +32,15 @@ const BrowserComponent = () => {
       element: <LoginPage />,
     },
   ]);
+
   return <RouterProvider router={router}></RouterProvider>;
 };
 
 const WEBSOCKET_URL = `ws://localhost:8000/connection?token=${await fetchToken()}`;
+
 const ClientController: React.FC = () => {
   const dispatch = useDispatch();
+
   useEffect(() => {
     const setupWebsocket = async () => {
       const connectionSocket = new ConnectionSocket(WEBSOCKET_URL);
@@ -48,6 +53,7 @@ const ClientController: React.FC = () => {
       dispatch(clearWebsocketInstance());
     };
   }, [dispatch]);
+
   return <BrowserComponent />;
 };
 
