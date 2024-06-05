@@ -1,22 +1,29 @@
 //* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect } from "react";
 import AuthProvider from "./components/providers/AuthProviders";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./pages/auth/Login.tsx";
 import ProfilePage from "./pages/personal/profile";
 import Socket from "./pages/chat/main";
 import { useDispatch } from "react-redux";
-import ConnectionSocket from "./utils/ConnectionSocket.ts";
+import { useEffect } from "react";
+import { addNotification } from "./state/connectionSlice.ts";
 
-import {
-  clearWebsocketInstance,
-  setupWebsocketInstance,
-} from "./state/connectionSlice.ts";
-
-import { fetchToken } from "./utils/login.ts";
-
-const BrowserComponent = () => {
+const ClientController = () => {
   const App = () => <Socket />;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const webSocketService = new Worker("./utils/webSocketWorker.ts");
+    webSocketService.onmessage = (e) => {
+      const { type, payload } = e.data;
+      if (type === "WEBSOCKET_MESSAGE") {
+        console.log("Received message from websocket: ", payload);
+        dispatch(
+          addNotification({ message: payload, hint: "new message receive" })
+        );
+      }
+    };
+  }, [dispatch]);
 
   const router = createBrowserRouter([
     {
@@ -34,27 +41,6 @@ const BrowserComponent = () => {
   ]);
 
   return <RouterProvider router={router}></RouterProvider>;
-};
-
-const WEBSOCKET_URL = `ws://localhost:8000/connection?token=${await fetchToken()}`;
-
-const ClientController: React.FC = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const setupWebsocket = async () => {
-      const connectionSocket = new ConnectionSocket(WEBSOCKET_URL);
-      dispatch(setupWebsocketInstance(connectionSocket));
-    };
-
-    setupWebsocket();
-
-    return () => {
-      dispatch(clearWebsocketInstance());
-    };
-  }, [dispatch]);
-
-  return <BrowserComponent />;
 };
 
 export default ClientController;

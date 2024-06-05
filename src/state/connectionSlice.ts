@@ -1,32 +1,28 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+// src/notificationSlice.js
+import { createSlice } from "@reduxjs/toolkit";
 
-import ConnectionSocket from "@/utils/ConnectionSocket";
-
-interface WebsocketState {
-  connectionSocket: ConnectionSocket | null;
+interface INotificationContent {
+  message: string;
+  hint: string;
 }
-const initialState: WebsocketState = {
-  connectionSocket: null,
+
+const initialState = {
+  notifications: [] as INotificationContent[],
 };
 
-const websocketSlice = createSlice({
-  name: "websocket",
-  initialState,
+export const notificationSlice = createSlice({
+  name: "notifications",
+  initialState: initialState,
   reducers: {
-    setupWebsocketInstance: (
-      state,
-      action: PayloadAction<ConnectionSocket>
-    ) => {
-      state.connectionSocket = action.payload;
+    addNotification: (state, action) => {
+      state.notifications = [...state.notifications, action.payload];
     },
-    clearWebsocketInstance: (state) => {
-      state.connectionSocket?.closeConnection();
-      state.connectionSocket = null;
+    clearNotifications: (state) => {
+      state.notifications = [];
     },
   },
 });
 
-export const { setupWebsocketInstance, clearWebsocketInstance } =
-  websocketSlice.actions;
-
-export default websocketSlice.reducer;
+export const { addNotification, clearNotifications } =
+  notificationSlice.actions;
+export default notificationSlice.reducer;

@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 //* eslint-disable @typescript-eslint/no-unused-vars */
+import { fetchToken } from "@/utils/login";
 import { useState, useCallback, useEffect } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
 // Constants
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb25ueTJmcmVzaCIsImV4cCI6MTcxNjc3OTQ2MH0.xjPg9Q0GnW_H1FQ09GV3iyOB4EZsYcu1TDkaNj3NIq8";
+const token = await fetchToken();
+
 const room_id = "245ec7c9-30a5-4e68-bdd4-36652b8c4037";
 const baseUrl = "ws://10.1.1.207:8000/message";
 
@@ -79,12 +81,6 @@ const ConnectionStatus = ({
 }: {
   connectionStatus: string;
 }) => <span>The WebSocket is currently {connectionStatus}</span>;
-
-const LastMessage = ({
-  lastMessage,
-}: {
-  lastMessage: MessageEvent<any> | null;
-}) => <span>Last message: {lastMessage?.data || "None"}</span>;
 
 const MessageHistory = ({
   messageHistory,

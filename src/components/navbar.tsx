@@ -51,10 +51,6 @@ export default function NavBar() {
     <div className="w-3 h-3 rounded-full bg-yellow-500 inline-block mr-2"></div>
   );
 
-  const OfflineDot = () => (
-    <div className="w-3 h-3 rounded-full bg-gray-500 inline-block mr-2"></div>
-  );
-
   return (
     <>
       <div
@@ -74,7 +70,7 @@ export default function NavBar() {
             <DropdownMenu aria-label="Static Actions">
               <DropdownSection showDivider>
                 <DropdownItem
-                  onClick={(e) => navigate("/profile")}
+                  onClick={() => navigate("/profile")}
                   key="profile"
                 >
                   profile

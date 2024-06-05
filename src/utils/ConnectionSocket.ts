@@ -1,12 +1,17 @@
-export default class ConnectionSocket {
-  connectionSocket: WebSocket;
+import { fetchToken } from "./login";
 
-  constructor(url: string) {
-    this.connectionSocket = new WebSocket(url);
+class ConnectionSocket {
+  connectionSocket: WebSocket;
+  WEBSOCKET_URL = `ws://localhost:8000/connection?token=${async () =>
+    await fetchToken()}`;
+
+  constructor() {
+    this.connectionSocket = new WebSocket(this.WEBSOCKET_URL);
 
     this.connectionSocket.onopen = () => {
       console.log("websocket connection opened");
     };
+
     this.connectionSocket.onmessage = (message) => {
       console.log("Received message:", message.data);
     };
@@ -35,3 +40,7 @@ export default class ConnectionSocket {
     this.connectionSocket.close();
   }
 }
+
+const webSocketService = new ConnectionSocket();
+
+export default webSocketService;

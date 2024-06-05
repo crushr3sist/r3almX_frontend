@@ -11,7 +11,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const loginUser = (data: loginRequest) => {
+  const loginUser = (data: { username: string; password: string }) => {
     axios
       .post(
         "http://10.1.1.207:8000/auth/token",
