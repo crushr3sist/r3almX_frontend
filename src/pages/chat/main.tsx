@@ -1,20 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 //* eslint-disable @typescript-eslint/no-unused-vars */
 import { fetchToken } from "@/utils/login";
+import { Button, Card, CardBody, Divider, Input } from "@nextui-org/react";
 import { useState, useCallback, useEffect } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import { CardHeader } from "@nextui-org/card";
 
 // Constants
 const token = await fetchToken();
 
 const room_id = "245ec7c9-30a5-4e68-bdd4-36652b8c4037";
 const baseUrl = "ws://10.1.1.207:8000/message";
+// need to fetch room ids
 
 // Components
 const Socket = () => {
   const [message, setMessage] = useState("");
   const [socketUrl] = useState(`${baseUrl}/${room_id}?token=${token}`);
-  const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
+  const [messageHistory, setMessageHistory] = useState<MessageEvent<string>[]>(
+    []
+  );
+  const [messageErr, flagMessageErr] = useState(false);
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
 
   useEffect(() => {
@@ -37,16 +43,25 @@ const Socket = () => {
   }[readyState];
 
   return (
-    <div className="flex flex-col items-start">
-      <ConnectionStatus connectionStatus={connectionStatus} />
-      <MessageHistory messageHistory={messageHistory} />
-      <div className="flex flex-row ">
-        <MessageInput message={message} setMessage={setMessage} />
-        <SendMessageButton
-          handleClickSendMessage={handleClickSendMessage}
-          readyState={readyState}
-        />
-      </div>
+    <div className="flex flex-col items-start w-1/2 h-1/2">
+      <Card>
+        <CardHeader>
+          Room-
+          <ConnectionStatus connectionStatus={connectionStatus} />
+        </CardHeader>
+        <Divider />
+
+        <CardBody>
+          <MessageHistory messageHistory={messageHistory} />
+          <div className="flex flex-row">
+            <MessageInput message={message} setMessage={setMessage} />
+            <SendMessageButton
+              handleClickSendMessage={handleClickSendMessage}
+              readyState={readyState}
+            />
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 };
@@ -58,7 +73,16 @@ const MessageInput = ({
   message: string;
   setMessage: (value: string) => void;
 }) => (
-  <input onChange={(text) => setMessage(text.target.value)} value={message} />
+  <Input
+    onChange={(text) => {
+      if (text.target.value !== null || text.target.value === "") {
+        setMessage(text.target.value);
+      } else {
+        flagMessageErr(true);
+      }
+    }}
+    value={message}
+  />
 );
 
 const SendMessageButton = ({
@@ -68,12 +92,12 @@ const SendMessageButton = ({
   handleClickSendMessage: () => void;
   readyState: ReadyState;
 }) => (
-  <button
+  <Button
     onClick={handleClickSendMessage}
     disabled={readyState !== ReadyState.OPEN}
   >
-    Click Me to send 'Hello'
-  </button>
+    send
+  </Button>
 );
 
 const ConnectionStatus = ({
@@ -85,7 +109,7 @@ const ConnectionStatus = ({
 const MessageHistory = ({
   messageHistory,
 }: {
-  messageHistory: MessageEvent<any>[];
+  messageHistory: MessageEvent[];
 }) => (
   <ul>
     {messageHistory.map((message, idx) => (
