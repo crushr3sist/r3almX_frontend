@@ -5,9 +5,15 @@ interface IUserState {
   userStatus: _status;
   notifications: number;
 }
+interface IRoomsJoined{
+  room_id: string,
+  room_name: string, 
+  notifications: number,
+}
 
 const initialState = {
   userState: <IUserState>{},
+  roomsJoined: <IRoomsJoined>{},
 };
 
 export const UserState = createSlice({
