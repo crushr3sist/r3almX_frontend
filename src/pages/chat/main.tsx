@@ -1,34 +1,40 @@
 import { fetchToken } from "@/utils/login";
 import { Button, Card, CardBody, Divider, Input } from "@nextui-org/react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { CardHeader } from "@nextui-org/card";
 import { useParams } from "react-router-dom";
 
 // Constants
 const token = await fetchToken();
-interface IMessages {
-  message: string;
-  username: string;
-}
 
 const Socket = () => {
   const { room_id } = useParams();
   const baseUrl = "ws://10.1.1.207:8000/message";
-
+  const didUnmount = useRef(false);
   const [message, setMessage] = useState("");
   const [messageHistory, setMessageHistory] = useState<MessageEvent<string>[]>(
     []
   );
   const [messageErr, flagMessageErr] = useState(false);
   const { sendMessage, lastMessage, readyState } = useWebSocket(
-    `${baseUrl}/${room_id}?token=${token}`
+    `${baseUrl}/${room_id}?token=${token}`,
+    {
+      shouldReconnect: () => {
+        return didUnmount.current === false;
+      },
+      reconnectAttempts: 10,
+      reconnectInterval: 3000,
+    }
   );
 
   useEffect(() => {
     if (lastMessage !== null) {
       setMessageHistory((prev) => prev.concat(lastMessage));
     }
+    return () => {
+      didUnmount.current = true;
+    };
   }, [lastMessage]);
 
   const handleSendMessage = useCallback(() => {
@@ -59,8 +65,17 @@ const Socket = () => {
           <ul>
             {messageHistory.map((msg, idx) => (
               <li key={idx}>
-                <>{msg?.data || null}</>
-                {/* <>Message:{JSON.parse(msg.data).message}</> */}
+                {/* <>{msg?.data || null}</> */}
+                <div className="flex flex-col mb-2 ml-2">
+                  <span>
+                    <text className="font-bold">
+                      {JSON.parse(msg.data).username}
+                    </text>
+                    <text className="pr-1 pl-1">@</text>
+                    <text>{JSON.parse(msg.data).time_stamp}</text>
+                  </span>
+                  <text>{JSON.parse(msg.data).message}</text>
+                </div>
               </li>
             ))}
           </ul>
@@ -77,7 +92,6 @@ const Socket = () => {
               }}
               value={message}
               placeholder="Enter your message"
-              status={messageErr ? "error" : "default"}
             />
             <Button
               onClick={handleSendMessage}

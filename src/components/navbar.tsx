@@ -16,10 +16,6 @@ export default function NavBar() {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const userStatus = useSelector(
-    (state: RootState) => state.userState.userState.userStatus
-  );
-
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined
   );
@@ -49,13 +45,14 @@ export default function NavBar() {
     };
   }, []);
 
-  const StatusDot = ({ status }) => {
-    const colorMap = {
-      online: "bg-green-500",
-      dnd: "bg-red-500",
-      idle: "bg-yellow-500",
-      offline: "bg-gray-500",
-    };
+  const colorMap = {
+    online: "bg-green-500",
+    dnd: "bg-red-500",
+    idle: "bg-yellow-500",
+    offline: "bg-gray-500",
+  };
+
+  const StatusDot = ({ status }: { status: keyof typeof colorMap }) => {
     return (
       <div
         className={`w-3 h-3 rounded-full ${colorMap[status]} inline-block mr-2`}

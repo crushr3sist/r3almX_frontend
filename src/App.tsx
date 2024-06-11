@@ -1,6 +1,6 @@
 // App.tsx or ClientController.tsx
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import AuthProvider from "./components/providers/AuthProviders";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./pages/auth/Login";
@@ -9,7 +9,7 @@ import Socket from "./pages/chat/main";
 import { useDispatch } from "react-redux";
 import { addNotification } from "./state/connectionSlice";
 import { fetchRooms } from "./utils/roomService";
-import { IRoom, setRooms } from "./state/userSlice";
+import { incrementRoomNotification, IRoom, setRooms } from "./state/userSlice";
 import { fetchToken } from "./utils/login";
 
 const ClientController = () => {
@@ -35,9 +35,16 @@ const ClientController = () => {
         const { type, payload } = e.data;
 
         if (type === "WEBSOCKET_MESSAGE") {
+          // Assume payload has room_id and the message data
+          const { room_id, data } = payload.message;
+
+          // Dispatch a notification for the specific room
+          dispatch(incrementRoomNotification(room_id));
+
+          // Optionally, handle a general notification
           dispatch(
             addNotification({
-              message: payload,
+              message: data,
               hint: "new message received",
             })
           );
