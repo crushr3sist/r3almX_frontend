@@ -41,6 +41,4 @@ class ConnectionSocket {
   }
 }
 
-const webSocketService = new ConnectionSocket();
-
-export default webSocketService;
+export default ConnectionSocket;
