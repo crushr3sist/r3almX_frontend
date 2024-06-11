@@ -18,39 +18,38 @@ const ClientController = () => {
   useEffect(() => {
     const initializeData = async () => {
       const token = await fetchToken();
-
-      // Fetch and set rooms
       const rooms = await fetchRooms();
       dispatch(setRooms(rooms as unknown as IRoom[]));
+      let webSocketService: Worker;
 
-      // Initialize WebSocket
-      const WEBSOCKET_URL = `ws://localhost:8000/connection?token=${token}`;
-      const webSocketService = new Worker(
-        new URL("utils/webSocketWorker.js", import.meta.url)
-      );
+      try {
+        const WEBSOCKET_URL = `ws://localhost:8000/connection?token=${token}`;
+        webSocketService = new Worker(
+          new URL("utils/webSocketWorker.js", import.meta.url)
+        );
 
-      webSocketService.postMessage({ type: "connect", url: WEBSOCKET_URL });
+        webSocketService.postMessage({ type: "connect", url: WEBSOCKET_URL });
 
-      webSocketService.onmessage = (e) => {
-        const { type, payload } = e.data;
+        webSocketService.onmessage = (e) => {
+          const { type, payload } = e.data;
 
-        if (type === "WEBSOCKET_MESSAGE") {
-          // Assume payload has room_id and the message data
-          const { room_id, data } = payload.message;
+          if (type === "WEBSOCKET_MESSAGE") {
+            console.log(payload.message);
+            const { room_id, data } = payload.message;
 
-          // Dispatch a notification for the specific room
-          dispatch(incrementRoomNotification(room_id));
+            dispatch(incrementRoomNotification(room_id));
 
-          // Optionally, handle a general notification
-          dispatch(
-            addNotification({
-              message: data,
-              hint: "new message received",
-            })
-          );
-        }
-      };
-
+            dispatch(
+              addNotification({
+                message: data,
+                hint: "new message received",
+              })
+            );
+          }
+        };
+      } catch (e) {
+        console.log(e);
+      }
       return () => {
         webSocketService.terminate();
       };

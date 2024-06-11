@@ -63,9 +63,8 @@ const Socket = () => {
         <Divider />
         <CardBody>
           <ul>
-            {messageHistory.map((msg, idx) => (
-              <li key={idx}>
-                {/* <>{msg?.data || null}</> */}
+            {messageHistory.map((msg) => (
+              <li key={JSON.parse(msg.data).mid}>
                 <div className="flex flex-col mb-2 ml-2">
                   <span>
                     <text className="font-bold">

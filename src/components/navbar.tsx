@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Avatar, AvatarGroup } from "@nextui-org/react";
+import { Avatar, AvatarGroup, Badge } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import {
   Dropdown,
@@ -18,6 +18,9 @@ export default function NavBar() {
 
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined
+  );
+  const status = useSelector(
+    (state: RootState) => state.userState.userState.userStatus
   );
 
   useEffect(() => {
@@ -45,20 +48,36 @@ export default function NavBar() {
     };
   }, []);
 
-  const colorMap = {
+  const _colorMap = {
     online: "bg-green-500",
     dnd: "bg-red-500",
     idle: "bg-yellow-500",
     offline: "bg-gray-500",
   };
+  type badge_type =
+    | "success"
+    | "danger"
+    | "warning"
+    | "default"
+    | "primary"
+    | "secondary"
+    | undefined;
 
-  const StatusDot = ({ status }: { status: keyof typeof colorMap }) => {
+  const colorMap = {
+    online: "success",
+    dnd: "danger",
+    idle: "warning",
+    offline: "default",
+  };
+
+  const StatusDot = ({ status }: { status: keyof typeof _colorMap }) => {
     return (
       <div
-        className={`w-3 h-3 rounded-full ${colorMap[status]} inline-block mr-2`}
+        className={`w-3 h-3 rounded-full ${_colorMap[status]} inline-block mr-2`}
       ></div>
     );
   };
+  console.log("status is ", colorMap[status] as badge_type);
 
   return (
     <>
@@ -72,10 +91,12 @@ export default function NavBar() {
           {/* Dropdown for Profile and Status */}
           <Dropdown>
             <DropdownTrigger>
-              <Avatar
-                className="transition-transform duration-300 hover:-translate-y-1 shadow-lg"
-                src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-              />
+              <Badge content="0" color={colorMap[status].toString()}>
+                <Avatar
+                  className="transition-transform duration-300 hover:-translate-y-1 shadow-lg"
+                  src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+                />
+              </Badge>
             </DropdownTrigger>
             <DropdownMenu aria-label="User Actions">
               <DropdownSection showDivider>

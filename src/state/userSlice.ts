@@ -1,11 +1,13 @@
 // src/state/userSlice.ts
 
+import { fetchToken } from "@/utils/login";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
 
-type _status = "online" | "idle" | "dnd" | "offline";
+type TSstatus = "online" | "idle" | "dnd" | "offline";
 
 export interface IUserState {
-  userStatus: _status;
+  userStatus: TSstatus;
   notifications: number;
 }
 
@@ -15,7 +17,7 @@ export interface IRoom {
   members: string[];
   room_owner: string;
   invite_key: string;
-  notifications: number; // Ensure this is part of the room interface
+  notifications: number;
 }
 
 export interface IUserStateSlice {
@@ -23,9 +25,29 @@ export interface IUserStateSlice {
   roomsJoined: IRoom[];
 }
 
+const statusFetcher = async (): Promise<string | "offline" | undefined> => {
+  try {
+    const token = await fetchToken();
+    if (!token) {
+      return "offline";
+    }
+    const response = await axios.get(
+      `http://10.1.1.207:8000/status?token=${token}`
+    );
+
+    return Object.values(response.data)[0] as string;
+  } catch (e) {
+    console.log(e);
+  }
+
+  return undefined;
+};
+
+const __status = await statusFetcher();
+
 const initialState: IUserStateSlice = {
   userState: {
-    userStatus: "idle", // default status
+    userStatus: __status as TSstatus | "offline",
     notifications: 0,
   },
   roomsJoined: [],
@@ -35,7 +57,7 @@ export const UserState = createSlice({
   name: "userState",
   initialState,
   reducers: {
-    changeStatus: (state, action: PayloadAction<_status>) => {
+    changeStatus: (state, action: PayloadAction<TSstatus>) => {
       state.userState.userStatus = action.payload;
     },
     incrementNotification: (state) => {
