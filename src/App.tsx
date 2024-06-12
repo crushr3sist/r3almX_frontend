@@ -38,10 +38,10 @@ const ClientController = () => {
 
         webSocketService.postMessage({ type: "connect", url: WEBSOCKET_URL });
         // Fetch the initial status and update the Redux state
-        const status = await statusFetcher();
-        dispatch(setStatus(status as TSstatus));
-        webSocketService.onmessage = (e) => {
+        webSocketService.onmessage = async (e) => {
           const { type, payload } = e.data;
+          const status = await statusFetcher();
+          dispatch(setStatus(status as TSstatus));
 
           if (type === "WEBSOCKET_MESSAGE") {
             console.log(payload.message);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../navbar";
+import { NavbarProvider } from "./NavbarContext";
 
 const AuthProvider = ({ ProtectedPage }: any) => {
   const navigate = useNavigate();
@@ -23,8 +24,10 @@ const AuthProvider = ({ ProtectedPage }: any) => {
   if (canRender) {
     return (
       <div>
-        <NavBar />
-        {ProtectedPage}
+        <NavbarProvider>
+          {ProtectedPage}
+          <NavBar />
+        </NavbarProvider>
       </div>
     );
   } else {

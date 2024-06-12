@@ -6,13 +6,16 @@ import { Provider } from "react-redux";
 import { NextUIProvider } from "@nextui-org/react";
 import store from "./state/store.ts";
 import ClientController from "./App.tsx";
+import { NavbarProvider } from "./components/providers/NavbarContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
       <NextUIProvider>
         <main className="dark text-foreground bg-background h-screen w-screen">
-          <ClientController />
+          <NavbarProvider>
+            <ClientController />
+          </NavbarProvider>
         </main>
       </NextUIProvider>
     </Provider>
