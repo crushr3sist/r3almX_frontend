@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { fetchToken } from "@/utils/login";
 import {
   Avatar,
@@ -7,7 +7,6 @@ import {
   CardBody,
   Divider,
   Input,
-  ScrollShadow,
 } from "@nextui-org/react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { CardHeader } from "@nextui-org/card";
@@ -17,6 +16,7 @@ import { RootState } from "@/state/store";
 import { decrementRoomNotification } from "@/state/userSlice";
 import { useNavbarContext } from "@/components/providers/NavbarContext";
 import { BsEmojiSmile, BsPaperclip, BsChevronRight } from "react-icons/bs";
+import EmojiPicker from "emoji-picker-react";
 
 const token = await fetchToken();
 
@@ -99,7 +99,7 @@ const Socket = () => {
         isNavbarOpen ? "pb-28" : "pb-20"
       } flex flex-col bg-black text-sepia relative`}
     >
-      <div className="flex w-full h-full">
+      <div className="flex w-full h-full p-5">
         <Card
           className={`flex flex-col h-full ${
             isSidebarOpen ? "w-3/4" : "w-full"
@@ -168,6 +168,7 @@ const Socket = () => {
                 endContent={
                   <BsEmojiSmile
                     size={20}
+                    onClick={() => <EmojiPicker />}
                     className="cursor-pointer text-sepia hover:text-sepia/80 transition-colors duration-200"
                   />
                 }
