@@ -1,10 +1,9 @@
-// src/state/userSlice.ts
-
 import { fetchToken } from "@/utils/login";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-type TSstatus = "online" | "idle" | "dnd" | "offline";
+// Define status type
+export type TSstatus = "online" | "idle" | "dnd" | "offline";
 
 export interface IUserState {
   userStatus: TSstatus;
@@ -25,29 +24,32 @@ export interface IUserStateSlice {
   roomsJoined: IRoom[];
 }
 
-const statusFetcher = async (): Promise<string | "offline" | undefined> => {
+export const statusFetcher = async (): Promise<string | "offline"> => {
   try {
     const token = await fetchToken();
+
     if (!token) {
       return "offline";
     }
+
     const response = await axios.get(
       `http://10.1.1.207:8000/status?token=${token}`
     );
 
-    return Object.values(response.data)[0] as string;
-  } catch (e) {
-    console.log(e);
-  }
+    const data = response.data;
+    const status = Object.values(data)[0] as string;
 
-  return undefined;
+    return status || "offline";
+  } catch (e) {
+    console.error("Error fetching status:", e);
+    return "offline";
+  }
 };
 
-const __status = await statusFetcher();
-
+// Initialize the state with an optimistic default
 const initialState: IUserStateSlice = {
   userState: {
-    userStatus: __status as TSstatus | "offline",
+    userStatus: "offline",
     notifications: 0,
   },
   roomsJoined: [],
@@ -58,6 +60,9 @@ export const UserState = createSlice({
   initialState,
   reducers: {
     changeStatus: (state, action: PayloadAction<TSstatus>) => {
+      state.userState.userStatus = action.payload;
+    },
+    setStatus: (state, action: PayloadAction<TSstatus>) => {
       state.userState.userStatus = action.payload;
     },
     incrementNotification: (state) => {
@@ -86,7 +91,6 @@ export const UserState = createSlice({
         (room) => room.id === newRoom.id
       );
       if (!roomExists) {
-        // Ensure notifications are initialized to 0
         state.roomsJoined.push({ ...newRoom, notifications: 0 });
       }
     },
@@ -97,7 +101,6 @@ export const UserState = createSlice({
       );
     },
     setRooms: (state, action: PayloadAction<IRoom[]>) => {
-      // Initialize notifications to 0 for each room
       state.roomsJoined = action.payload.map((room) => ({
         ...room,
         notifications: room.notifications || 0,
@@ -108,6 +111,7 @@ export const UserState = createSlice({
 
 export const {
   changeStatus,
+  setStatus,
   incrementNotification,
   decrementNotification,
   addRoom,

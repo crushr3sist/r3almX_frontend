@@ -9,8 +9,15 @@ import Socket from "./pages/chat/main";
 import { useDispatch } from "react-redux";
 import { addNotification } from "./state/connectionSlice";
 import { fetchRooms } from "./utils/roomService";
-import { incrementRoomNotification, IRoom, setRooms } from "./state/userSlice";
+import {
+  incrementRoomNotification,
+  IRoom,
+  setRooms,
+  setStatus,
+  TSstatus,
+} from "./state/userSlice";
 import { fetchToken } from "./utils/login";
+import { statusFetcher } from "./state/userSlice"; // Import statusFetcher here
 
 const ClientController = () => {
   const dispatch = useDispatch();
@@ -20,6 +27,7 @@ const ClientController = () => {
       const token = await fetchToken();
       const rooms = await fetchRooms();
       dispatch(setRooms(rooms as unknown as IRoom[]));
+
       let webSocketService: Worker;
 
       try {
@@ -29,7 +37,9 @@ const ClientController = () => {
         );
 
         webSocketService.postMessage({ type: "connect", url: WEBSOCKET_URL });
-
+        // Fetch the initial status and update the Redux state
+        const status = await statusFetcher();
+        dispatch(setStatus(status as TSstatus));
         webSocketService.onmessage = (e) => {
           const { type, payload } = e.data;
 
