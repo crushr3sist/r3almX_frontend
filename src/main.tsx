@@ -6,7 +6,7 @@ import { Provider } from "react-redux";
 import { NextUIProvider } from "@nextui-org/react";
 import store from "./state/store.ts";
 import ClientController from "./App.tsx";
-import { NavbarProvider } from "./components/providers/NavbarContext.tsx";
+import { NavbarProvider } from "./providers/NavbarContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

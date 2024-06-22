@@ -1,32 +1,39 @@
-// App.tsx or ClientController.tsx
+// ClientController.tsx
 
 import { useEffect } from "react";
-import AuthProvider from "./components/providers/AuthProviders";
+import { useDispatch, useSelector } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import AuthProvider from "@/providers/AuthProviders";
+import LoggedOutUserProvider from "./providers/NonAuthProvider";
 import LoginPage from "./pages/auth/Login";
 import ProfilePage from "./pages/personal/profile";
 import Socket from "./pages/chat/main";
-import { useDispatch } from "react-redux";
-import { addNotification } from "./state/connectionSlice";
-import { fetchRooms } from "./utils/roomService";
 import {
-  incrementRoomNotification,
-  IRoom,
+  tokenChecked,
   setRooms,
   setStatus,
+  incrementRoomNotification,
+  isAuthenticated,
   TSstatus,
 } from "./state/userSlice";
+import addNotification from "./state/connectionSlice";
 import { fetchToken } from "./utils/login";
+import { fetchRooms, IRoomFetch } from "./utils/roomService";
 import { statusFetcher } from "./state/userSlice"; // Import statusFetcher here
+import axios from "axios";
+import { RootState } from "./state/store";
 
 const ClientController = () => {
   const dispatch = useDispatch();
+  const isTokenChecked = useSelector(
+    (state: RootState) => state.userState.userState.tokenChecked
+  );
 
   useEffect(() => {
     const initializeData = async () => {
       const token = await fetchToken();
       const rooms = await fetchRooms();
-      dispatch(setRooms(rooms as unknown as IRoom[]));
+      dispatch(setRooms(rooms as unknown as IRoomFetch[]));
 
       let webSocketService: Worker;
 
@@ -37,6 +44,7 @@ const ClientController = () => {
         );
 
         webSocketService.postMessage({ type: "connect", url: WEBSOCKET_URL });
+
         // Fetch the initial status and update the Redux state
         webSocketService.onmessage = async (e) => {
           const { type, payload } = e.data;
@@ -44,11 +52,8 @@ const ClientController = () => {
           dispatch(setStatus(status as TSstatus));
 
           if (type === "WEBSOCKET_MESSAGE") {
-            console.log(payload.message);
             const { room_id, data } = payload.message;
-
             dispatch(incrementRoomNotification(room_id));
-
             dispatch(
               addNotification({
                 message: data,
@@ -58,15 +63,42 @@ const ClientController = () => {
           }
         };
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
+
       return () => {
         webSocketService.terminate();
       };
     };
 
-    initializeData();
-  }, [dispatch]);
+    const checkToken = async () => {
+      const token = await fetchToken();
+      try {
+        const response = await axios.get(
+          `http://10.1.1.207:8000/auth/token/check?token=${token}`
+        );
+        if (response.data.status === 401) {
+          dispatch(isAuthenticated(false));
+        } else {
+          dispatch(isAuthenticated(true));
+          await initializeData();
+        }
+        dispatch(tokenChecked(true));
+      } catch (error) {
+        console.error("Error checking token:", error);
+        dispatch(isAuthenticated(false));
+        dispatch(tokenChecked(true));
+      }
+    };
+
+    if (!isTokenChecked) {
+      checkToken();
+    }
+  }, [dispatch, isTokenChecked]);
+
+  if (!isTokenChecked) {
+    return <div>Loading...</div>; // Render a loading state while checking the token
+  }
 
   const router = createBrowserRouter([
     {
@@ -78,12 +110,16 @@ const ClientController = () => {
       element: <AuthProvider ProtectedPage={<ProfilePage />} />,
     },
     {
+      path: "/",
+      element: <AuthProvider ProtectedPage={<ProfilePage />} />,
+    },
+    {
       path: "/auth/login",
-      element: <LoginPage />,
+      element: <LoggedOutUserProvider Children={<LoginPage />} />,
     },
   ]);
 
-  return <RouterProvider router={router}></RouterProvider>;
+  return <RouterProvider router={router} />;
 };
 
 export default ClientController;

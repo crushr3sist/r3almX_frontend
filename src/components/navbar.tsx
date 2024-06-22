@@ -10,7 +10,7 @@ import {
 } from "@nextui-org/dropdown";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "@/state/store";
-import { useNavbarContext } from "./providers/NavbarContext";
+import { useNavbarContext } from "../providers/NavbarContext";
 
 export default function NavBar() {
   const navigate = useNavigate();

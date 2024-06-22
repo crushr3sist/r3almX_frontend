@@ -1,0 +1,14 @@
+- top looks anxiety inducing and empty
+- spacing is too open
+- borders need more pronunciation
+- profile hover fluid timeframe animations
+- commandline on top of the page
+  - message @ moey : "hello"
+  - jump @ gaming
+  - call @ moey
+  - voice_message @ moey
+  - invite @ moey
+  - impliment autocomplete
+- ai
+  - learn user personal behavior using gpt
+  - map contexts such as "go to moey" -> goes to moey chat or just "moey" and enters moey dms

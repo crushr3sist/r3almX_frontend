@@ -1,15 +1,27 @@
-import { fetchToken } from "@/utils/login";
+// userSlice.ts
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import { fetchToken } from "@/utils/login";
+import { IRoomFetch } from "@/utils/roomService";
 
-// Define status type
 export type TSstatus = "online" | "idle" | "dnd" | "offline";
 
 export interface IUserState {
   userStatus: TSstatus;
+  tokenChecked: boolean;
+  isAuthenticated: boolean;
   notifications: number;
 }
 
+// Define the Channel interface
+export interface IChannel {
+  id: string;
+  channel_name: string;
+  time_created: string;
+  channel_description: string;
+  author: string;
+}
 export interface IRoom {
   id: string;
   room_name: string;
@@ -21,41 +33,37 @@ export interface IRoom {
 
 export interface IUserStateSlice {
   userState: IUserState;
-  roomsJoined: IRoom[];
+  roomsJoined: IRoomFetch[];
 }
 
 export const statusFetcher = async (): Promise<string | "offline"> => {
   try {
     const token = await fetchToken();
-
     if (!token) {
       return "offline";
     }
-
     const response = await axios.get(
       `http://10.1.1.207:8000/status?token=${token}`
     );
-
-    const data = response.data;
-    const status = Object.values(data)[0] as string;
-
-    return status || "offline";
-  } catch (e) {
-    console.error("Error fetching status:", e);
+    const status = response.data?.status || "offline";
+    return status;
+  } catch (error) {
+    console.error("Error fetching status:", error);
     return "offline";
   }
 };
 
-// Initialize the state with an optimistic default
 const initialState: IUserStateSlice = {
   userState: {
     userStatus: "offline",
+    tokenChecked: false,
+    isAuthenticated: false,
     notifications: 0,
   },
   roomsJoined: [],
 };
 
-export const UserState = createSlice({
+const userSlice = createSlice({
   name: "userState",
   initialState,
   reducers: {
@@ -64,6 +72,12 @@ export const UserState = createSlice({
     },
     setStatus: (state, action: PayloadAction<TSstatus>) => {
       state.userState.userStatus = action.payload;
+    },
+    tokenChecked: (state, action: PayloadAction<boolean>) => {
+      state.userState.tokenChecked = action.payload;
+    },
+    isAuthenticated: (state, action: PayloadAction<boolean>) => {
+      state.userState.isAuthenticated = action.payload;
     },
     incrementNotification: (state) => {
       state.userState.notifications++;
@@ -85,7 +99,7 @@ export const UserState = createSlice({
         room.notifications = 0;
       }
     },
-    addRoom: (state, action: PayloadAction<IRoom>) => {
+    addRoom: (state, action: PayloadAction<IRoomFetch>) => {
       const newRoom = action.payload;
       const roomExists = state.roomsJoined.some(
         (room) => room.id === newRoom.id
@@ -100,7 +114,7 @@ export const UserState = createSlice({
         (room) => room.id !== roomIdToRemove
       );
     },
-    setRooms: (state, action: PayloadAction<IRoom[]>) => {
+    setRooms: (state, action: PayloadAction<IRoomFetch[]>) => {
       state.roomsJoined = action.payload.map((room) => ({
         ...room,
         notifications: room.notifications || 0,
@@ -112,6 +126,8 @@ export const UserState = createSlice({
 export const {
   changeStatus,
   setStatus,
+  tokenChecked,
+  isAuthenticated,
   incrementNotification,
   decrementNotification,
   addRoom,
@@ -119,6 +135,6 @@ export const {
   setRooms,
   incrementRoomNotification,
   decrementRoomNotification,
-} = UserState.actions;
+} = userSlice.actions;
 
-export default UserState.reducer;
+export default userSlice.reducer;

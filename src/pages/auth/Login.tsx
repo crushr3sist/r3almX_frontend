@@ -5,11 +5,14 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setToken, setTokenExpire, expTime } from "@/utils/login";
+import { useDispatch } from "react-redux";
+import { isAuthenticated, tokenChecked } from "@/state/userSlice";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const loginUser = (data: { username: string; password: string }) => {
     axios
@@ -25,6 +28,10 @@ function LoginPage() {
           (async () => {
             await setToken(e.data.access_token);
             await setTokenExpire(expTime().toString());
+            console.log("tokens set");
+            dispatch(isAuthenticated(true));
+            dispatch(tokenChecked(true));
+            console.log("states set");
           })();
           navigate("/");
         }

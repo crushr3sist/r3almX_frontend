@@ -14,7 +14,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/state/store";
 import { decrementRoomNotification } from "@/state/userSlice";
-import { useNavbarContext } from "@/components/providers/NavbarContext";
+import { useNavbarContext } from "@/providers/NavbarContext";
 import { BsEmojiSmile, BsPaperclip, BsChevronRight } from "react-icons/bs";
 import EmojiPicker from "emoji-picker-react";
 
@@ -168,7 +168,7 @@ const Socket = () => {
                 endContent={
                   <BsEmojiSmile
                     size={20}
-                    onClick={() => <EmojiPicker />}
+                    onClick={() => <EmojiPicker open={true} />}
                     className="cursor-pointer text-sepia hover:text-sepia/80 transition-colors duration-200"
                   />
                 }
