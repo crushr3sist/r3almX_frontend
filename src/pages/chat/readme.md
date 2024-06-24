@@ -1,0 +1,4 @@
+- need to make sure page is refreshed upon channel change
+- need to populate chat using redis cache
+- need to minimize connections and fetches made
+-

@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarGroup, Badge } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import {
@@ -11,10 +11,15 @@ import {
 import { useNavigate } from "react-router-dom";
 import { RootState } from "@/state/store";
 import { useNavbarContext } from "../providers/NavbarContext";
+import { clearRoomNotifications } from "@/state/connectionSlice";
 
 export default function NavBar() {
   const navigate = useNavigate();
   const { isNavbarOpen } = useNavbarContext();
+  const dispatch = useDispatch();
+  const notifications = useSelector(
+    (state: RootState) => state.webSocket.notifications
+  );
 
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined
@@ -22,6 +27,10 @@ export default function NavBar() {
   const status = useSelector(
     (state: RootState) => state.userState.userState.userStatus
   );
+  const handleRoomNavigation = (roomId: string) => {
+    dispatch(clearRoomNotifications(roomId));
+    navigate(`/room/${roomId}`);
+  };
 
   const _colorMap = {
     online: "bg-green-500",
@@ -121,19 +130,26 @@ export default function NavBar() {
           />
         </AvatarGroup>
 
-        <div className="flex flex-col ml-6">
-          {roomsJoined.map((room) => (
-            <div
-              key={room.id}
-              className="flex items-center gap-2 p-2 rounded-md bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg transition-all duration-300 cursor-pointer"
-              onClick={() => navigate(`/room/${room.id}`)}
-            >
-              <div className="font-semibold">{room.room_name}</div>
-              {room.notifications > 0 && (
-                <div className="text-sm text-red-500">{room.notifications}</div>
-              )}
-            </div>
-          ))}
+        <div className="flex flex-row ml-6">
+          {roomsJoined.map((room) => {
+            const roomNotifications = notifications.filter(
+              (n) => n.roomId === room.id
+            ).length;
+            return (
+              <div
+                key={room.id as string} // Add type assertion here
+                className="flex items-center gap-2 p-2 rounded-md bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={() => handleRoomNavigation(room.id.toString())}
+              >
+                <div className="font-semibold">{room.room_name}</div>
+                {roomNotifications > 0 && (
+                  <div className="text-sm text-red-500">
+                    {roomNotifications}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

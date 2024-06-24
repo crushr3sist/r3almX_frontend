@@ -11,7 +11,6 @@ onmessage = function (event) {
       });
     };
   }
-  console.log("Received message:", event.data);
   postMessage({ type: "WEBSOCKET_MESSAGE", payload: event.data });
 };
 

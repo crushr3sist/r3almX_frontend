@@ -1,24 +1,25 @@
-// AuthProvider.tsx
-
-import { useEffect, useState, ReactNode } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/state/store";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../components/navbar";
 import { NavbarProvider } from "./NavbarContext";
 
-const AuthProvider = ({
-  ProtectedPage,
-}: {
-  ProtectedPage: ReactNode;
-}): ReactNode => {
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.userState.userState.isAuthenticated
-  );
-  const [canRender, setCanRender] = useState(false);
+const AuthProvider = ({ ProtectedPage }: any) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [canRender, allowRender] = useState<boolean>(false);
 
   useEffect(() => {
-    setCanRender(isAuthenticated);
-  }, [isAuthenticated]);
+    const token = localStorage.getItem("token");
+    if (token === null) {
+      navigate("/auth/login");
+      allowRender(false);
+    } else if (location.pathname === "/" && token === null) {
+      navigate("/auth/login");
+      allowRender(false);
+    } else {
+      allowRender(true);
+    }
+  }, [location]);
 
   if (canRender) {
     return (
@@ -30,6 +31,7 @@ const AuthProvider = ({
       </div>
     );
   } else {
+    // You don't need to navigate here, just return null or any other component you want to render
     return null;
   }
 };

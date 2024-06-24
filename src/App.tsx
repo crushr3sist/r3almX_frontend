@@ -9,31 +9,26 @@ import LoginPage from "./pages/auth/Login";
 import ProfilePage from "./pages/personal/profile";
 import Socket from "./pages/chat/main";
 import {
-  tokenChecked,
   setRooms,
   setStatus,
   incrementRoomNotification,
-  isAuthenticated,
   TSstatus,
+  IRoom,
 } from "./state/userSlice";
-import addNotification from "./state/connectionSlice";
+import { addNotification } from "./state/connectionSlice";
+
 import { fetchToken } from "./utils/login";
-import { fetchRooms, IRoomFetch } from "./utils/roomService";
+import { fetchRooms } from "./utils/roomService";
 import { statusFetcher } from "./state/userSlice"; // Import statusFetcher here
-import axios from "axios";
-import { RootState } from "./state/store";
 
 const ClientController = () => {
   const dispatch = useDispatch();
-  const isTokenChecked = useSelector(
-    (state: RootState) => state.userState.userState.tokenChecked
-  );
 
   useEffect(() => {
     const initializeData = async () => {
       const token = await fetchToken();
       const rooms = await fetchRooms();
-      dispatch(setRooms(rooms as unknown as IRoomFetch[]));
+      dispatch(setRooms(rooms as unknown as IRoom[]));
 
       let webSocketService: Worker;
 
@@ -49,17 +44,25 @@ const ClientController = () => {
         webSocketService.onmessage = async (e) => {
           const { type, payload } = e.data;
           const status = await statusFetcher();
-          dispatch(setStatus(status as TSstatus));
-
           if (type === "WEBSOCKET_MESSAGE") {
-            const { room_id, data } = payload.message;
-            dispatch(incrementRoomNotification(room_id));
-            dispatch(
-              addNotification({
-                message: data,
-                hint: "new message received",
-              })
-            );
+            dispatch(setStatus(status as TSstatus));
+
+            if (payload.message) {
+              const { room_id, channel_id, mid } = payload.message;
+              const sender = payload.sender;
+
+              dispatch(incrementRoomNotification(room_id));
+
+              dispatch(
+                addNotification({
+                  message: `New message in room ${room_id}, channel ${channel_id}`,
+                  hint: `From sender: ${sender}`,
+                  roomId: room_id,
+                  channelId: channel_id,
+                  messageId: mid,
+                })
+              );
+            }
           }
         };
       } catch (e) {
@@ -70,35 +73,8 @@ const ClientController = () => {
         webSocketService.terminate();
       };
     };
-
-    const checkToken = async () => {
-      const token = await fetchToken();
-      try {
-        const response = await axios.get(
-          `http://10.1.1.207:8000/auth/token/check?token=${token}`
-        );
-        if (response.data.status === 401) {
-          dispatch(isAuthenticated(false));
-        } else {
-          dispatch(isAuthenticated(true));
-          await initializeData();
-        }
-        dispatch(tokenChecked(true));
-      } catch (error) {
-        console.error("Error checking token:", error);
-        dispatch(isAuthenticated(false));
-        dispatch(tokenChecked(true));
-      }
-    };
-
-    if (!isTokenChecked) {
-      checkToken();
-    }
-  }, [dispatch, isTokenChecked]);
-
-  if (!isTokenChecked) {
-    return <div>Loading...</div>; // Render a loading state while checking the token
-  }
+    initializeData();
+  }, [dispatch]);
 
   const router = createBrowserRouter([
     {

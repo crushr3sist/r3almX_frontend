@@ -3,7 +3,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { fetchToken } from "@/utils/login";
-import { IRoomFetch } from "@/utils/roomService";
 
 export type TSstatus = "online" | "idle" | "dnd" | "offline";
 
@@ -33,24 +32,16 @@ export interface IRoom {
 
 export interface IUserStateSlice {
   userState: IUserState;
-  roomsJoined: IRoomFetch[];
+  roomsJoined: IRoom[];
 }
 
 export const statusFetcher = async (): Promise<string | "offline"> => {
-  try {
-    const token = await fetchToken();
-    if (!token) {
-      return "offline";
-    }
-    const response = await axios.get(
-      `http://10.1.1.207:8000/status?token=${token}`
-    );
-    const status = response.data?.status || "offline";
-    return status;
-  } catch (error) {
-    console.error("Error fetching status:", error);
-    return "offline";
-  }
+  const token = await fetchToken();
+  const response = await axios.get(
+    `http://10.1.1.207:8000/status?token=${token}`
+  );
+  const status = response.data[Object.keys(response.data)[0]];
+  return status;
 };
 
 const initialState: IUserStateSlice = {
@@ -73,12 +64,7 @@ const userSlice = createSlice({
     setStatus: (state, action: PayloadAction<TSstatus>) => {
       state.userState.userStatus = action.payload;
     },
-    tokenChecked: (state, action: PayloadAction<boolean>) => {
-      state.userState.tokenChecked = action.payload;
-    },
-    isAuthenticated: (state, action: PayloadAction<boolean>) => {
-      state.userState.isAuthenticated = action.payload;
-    },
+
     incrementNotification: (state) => {
       state.userState.notifications++;
     },
@@ -99,7 +85,7 @@ const userSlice = createSlice({
         room.notifications = 0;
       }
     },
-    addRoom: (state, action: PayloadAction<IRoomFetch>) => {
+    addRoom: (state, action: PayloadAction<IRoom>) => {
       const newRoom = action.payload;
       const roomExists = state.roomsJoined.some(
         (room) => room.id === newRoom.id
@@ -108,17 +94,25 @@ const userSlice = createSlice({
         state.roomsJoined.push({ ...newRoom, notifications: 0 });
       }
     },
+
     removeRoom: (state, action: PayloadAction<string>) => {
       const roomIdToRemove = action.payload;
       state.roomsJoined = state.roomsJoined.filter(
         (room) => room.id !== roomIdToRemove
       );
     },
-    setRooms: (state, action: PayloadAction<IRoomFetch[]>) => {
-      state.roomsJoined = action.payload.map((room) => ({
-        ...room,
-        notifications: room.notifications || 0,
-      }));
+    setRooms: (state, action: PayloadAction<IRoom[]>) => {
+      console.log("the payload", action.payload);
+      if (action.payload && typeof action.payload === "object") {
+        console.log("its detecting an object");
+        state.roomsJoined = [...action.payload.rooms];
+        state.roomsJoined.map((obj) => {
+          obj.notifications = 0;
+        });
+      } else {
+        console.error("Invalid payload for setRooms action:", action.payload);
+        state.roomsJoined = [];
+      }
     },
   },
 });
@@ -126,8 +120,6 @@ const userSlice = createSlice({
 export const {
   changeStatus,
   setStatus,
-  tokenChecked,
-  isAuthenticated,
   incrementNotification,
   decrementNotification,
   addRoom,

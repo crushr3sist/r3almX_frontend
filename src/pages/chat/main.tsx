@@ -17,16 +17,9 @@ import { decrementRoomNotification } from "@/state/userSlice";
 import { useNavbarContext } from "@/providers/NavbarContext";
 import { BsEmojiSmile, BsPaperclip, BsChevronRight } from "react-icons/bs";
 import EmojiPicker from "emoji-picker-react";
+import axios from "axios";
 
 const token = await fetchToken();
-
-const mockMembers = [
-  { id: 1, name: "Alice" },
-  { id: 2, name: "Bob" },
-  { id: 3, name: "Charlie" },
-  { id: 4, name: "Diana" },
-  { id: 5, name: "Eve" },
-];
 
 const Socket = () => {
   const { room_id } = useParams();
@@ -34,16 +27,24 @@ const Socket = () => {
   const didUnmount = useRef(false);
   const [message, setMessage] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [channelId, setChannelId] = useState("");
+  const [channels, setChannels] = useState<any>(null);
   const dispatch = useDispatch();
   const [messageHistory, setMessageHistory] = useState<MessageEvent<string>[]>(
     []
   );
+
   const roomsJoined = useSelector(
+    (state: RootState) => state.userState.roomsJoined
+  );
+
+  const roomsChannels = useSelector(
     (state: RootState) => state.userState.roomsJoined
   );
   const roomName = roomsJoined.find((room) => room.id === room_id)?.room_name;
   const [messageErr, flagMessageErr] = useState(false);
-  const { sendMessage, lastMessage, readyState } = useWebSocket(
+
+  const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
     `${baseUrl}/${room_id}?token=${token}`,
     {
       shouldReconnect: () => !didUnmount.current,
@@ -55,6 +56,38 @@ const Socket = () => {
   const { isNavbarOpen } = useNavbarContext();
 
   const scrollRef = useRef<HTMLUListElement>(null);
+  const fetchChannels = async (roomId: string) => {
+    try {
+      const response = await axios.get(
+        `http://10.1.1.207:8000/channel/fetch?room_id=${roomId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setChannels(response.data.channels);
+    } catch (error) {
+      console.error("Error fetching channels:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (room_id) {
+      setChannels(null); // Clear existing channels
+      fetchChannels(room_id);
+    }
+
+    return () => {
+      setChannels(null); // Clear channels on unmount
+    };
+  }, [room_id]);
+
+  useEffect(() => {
+    if (room_id) {
+      fetchChannels(room_id);
+    }
+  }, []);
 
   useEffect(() => {
     if (lastMessage !== null) {
@@ -70,7 +103,6 @@ const Socket = () => {
   }, [dispatch, room_id]);
 
   useEffect(() => {
-    // Scroll to the bottom when messageHistory changes
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
@@ -78,12 +110,16 @@ const Socket = () => {
 
   const handleSendMessage = useCallback(() => {
     if (message.trim()) {
-      sendMessage(message);
+      sendJsonMessage({
+        message: message,
+        room_id: room_id,
+        channel_id: channelId,
+      });
       setMessage("");
     } else {
       flagMessageErr(true);
     }
-  }, [message, sendMessage]);
+  }, [message, sendJsonMessage]);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
@@ -212,18 +248,23 @@ const Socket = () => {
             />
           </div>
           <ul className="flex-1 overflow-y-auto space-y-2 p-4 pr-2 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50">
-            {mockMembers.map((member) => (
-              <li
-                key={member.id}
-                className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200"
-              >
-                <Avatar
-                  src={`https://i.pravatar.cc/50?u=${member.id}`}
-                  className="mr-2"
-                />
-                <span className="text-sm font-semibold">{member.name}</span>
-              </li>
-            ))}
+            {channels &&
+              channels.map((channel) => (
+                <li
+                  key={channel.id}
+                  className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
+                  onClick={() => setChannelId(channel.id)}
+                >
+                  <div className="w-full">
+                    <div className="font-semibold text-sm">
+                      {channel.channel_name}
+                    </div>
+                    <div className="text-xs text-gray-400 truncate">
+                      {channel.channel_description}
+                    </div>
+                  </div>
+                </li>
+              ))}
           </ul>
         </div>
       </div>

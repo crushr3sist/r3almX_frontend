@@ -1,32 +1,33 @@
-// LoggedOutUserProvider.tsx
-
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { RootState } from "@/state/store";
+import NavBar from "../components/navbar";
 
-const LoggedOutUserProvider = ({ Children }: { Children: React.ReactNode }) => {
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.userState.userState.isAuthenticated
-  );
+const LoggedOutUserProvider = ({ Children }: any) => {
   const navigate = useNavigate();
-  const [authenticated, setAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token || isAuthenticated) {
-      setAuthenticated(true);
+    console.log(token);
+    if (token) {
+      setIsAuthenticated(true);
       navigate("/");
-    } else {
-      setAuthenticated(false);
+    } else if (token === null) {
+      setIsAuthenticated(false);
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
-  if (!authenticated) {
-    return <>{Children}</>;
+  if (!isAuthenticated) {
+    return (
+      <>
+        <NavBar />
+        {Children}
+      </>
+    );
   } else {
-    navigate("/auth/login");
-    return null;
+    {
+      navigate("/auth/login");
+    }
   }
 };
 
