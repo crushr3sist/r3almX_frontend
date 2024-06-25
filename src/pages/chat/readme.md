@@ -1,4 +1,6 @@
 - need to make sure page is refreshed upon channel change
 - need to populate chat using redis cache
 - need to minimize connections and fetches made
--
+- need to store username and email into the state as well
+- or atleast write a fetcher in the backend.
+- send username into the websocket message and receive username as well

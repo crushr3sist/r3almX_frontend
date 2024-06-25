@@ -1,5 +1,3 @@
-// userSlice.ts
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { fetchToken } from "@/utils/login";
@@ -28,21 +26,23 @@ export interface IRoom {
   room_owner: string;
   invite_key: string;
   notifications: number;
+  last_channel_visited: string;
 }
 
-export interface IUserStateSlice {
-  userState: IUserState;
+interface ISetLastRoomVisitedPayload {
+  roomId: string;
+  channelId: string;
+}
+
+interface IUserStateSlice {
+  userState: {
+    userStatus: "online" | "idle" | "dnd" | "offline";
+    tokenChecked: boolean;
+    isAuthenticated: boolean;
+    notifications: number;
+  };
   roomsJoined: IRoom[];
 }
-
-export const statusFetcher = async (): Promise<string | "offline"> => {
-  const token = await fetchToken();
-  const response = await axios.get(
-    `http://10.1.1.207:8000/status?token=${token}`
-  );
-  const status = response.data[Object.keys(response.data)[0]];
-  return status;
-};
 
 const initialState: IUserStateSlice = {
   userState: {
@@ -52,6 +52,15 @@ const initialState: IUserStateSlice = {
     notifications: 0,
   },
   roomsJoined: [],
+};
+
+export const statusFetcher = async (): Promise<string | "offline"> => {
+  const token = await fetchToken();
+  const response = await axios.get(
+    `http://10.1.1.207:8000/status?token=${token}`
+  );
+  const status = response.data[Object.keys(response.data)[0]];
+  return status;
 };
 
 const userSlice = createSlice({
@@ -70,6 +79,18 @@ const userSlice = createSlice({
     },
     decrementNotification: (state) => {
       state.userState.notifications = 0;
+    },
+    setLastRoomVisited: (
+      state,
+      action: PayloadAction<ISetLastRoomVisitedPayload>
+    ) => {
+      const { roomId, channelId } = action.payload;
+      const room = state.roomsJoined.find((room) => room.id === roomId);
+      if (room) {
+        room.last_channel_visited = channelId;
+      } else {
+        console.error("Room not found for the given roomId:", roomId);
+      }
     },
     incrementRoomNotification: (state, action: PayloadAction<string>) => {
       const roomId = action.payload;
@@ -101,17 +122,22 @@ const userSlice = createSlice({
         (room) => room.id !== roomIdToRemove
       );
     },
-    setRooms: (state, action: PayloadAction<IRoom[]>) => {
-      console.log("the payload", action.payload);
-      if (action.payload && typeof action.payload === "object") {
-        console.log("its detecting an object");
-        state.roomsJoined = [...action.payload.rooms];
-        state.roomsJoined.map((obj) => {
-          obj.notifications = 0;
-        });
+
+    setRooms: (state, action: PayloadAction<{ rooms: IRoom[] }>) => {
+      const { rooms } = action.payload;
+
+      if (Array.isArray(rooms)) {
+        state.roomsJoined = rooms.map((room) => ({
+          ...room,
+          notifications: 0,
+          last_channel_visited: "",
+        }));
       } else {
-        console.error("Invalid payload for setRooms action:", action.payload);
-        state.roomsJoined = [];
+        console.error(
+          "Expected an array for setRooms payload.rooms, but got:",
+          rooms
+        );
+        state.roomsJoined = []; // Or handle it in an appropriate way
       }
     },
   },
@@ -123,6 +149,7 @@ export const {
   incrementNotification,
   decrementNotification,
   addRoom,
+  setLastRoomVisited,
   removeRoom,
   setRooms,
   incrementRoomNotification,
