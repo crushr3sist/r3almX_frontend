@@ -1,7 +1,7 @@
 // ClientController.tsx
 
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthProvider from "@/providers/AuthProviders";
 import LoggedOutUserProvider from "./providers/NonAuthProvider";
