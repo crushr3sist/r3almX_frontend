@@ -20,6 +20,7 @@ import { addNotification } from "./state/connectionSlice";
 import { fetchToken } from "./utils/login";
 import { fetchRooms } from "./utils/roomService";
 import { statusFetcher } from "./state/userSlice"; // Import statusFetcher here
+import HomePage from "./pages/personal/home";
 
 const ClientController = () => {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ const ClientController = () => {
     const initializeData = async () => {
       const token = await fetchToken();
       const rooms = await fetchRooms();
-      dispatch(setRooms(rooms as unknown as IRoom[]));
+      dispatch(setRooms(rooms as IRoom[]));
 
       let webSocketService: Worker;
 
@@ -87,7 +88,7 @@ const ClientController = () => {
     },
     {
       path: "/",
-      element: <AuthProvider ProtectedPage={<ProfilePage />} />,
+      element: <AuthProvider ProtectedPage={<HomePage />} />,
     },
     {
       path: "/auth/login",

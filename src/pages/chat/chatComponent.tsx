@@ -10,8 +10,33 @@ import {
   Input,
 } from "@nextui-org/react";
 import EmojiPicker from "emoji-picker-react";
+import {
+  Key,
+  ReactElement,
+  JSXElementConstructor,
+  ReactNode,
+  ReactPortal,
+} from "react";
 import { BsPaperclip, BsEmojiSmile, BsChevronRight } from "react-icons/bs";
 import { ReadyState } from "react-use-websocket";
+
+interface ICHatProps {
+  isNavbarOpen: any;
+  isSidebarOpen: any;
+  connectionStatus: any;
+  roomName: any;
+  scrollRef: any;
+  messageHistory: any;
+  setMessage: any;
+  flagMessageErr: any;
+  message: any;
+  handleSendMessage: any;
+  readyState: any;
+  messageErr: any;
+  setIsSidebarOpen: any;
+  channels: any;
+  handleClick: any;
+}
 
 const ChatComponent = ({
   isNavbarOpen,
@@ -29,7 +54,7 @@ const ChatComponent = ({
   setIsSidebarOpen,
   channels,
   handleClick,
-}) => {
+}: ICHatProps) => {
   return (
     <div
       className={`w-screen h-screen transition-padding duration-300 ${
@@ -58,7 +83,7 @@ const ChatComponent = ({
               ref={scrollRef}
               className="flex-1 overflow-y-auto space-y-4 pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50"
             >
-              {messageHistory.map((msg) => {
+              {messageHistory.map((msg: { data: string }) => {
                 const messageData = JSON.parse(msg.data);
 
                 return (
@@ -170,22 +195,44 @@ const ChatComponent = ({
           </div>
           <ul className="flex-1 overflow-y-auto space-y-2 p-4 pr-2 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50">
             {channels &&
-              channels.map((channel) => (
-                <li
-                  key={channel.id}
-                  className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
-                  onClick={() => handleClick(channel.id)}
-                >
-                  <div className="w-full">
-                    <div className="font-semibold text-sm">
-                      {channel.channel_name}
+              channels.map(
+                (channel: {
+                  id: Key | null | undefined;
+                  channel_name:
+                    | string
+                    | number
+                    | boolean
+                    | ReactElement<any, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | ReactPortal
+                    | null
+                    | undefined;
+                  channel_description:
+                    | string
+                    | number
+                    | boolean
+                    | ReactElement<any, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | ReactPortal
+                    | null
+                    | undefined;
+                }) => (
+                  <li
+                    key={channel.id}
+                    className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
+                    onClick={() => handleClick(channel.id)}
+                  >
+                    <div className="w-full">
+                      <div className="font-semibold text-sm">
+                        {channel.channel_name}
+                      </div>
+                      <div className="text-xs text-gray-400 truncate">
+                        {channel.channel_description}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-400 truncate">
-                      {channel.channel_description}
-                    </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                )
+              )}
           </ul>
         </div>
       </div>

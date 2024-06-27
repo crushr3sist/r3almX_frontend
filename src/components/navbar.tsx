@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, AvatarGroup, Badge } from "@nextui-org/react";
+import { Avatar, AvatarGroup, Badge, Button } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import {
   Dropdown,
@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "@/state/store";
 import { useNavbarContext } from "../providers/NavbarContext";
 import { clearRoomNotifications } from "@/state/connectionSlice";
+import { BsGear, BsHouseExclamation, BsOctagon } from "react-icons/bs";
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -31,7 +32,6 @@ export default function NavBar() {
     dispatch(clearRoomNotifications(roomId));
     navigate(`/room/${roomId}`);
   };
-
   const _colorMap = {
     online: "bg-green-500",
     dnd: "bg-red-500",
@@ -55,13 +55,12 @@ export default function NavBar() {
   return (
     <div
       id="drawer-trigger"
-      className={`fixed inset-x-0 bottom-0 h-20 flex justify-center items-center transition-transform duration-300 ${
-        isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"
-      }`}
+      className={`fixed inset-x-0 bottom-0 h-20 flex justify-center items-center transition-transform duration-300 
+      ${isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"}`}
     >
       <div
         id="drawer-trigger"
-        className="isolate flex gap-6 p-4 mx-4 w-full max-w-4xl rounded-t-lg backdrop-blur-md bg-black/70 border border-sepia/30 shadow-lg"
+        className="isolate flex justify-center items-center gap-6 p-4 mx-4 w-full max-w-4xl rounded-t-lg backdrop-blur-md bg-black/70 border border-sepia/30 shadow-lg"
       >
         <Dropdown>
           <DropdownTrigger>
@@ -79,7 +78,7 @@ export default function NavBar() {
               }
             >
               <Avatar
-                className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
+                className=" transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia "
                 src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
               />
             </Badge>
@@ -138,7 +137,7 @@ export default function NavBar() {
             return (
               <div
                 key={room.id as string} // Add type assertion here
-                className="flex items-center gap-2 p-2 rounded-md bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg transition-all duration-300 cursor-pointer"
+                className="flex flex-row  items-center gap-2 p-2 rounded-md bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg transition-all duration-300 cursor-pointer"
                 onClick={() => handleRoomNavigation(room.id.toString())}
               >
                 <div className="font-semibold">{room.room_name}</div>
@@ -150,6 +149,24 @@ export default function NavBar() {
               </div>
             );
           })}
+        </div>
+        <div className="flex justify-end ml-6">
+          <div className="flex justify-end gap-2 p-2 rounded-md items-center text-sepia bg-black/50 hover:bg-black/70 transition-all duration-300 cursor-pointer space-x-2">
+            <Button
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              <BsHouseExclamation size={20} />
+            </Button>
+            <Button
+              onClick={() => {
+                navigate("/settings");
+              }}
+            >
+              <BsGear size={20} />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

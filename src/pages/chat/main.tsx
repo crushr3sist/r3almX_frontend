@@ -23,7 +23,6 @@ const Socket = () => {
   const baseUrl = "ws://10.1.1.207:8000/message";
   const didUnmount = useRef(false);
   const dispatch = useDispatch();
-
   const [message, setMessage] = useState("");
   const { isNavbarOpen } = useNavbarContext();
   const [channels, setChannels] = useState<any>(null);
@@ -40,9 +39,7 @@ const Socket = () => {
     (room) => room.id === room_id
   )?.last_channel_visited;
   const roomName = roomsJoined.find((room) => room.id === room_id)?.room_name;
-
   const [channelId, setChannelId] = useState(lastVisitedChannel || "");
-
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
     `${baseUrl}/${room_id}?token=${token}`,
     {
@@ -72,7 +69,6 @@ const Socket = () => {
         console.error("Error fetching channels:", error);
       }
     };
-
     fetchChannels();
   }, [room_id, token]);
 
@@ -174,7 +170,6 @@ const Socket = () => {
               },
             }
           );
-
           const cachedMessages = response.data || [];
           const parsedMessages = cachedMessages.reverse().map((msg) => ({
             data: JSON.stringify(msg),
