@@ -14,6 +14,9 @@ import {
   incrementRoomNotification,
   TSstatus,
   IRoom,
+  userDataFetcher,
+  setUsername,
+  setEmail,
 } from "./state/userSlice";
 import { addNotification } from "./state/connectionSlice";
 
@@ -28,8 +31,15 @@ const ClientController = () => {
   useEffect(() => {
     const initializeData = async () => {
       const token = await fetchToken();
+
+      if (token) {
+        const user = await userDataFetcher();
+        dispatch(setUsername(user.username));
+        dispatch(setEmail(user.email));
+      }
+
       const rooms = await fetchRooms();
-      dispatch(setRooms(rooms as IRoom[]));
+      if (rooms[0] !== null) dispatch(setRooms(rooms as unknown as IRoom[]));
 
       let webSocketService: Worker;
 

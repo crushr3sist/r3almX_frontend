@@ -9,6 +9,7 @@ export interface IUserState {
   tokenChecked: boolean;
   isAuthenticated: boolean;
   notifications: number;
+  username: string;
 }
 
 // Define the Channel interface
@@ -40,18 +41,22 @@ interface IUserStateSlice {
     tokenChecked: boolean;
     isAuthenticated: boolean;
     notifications: number;
+    username: string;
+    email: string;
   };
   roomsJoined: IRoom[];
 }
-
-const initialState: IUserStateSlice = {
-  userState: {
-    userStatus: "offline",
-    tokenChecked: false,
-    isAuthenticated: false,
-    notifications: 0,
-  },
-  roomsJoined: [],
+export const userDataFetcher = async (): Promise<{
+  username: string;
+  email: string;
+}> => {
+  const token = await fetchToken();
+  const response = await axios.get(
+    `http://10.1.1.207:8000/auth/fetch?token=${token}`
+  );
+  const user = response.data.user;
+  console.log(user);
+  return user;
 };
 
 export const statusFetcher = async (): Promise<string | "offline"> => {
@@ -61,6 +66,18 @@ export const statusFetcher = async (): Promise<string | "offline"> => {
   );
   const status = response.data[Object.keys(response.data)[0]];
   return status;
+};
+
+const initialState: IUserStateSlice = {
+  userState: {
+    userStatus: "offline",
+    tokenChecked: false,
+    isAuthenticated: false,
+    notifications: 0,
+    username: "",
+    email: "",
+  },
+  roomsJoined: [],
 };
 
 const userSlice = createSlice({
@@ -79,6 +96,12 @@ const userSlice = createSlice({
     },
     decrementNotification: (state) => {
       state.userState.notifications = 0;
+    },
+    setUsername: (state, action) => {
+      state.userState.username = action.payload;
+    },
+    setEmail: (state, action) => {
+      state.userState.email = action.payload;
     },
     setLastRoomVisited: (
       state,
@@ -137,7 +160,7 @@ const userSlice = createSlice({
           "Expected an array for setRooms payload.rooms, but got:",
           rooms
         );
-        state.roomsJoined = []; // Or handle it in an appropriate way
+        state.roomsJoined = [];
       }
     },
   },
@@ -152,6 +175,8 @@ export const {
   setLastRoomVisited,
   removeRoom,
   setRooms,
+  setUsername,
+  setEmail,
   incrementRoomNotification,
   decrementRoomNotification,
 } = userSlice.actions;

@@ -1,67 +1,10 @@
 import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Divider,
-  Link,
-  Image,
-} from "@nextui-org/react";
-import { LoremIpsum, Avatar } from "react-lorem-ipsum";
+import { Card, CardHeader, CardBody, Divider } from "@nextui-org/react";
 
 import { useNavbarContext } from "@/providers/NavbarContext";
-import { useDispatch, useSelector } from "react-redux";
+import RoomsRender from "./RoomsRender";
+import { useSelector } from "react-redux";
 import { RootState } from "@/state/store";
-import { clearRoomNotifications } from "@/state/connectionSlice";
-import { useNavigate } from "react-router-dom";
-const handleRoomNavigation = (roomId: string) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  dispatch(clearRoomNotifications(roomId));
-  navigate(`/room/${roomId}`);
-};
-const RoomsRender: React.FC = () => {
-  const roomsJoined = useSelector(
-    (state: RootState) => state.userState.roomsJoined
-  );
-
-  return (
-    <>
-      {roomsJoined.map((room) => {
-        return (
-          <Card
-            key={room.id as string} // Add type assertion here
-            className={`
-              border 
-              border-sepia 
-              rounded-lg 
-              shadow-lg 
-              m-1 
-              bg-black/50 
-              hover:bg-black/70 
-              text-sepia 
-              hover:shadow-lg  
-              cursor-pointer
-              h-full
-              w-60
-              `}
-            onClick={() => handleRoomNavigation(room.id.toString())}
-          >
-            <CardHeader className="font-semibold justify-center">
-              {room.room_name}
-            </CardHeader>
-            <CardBody>
-              <p>
-                Lorem ipsum odor amet, consectetuer adipiscing elit. Ac purus in
-                massa egestas mollis varius; dignissim elementum.
-              </p>
-            </CardBody>
-          </Card>
-        );
-      })}
-    </>
-  );
-};
 
 const NewsRender: React.FC = () => {
   return (
@@ -82,6 +25,10 @@ const FeedRender: React.FC = () => {
 const HomePage: React.FC = () => {
   const { isNavbarOpen } = useNavbarContext();
 
+  const username = useSelector(
+    (state: RootState) => state.userState.userState.username
+  );
+
   return (
     <div
       className={`w-screen h-screen transition-padding duration-300 ${
@@ -90,8 +37,13 @@ const HomePage: React.FC = () => {
     >
       <div className="flex w-full h-full p-5">
         <Card className="h-full w-full rounded-lg shadow-lg bg-black/90 border border-sepia text-sepia backdrop-blur-md transition-width duration-300 ">
-          <CardHeader>
-            <p className="font-bold">R3almx</p> - Create your way
+          <CardHeader className=" w-full flex flex-row  items-center ">
+            <p className="w-full font-bold justify-items-start">
+              R3almx - Create your way
+            </p>
+            <p className="w-full font-bold justify-items-end">
+              Welcome Back - {username}
+            </p>
           </CardHeader>
           <Divider />
           <CardBody className="flex-1 flex flex-col overflow-hidden p-4 space-y-4">
@@ -103,7 +55,6 @@ const HomePage: React.FC = () => {
               </div>
             </div>
             <Divider />
-
             <div id="news">
               <h4>News:</h4>
               {/* Component that automatically loads news */}
