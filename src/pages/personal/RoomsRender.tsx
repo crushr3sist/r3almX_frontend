@@ -149,9 +149,8 @@ const RoomsRender: React.FC = () => {
     (state: RootState) => state.userState.roomsJoined
   );
 
-  // Callback function to update the rooms after creating a new room
   const handleRoomCreated = async (roomName: string) => {
-    await roomUpdater(dispatch); // Refresh rooms from the server
+    await roomUpdater(dispatch);
   };
 
   return (
@@ -179,14 +178,15 @@ const RoomsRender: React.FC = () => {
                 h-full
                 w-60
               `}
-              onClick={() =>
-                handleRoomNavigation(room.id.toString(), navigate, dispatch)
-              }
             >
               <CardHeader className="font-semibold justify-center">
                 {room.room_name}
               </CardHeader>
-              <CardBody>
+              <CardBody
+                onClick={() => {
+                  handleRoomNavigation(room.id.toString(), navigate, dispatch);
+                }}
+              >
                 <p>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ac
                   purus in massa egestas mollis varius; dignissim elementum.
@@ -194,7 +194,7 @@ const RoomsRender: React.FC = () => {
               </CardBody>
             </Card>
           ))}
-          <CreationBox onRoomCreated={handleRoomCreated} />{" "}
+          <CreationBox onRoomCreated={handleRoomCreated} />
           {/* Render CreationBox at the end */}
         </>
       )}

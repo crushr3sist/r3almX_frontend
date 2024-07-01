@@ -1,3 +1,5 @@
+import { RootState } from "@/state/store";
+import { fetchToken } from "@/utils/login";
 import {
   Card,
   CardHeader,
@@ -9,15 +11,32 @@ import {
   PopoverContent,
   Input,
 } from "@nextui-org/react";
+import {
+  Modal,
+  useDisclosure,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+} from "@nextui-org/react";
+import axios from "axios";
+
 import EmojiPicker from "emoji-picker-react";
+
 import {
   Key,
   ReactElement,
   JSXElementConstructor,
   ReactNode,
   ReactPortal,
+  useState,
 } from "react";
-import { BsPaperclip, BsEmojiSmile, BsChevronRight } from "react-icons/bs";
+import {
+  BsPaperclip,
+  BsEmojiSmile,
+  BsChevronRight,
+  BsPlusCircleDotted,
+} from "react-icons/bs";
+
 import { ReadyState } from "react-use-websocket";
 
 interface ICHatProps {
@@ -38,6 +57,8 @@ interface ICHatProps {
   handleClick: any;
 }
 
+const token = await fetchToken();
+
 const ChatComponent = ({
   isNavbarOpen,
   isSidebarOpen,
@@ -55,6 +76,8 @@ const ChatComponent = ({
   channels,
   handleClick,
 }: ICHatProps) => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   return (
     <div
       className={`w-screen h-screen transition-padding duration-300 ${
@@ -132,7 +155,7 @@ const ChatComponent = ({
                 className="p-2 bg-sepia text-black rounded-lg hover:bg-sepia/80 transition-all duration-200"
               >
                 <BsPaperclip size={20} />
-                <input type="file" className="absolute opacity-0" />
+                <Input type="file" className="absolute opacity-0" />
               </Button>
               <Input
                 onChange={(e) => {
@@ -171,7 +194,7 @@ const ChatComponent = ({
           </CardBody>
         </Card>
 
-        <button
+        <Button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className={`absolute right-0 top-0 mt-20 p-2 bg-sepia rounded-l-lg text-black hover:bg-sepia/80 transition-all duration-300 ${
             isSidebarOpen ? "mr-64" : ""
@@ -181,7 +204,7 @@ const ChatComponent = ({
             size={24}
             className={`${isSidebarOpen ? "" : "rotate-180"}`}
           />
-        </button>
+        </Button>
         <div
           className={`fixed top-0 right-0 h-full w-64 bg-black/90 text-sepia shadow-lg rounded-l-lg transition-transform duration-300 ${
             isSidebarOpen ? "translate-x-0" : "translate-x-full"
@@ -192,6 +215,31 @@ const ChatComponent = ({
               placeholder="Search members"
               className="w-full bg-black/70 text-sepia placeholder-gray-500 border-sepia focus:border-sepia focus:ring-0 rounded-lg"
             />
+            <Button
+              onPress={onOpen}
+              className="w-full bg-black/70 text-sepia placeholder-gray-500 border-sepia focus:border-sepia focus:ring-0 rounded-lg"
+            >
+              Add Channel <BsPlusCircleDotted size={20} />
+            </Button>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+              <ModalContent>
+                {(_onClose) => (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Modal Title
+                    </ModalHeader>
+                    <ModalBody>
+                      <div></div>
+                      <div className="pb-1">
+                        <h1>Add new room</h1>
+                        Create
+                        {/* </Button> */}
+                      </div>
+                    </ModalBody>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
           </div>
           <ul className="flex-1 overflow-y-auto space-y-2 p-4 pr-2 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50">
             {channels &&

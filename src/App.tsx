@@ -39,7 +39,10 @@ const ClientController = () => {
       }
 
       const rooms = await fetchRooms();
-      if (rooms[0] !== null) dispatch(setRooms(rooms as unknown as IRoom[]));
+
+      if (rooms[0] !== null) {
+        dispatch(setRooms(rooms as unknown as IRoom[]));
+      }
 
       let webSocketService: Worker;
 
