@@ -18,12 +18,7 @@ const LoggedOutUserProvider = ({ Children }: any) => {
   }, [navigate]);
 
   if (!isAuthenticated) {
-    return (
-      <>
-        <NavBar />
-        {Children}
-      </>
-    );
+    return <>{Children}</>;
   } else {
     {
       navigate("/auth/login");

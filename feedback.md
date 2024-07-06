@@ -1,4 +1,13 @@
+- alot of functionality isnt reactive
+
+  - login needs page refresh
+  - chat needs refresh to correctly render
+  - chat leaks into other channels
+  - channels need auto selection
+  -
+
 - top looks anxiety inducing and empty
+-
 - spacing is too open
 - borders need more pronunciation
 - profile hover fluid timeframe animations

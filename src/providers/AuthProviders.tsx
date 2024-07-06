@@ -5,13 +5,13 @@ import { NavbarProvider } from "./NavbarContext";
 import axios from "axios";
 
 const token = localStorage.getItem("token");
-const verifyToken = (token) => {
-  return axios.get(`http://10.1.1.207:8000/auth/token/check`, {
-    params: { token },
-  });
-};
+// const verifyToken = (token) => {
+//   return axios.get(`http://10.1.1.207:8000/auth/token/check`, {
+//     params: { token },
+//   });
+// };
 
-const userVerified = await verifyToken(token);
+// const userVerified = await verifyToken(token);
 
 const AuthProvider = ({ ProtectedPage }: any) => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const AuthProvider = ({ ProtectedPage }: any) => {
   const [canRender, allowRender] = useState<boolean>(false);
 
   useEffect(() => {
-    if (token === null) {
+    if (token === "") {
       console.log("user's token isnt true");
       navigate("/auth/login");
       allowRender(false);
@@ -28,10 +28,7 @@ const AuthProvider = ({ ProtectedPage }: any) => {
     //   navigate("/auth/login");
     //   allowRender(false);
     // }
-    else if (location.pathname === "/" && token === null) {
-      navigate("/auth/login");
-      allowRender(false);
-    } else {
+    else {
       allowRender(true);
     }
   }, [location]);

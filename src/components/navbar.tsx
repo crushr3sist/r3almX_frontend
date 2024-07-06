@@ -1,5 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, AvatarGroup, Badge, Button } from "@nextui-org/react";
+import {
+  Avatar,
+  AvatarGroup,
+  Badge,
+  Button,
+  useDisclosure,
+} from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import {
   Dropdown,
@@ -8,13 +14,23 @@ import {
   DropdownSection,
   DropdownItem,
 } from "@nextui-org/dropdown";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@nextui-org/modal";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "@/state/store";
 import { useNavbarContext } from "../providers/NavbarContext";
 import { clearRoomNotifications } from "@/state/connectionSlice";
-import { BsGear, BsHouseExclamation, BsOctagon } from "react-icons/bs";
+import { BsArrowBarRight, BsGear, BsHouseExclamation } from "react-icons/bs";
+import { logOff } from "./logOff";
 
 export default function NavBar() {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const navigate = useNavigate();
   const { isNavbarOpen } = useNavbarContext();
   const dispatch = useDispatch();
@@ -156,6 +172,7 @@ export default function NavBar() {
               onClick={() => {
                 navigate("/");
               }}
+              variant="bordered"
             >
               <BsHouseExclamation size={20} />
             </Button>
@@ -163,9 +180,37 @@ export default function NavBar() {
               onClick={() => {
                 navigate("/settings");
               }}
+              variant="bordered"
             >
               <BsGear size={20} />
             </Button>
+            <Button onPress={onOpen} onClick={() => {}} variant="bordered">
+              Log Out
+              <BsArrowBarRight size={20} />
+            </Button>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+              <ModalContent>
+                {(onClose) => (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      {
+                        // add logo with name
+                      }{" "}
+                      R3almx{" "}
+                    </ModalHeader>
+                    <ModalBody>Are you sure you want to Log Out</ModalBody>
+                    <ModalFooter>
+                      <Button color="danger" variant="light" onPress={logOff}>
+                        Log Out
+                      </Button>
+                      <Button color="primary" onPress={onClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
           </div>
         </div>
       </div>
