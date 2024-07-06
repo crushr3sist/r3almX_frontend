@@ -32,6 +32,9 @@ const Socket = () => {
   const [messageHistory, setMessageHistory] = useState<MessageEvent<string>[]>(
     []
   );
+  const [newChannelName, setNewChannelName] = useState("");
+  const [newChannelDescription, setNewChannelDescription] = useState("");
+
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined
   );
@@ -50,7 +53,6 @@ const Socket = () => {
   );
 
   const scrollRef = useRef<HTMLUListElement>(null);
-
   // Fetch channels when room_id changes
   useEffect(() => {
     const fetchChannels = async () => {
@@ -207,21 +209,26 @@ const Socket = () => {
 
   return (
     <ChatComponent
+      message={message}
+      roomName={roomName}
+      roomId={room_id}
+      channels={channels}
+      scrollRef={scrollRef}
+      readyState={readyState}
+      setMessage={setMessage}
+      messageErr={messageErr}
+      handleClick={handleClick}
       isNavbarOpen={isNavbarOpen}
       isSidebarOpen={isSidebarOpen}
-      connectionStatus={connectionStatus}
-      roomName={roomName}
-      scrollRef={scrollRef}
       messageHistory={messageHistory}
-      setMessage={setMessage}
       flagMessageErr={flagMessageErr}
-      message={message}
-      handleSendMessage={handleSendMessage}
-      readyState={readyState}
-      messageErr={messageErr}
+      connectionStatus={connectionStatus}
       setIsSidebarOpen={setIsSidebarOpen}
-      channels={channels}
-      handleClick={handleClick}
+      handleSendMessage={handleSendMessage}
+      setNewChannelName={setNewChannelName}
+      setNewChannelDescription={setNewChannelDescription}
+      newChannelName={newChannelName}
+      newChannelDescription={newChannelDescription}
     />
   );
 };

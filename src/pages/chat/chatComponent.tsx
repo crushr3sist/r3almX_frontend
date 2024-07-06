@@ -38,12 +38,14 @@ import {
 } from "react-icons/bs";
 
 import { ReadyState } from "react-use-websocket";
+import { createNewChannel } from "./fetchers";
 
 interface ICHatProps {
   isNavbarOpen: any;
   isSidebarOpen: any;
   connectionStatus: any;
   roomName: any;
+  roomId: any;
   scrollRef: any;
   messageHistory: any;
   setMessage: any;
@@ -55,6 +57,10 @@ interface ICHatProps {
   setIsSidebarOpen: any;
   channels: any;
   handleClick: any;
+  setNewChannelName: any;
+  setNewChannelDescription: any;
+  newChannelName: any;
+  newChannelDescription: any;
 }
 
 const token = await fetchToken();
@@ -64,6 +70,7 @@ const ChatComponent = ({
   isSidebarOpen,
   connectionStatus,
   roomName,
+  roomId,
   scrollRef,
   messageHistory,
   setMessage,
@@ -75,6 +82,10 @@ const ChatComponent = ({
   setIsSidebarOpen,
   channels,
   handleClick,
+  setNewChannelName,
+  setNewChannelDescription,
+  newChannelName,
+  newChannelDescription,
 }: ICHatProps) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -194,7 +205,7 @@ const ChatComponent = ({
           </CardBody>
         </Card>
 
-        <Button
+        <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className={`absolute right-0 top-0 mt-20 p-2 bg-sepia rounded-l-lg text-black hover:bg-sepia/80 transition-all duration-300 ${
             isSidebarOpen ? "mr-64" : ""
@@ -204,7 +215,7 @@ const ChatComponent = ({
             size={24}
             className={`${isSidebarOpen ? "" : "rotate-180"}`}
           />
-        </Button>
+        </button>
         <div
           className={`fixed top-0 right-0 h-full w-64 bg-black/90 text-sepia shadow-lg rounded-l-lg transition-transform duration-300 ${
             isSidebarOpen ? "translate-x-0" : "translate-x-full"
@@ -231,9 +242,32 @@ const ChatComponent = ({
                     <ModalBody>
                       <div></div>
                       <div className="pb-1">
-                        <h1>Add new room</h1>
-                        Create
-                        {/* </Button> */}
+                        <h1>Add channel</h1>
+                        <Input
+                          placeholder="Channel Name"
+                          onChange={(e) => setNewChannelName(e.target.value)}
+                        ></Input>
+                        <Input
+                          placeholder="Channel Description"
+                          onChange={(e) =>
+                            setNewChannelDescription(e.target.value)
+                          }
+                        ></Input>
+                        <Button
+                          onPress={() => {
+                            console.log(
+                              newChannelName,
+                              newChannelDescription,
+                              roomId
+                            );
+
+                            createNewChannel(
+                              newChannelName,
+                              newChannelDescription,
+                              roomId
+                            );
+                          }}
+                        ></Button>
                       </div>
                     </ModalBody>
                   </>
