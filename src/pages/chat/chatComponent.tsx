@@ -83,6 +83,7 @@ const ChatComponent = ({
   createNewChannel, // Accept the function as a prop
 }: ICHatProps) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const handleCreateChannel = (e) => {
     e.preventDefault();
     createNewChannel(newChannelName, newChannelDescription, roomId);
@@ -323,10 +324,14 @@ const ChatComponent = ({
                       aria-label="Merge options"
                       className="max-w-[300px]"
                     >
-                      <DropdownItem key="merge" description={""}>
+                      <DropdownItem key="edit" description={""}>
                         edit
                       </DropdownItem>
-                      <DropdownItem key="merge" description={""}>
+
+                      <DropdownItem
+                        key="delete"
+                        onPress={() => deleteChannel(channel.id, roomId)}
+                      >
                         delete
                       </DropdownItem>
                     </DropdownMenu>
