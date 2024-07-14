@@ -1,4 +1,5 @@
 import { fetchToken } from "@/utils/login";
+import routes from "@/utils/routes";
 import axios from "axios";
 
 const token = await fetchToken();
@@ -6,7 +7,7 @@ const token = await fetchToken();
 const fetchChannels = async (roomId: string, setChannels, token) => {
   try {
     const response = await axios.get(
-      `http://10.1.1.207:8000/channel/fetch?room_id=${roomId}`,
+      `${routes.channelFetch}?room_id=${roomId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -19,10 +20,14 @@ const fetchChannels = async (roomId: string, setChannels, token) => {
   }
 };
 
-const createNewChannel = async (channel_description, channel_name, room_id) => {
+const _createNewChannel = async (
+  channel_description,
+  channel_name,
+  room_id
+) => {
   try {
     const response = await axios.post(
-      `http://10.1.1.207:8000/channel/create?channel_description=${channel_description}&channel_name=${channel_name}&room_id=${room_id}`,
+      `${routes.channelCreate}?channel_description=${channel_description}&channel_name=${channel_name}&room_id=${room_id}`,
       null,
       {
         headers: {
@@ -63,4 +68,4 @@ const fetchChannelMessages = async (
   }
 };
 
-export { fetchChannels, fetchChannelMessages, createNewChannel };
+export { fetchChannels, fetchChannelMessages, _createNewChannel };

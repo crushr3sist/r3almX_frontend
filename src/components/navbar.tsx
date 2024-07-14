@@ -44,6 +44,7 @@ export default function NavBar() {
   const status = useSelector(
     (state: RootState) => state.userState.userState.userStatus
   );
+  const pfp = useSelector((state: RootState) => state.userState.userState.pic);
   const handleRoomNavigation = (roomId: string) => {
     dispatch(clearRoomNotifications(roomId));
     navigate(`/room/${roomId}`);
@@ -95,7 +96,7 @@ export default function NavBar() {
             >
               <Avatar
                 className=" transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia "
-                src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+                src={pfp}
               />
             </Badge>
           </DropdownTrigger>

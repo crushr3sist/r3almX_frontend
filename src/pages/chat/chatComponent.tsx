@@ -1,5 +1,5 @@
-import { RootState } from "@/state/store";
 import { fetchToken } from "@/utils/login";
+import routes from "@/utils/routes";
 import {
   Card,
   CardHeader,
@@ -10,6 +10,10 @@ import {
   Button,
   PopoverContent,
   Input,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
 } from "@nextui-org/react";
 import {
   Modal,
@@ -19,17 +23,8 @@ import {
   ModalBody,
 } from "@nextui-org/react";
 import axios from "axios";
-
 import EmojiPicker from "emoji-picker-react";
 
-import {
-  Key,
-  ReactElement,
-  JSXElementConstructor,
-  ReactNode,
-  ReactPortal,
-  useState,
-} from "react";
 import {
   BsPaperclip,
   BsEmojiSmile,
@@ -38,7 +33,7 @@ import {
 } from "react-icons/bs";
 
 import { ReadyState } from "react-use-websocket";
-import { createNewChannel } from "./fetchers";
+const token = await fetchToken();
 
 interface ICHatProps {
   isNavbarOpen: any;
@@ -61,9 +56,8 @@ interface ICHatProps {
   setNewChannelDescription: any;
   newChannelName: any;
   newChannelDescription: any;
+  createNewChannel; // Accept the function as a prop
 }
-
-const token = await fetchToken();
 
 const ChatComponent = ({
   isNavbarOpen,
@@ -86,9 +80,27 @@ const ChatComponent = ({
   setNewChannelDescription,
   newChannelName,
   newChannelDescription,
+  createNewChannel, // Accept the function as a prop
 }: ICHatProps) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const handleCreateChannel = (e) => {
+    e.preventDefault();
+    createNewChannel(newChannelName, newChannelDescription, roomId);
+    setNewChannelName("");
+    setNewChannelDescription("");
+  };
+  const editChannelName = (channelId, roomId) => {};
 
+  const deleteChannel = (channelId, roomId) => {
+    axios.delete(
+      `${routes.channelDelete}?channel_id=${channelId}&room_id=${roomId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  };
   return (
     <div
       className={`w-screen h-screen transition-padding duration-300 ${
@@ -117,12 +129,12 @@ const ChatComponent = ({
               ref={scrollRef}
               className="flex-1 overflow-y-auto space-y-4 pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50"
             >
-              {messageHistory.map((msg: { data: string }) => {
+              {messageHistory.map((msg) => {
                 const messageData = JSON.parse(msg.data);
 
                 return (
                   <li
-                    key={messageData.id}
+                    key={messageData.id || messageData.mid}
                     className="flex flex-col w-full space-y-1 animate-slideIn"
                     onContextMenu={() => {
                       console.log("right clicked", messageData.id);
@@ -179,6 +191,11 @@ const ChatComponent = ({
                   }
                 }}
                 value={message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSendMessage();
+                  }
+                }}
                 placeholder="Enter your message"
                 className="flex-1 bg-black/70 text-sepia placeholder-gray-500 border-sepia focus:border-sepia focus:ring-0 rounded-lg"
                 endContent={
@@ -240,34 +257,38 @@ const ChatComponent = ({
                       Modal Title
                     </ModalHeader>
                     <ModalBody>
-                      <div></div>
                       <div className="pb-1">
                         <h1>Add channel</h1>
-                        <Input
-                          placeholder="Channel Name"
-                          onChange={(e) => setNewChannelName(e.target.value)}
-                        ></Input>
-                        <Input
-                          placeholder="Channel Description"
-                          onChange={(e) =>
-                            setNewChannelDescription(e.target.value)
-                          }
-                        ></Input>
-                        <Button
-                          onPress={() => {
-                            console.log(
-                              newChannelName,
-                              newChannelDescription,
-                              roomId
-                            );
+                        <form onSubmit={handleCreateChannel}>
+                          <Input
+                            placeholder="Channel Name"
+                            onChange={(e) => setNewChannelName(e.target.value)}
+                            required
+                          ></Input>
+                          <Input
+                            placeholder="Channel Description"
+                            onChange={(e) =>
+                              setNewChannelDescription(e.target.value)
+                            }
+                            required
+                          ></Input>
+                          <Button
+                            type="submit"
+                            // onPress={() => {
+                            //   console.log(
+                            //     newChannelName,
+                            //     newChannelDescription,
+                            //     roomId
+                            //   );
 
-                            createNewChannel(
-                              newChannelName,
-                              newChannelDescription,
-                              roomId
-                            );
-                          }}
-                        ></Button>
+                            //   createNewChannel(
+                            //     newChannelName,
+                            //     newChannelDescription,
+                            //     roomId
+                            //   );
+                            // }}
+                          ></Button>
+                        </form>
                       </div>
                     </ModalBody>
                   </>
@@ -277,44 +298,42 @@ const ChatComponent = ({
           </div>
           <ul className="flex-1 overflow-y-auto space-y-2 p-4 pr-2 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50">
             {channels &&
-              channels.map(
-                (channel: {
-                  id: Key | null | undefined;
-                  channel_name:
-                    | string
-                    | number
-                    | boolean
-                    | ReactElement<any, string | JSXElementConstructor<any>>
-                    | Iterable<ReactNode>
-                    | ReactPortal
-                    | null
-                    | undefined;
-                  channel_description:
-                    | string
-                    | number
-                    | boolean
-                    | ReactElement<any, string | JSXElementConstructor<any>>
-                    | Iterable<ReactNode>
-                    | ReactPortal
-                    | null
-                    | undefined;
-                }) => (
-                  <li
-                    key={channel.id}
-                    className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
-                    onClick={() => handleClick(channel.id)}
-                  >
-                    <div className="w-full">
-                      <div className="font-semibold text-sm">
-                        {channel.channel_name}
-                      </div>
-                      <div className="text-xs text-gray-400 truncate">
-                        {channel.channel_description}
-                      </div>
+              channels.map((channel) => (
+                <li
+                  key={channel.id}
+                  className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
+                  onClick={() => {
+                    console.log(channel, channel.id);
+                    handleClick(channel.id);
+                  }}
+                >
+                  <div className="w-full">
+                    <div className="font-semibold text-sm">
+                      {channel.channel_name}
                     </div>
-                  </li>
-                )
-              )}
+                    <div className="text-xs text-gray-400 truncate">
+                      {channel.channel_description}
+                    </div>
+                  </div>
+                  <Dropdown placement="bottom-end">
+                    <DropdownTrigger>
+                      <Button isIconOnly>:</Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                      disallowEmptySelection
+                      aria-label="Merge options"
+                      className="max-w-[300px]"
+                    >
+                      <DropdownItem key="merge" description={""}>
+                        edit
+                      </DropdownItem>
+                      <DropdownItem key="merge" description={""}>
+                        delete
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </li>
+              ))}
           </ul>
         </div>
       </div>

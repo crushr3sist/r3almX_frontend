@@ -17,6 +17,7 @@ import {
   userDataFetcher,
   setUsername,
   setEmail,
+  setPic,
 } from "./state/userSlice";
 import { addNotification } from "./state/connectionSlice";
 
@@ -24,6 +25,7 @@ import { fetchToken } from "./utils/login";
 import { fetchRooms } from "./utils/roomService";
 import { statusFetcher } from "./state/userSlice"; // Import statusFetcher here
 import HomePage from "./pages/personal/home";
+import routes from "./utils/routes";
 
 const ClientController = () => {
   const dispatch = useDispatch();
@@ -36,18 +38,19 @@ const ClientController = () => {
         const user = await userDataFetcher();
         dispatch(setUsername(user.username));
         dispatch(setEmail(user.email));
+        dispatch(setPic(user.pic));
       }
 
       const rooms = await fetchRooms();
 
       if (rooms[0] !== null) {
-        dispatch(setRooms(rooms as unknown as IRoom[]));
+        dispatch(setRooms(rooms));
       }
 
       let webSocketService: Worker;
 
       try {
-        const WEBSOCKET_URL = `ws://localhost:8000/connection?token=${token}`;
+        const WEBSOCKET_URL = `${routes.connectionSocket}?token=${token}`;
         webSocketService = new Worker(
           new URL("utils/webSocketWorker.js", import.meta.url)
         );

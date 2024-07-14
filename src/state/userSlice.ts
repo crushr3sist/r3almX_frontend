@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { fetchToken } from "@/utils/login";
+import routes from "@/utils/routes";
 
 export type TSstatus = "online" | "idle" | "dnd" | "offline";
 
@@ -43,17 +44,17 @@ interface IUserStateSlice {
     notifications: number;
     username: string;
     email: string;
+    pic: string;
   };
   roomsJoined: IRoom[];
 }
 export const userDataFetcher = async (): Promise<{
   username: string;
   email: string;
+  pic: string;
 }> => {
   const token = await fetchToken();
-  const response = await axios.get(
-    `http://10.1.1.207:8000/auth/fetch?token=${token}`
-  );
+  const response = await axios.get(`${routes.userFetch}?token=${token}`);
   const user = response.data.user;
   console.log(user);
   return user;
@@ -61,9 +62,7 @@ export const userDataFetcher = async (): Promise<{
 
 export const statusFetcher = async (): Promise<string | "offline"> => {
   const token = await fetchToken();
-  const response = await axios.get(
-    `http://10.1.1.207:8000/status?token=${token}`
-  );
+  const response = await axios.get(`${routes.statusFetch}?token=${token}`);
   const status = response.data[Object.keys(response.data)[0]];
   return status;
 };
@@ -76,6 +75,7 @@ const initialState: IUserStateSlice = {
     notifications: 0,
     username: "",
     email: "",
+    pic: "",
   },
   roomsJoined: [],
 };
@@ -99,6 +99,9 @@ const userSlice = createSlice({
     },
     setUsername: (state, action) => {
       state.userState.username = action.payload;
+    },
+    setPic: (state, action) => {
+      state.userState.pic = action.payload;
     },
     setEmail: (state, action) => {
       state.userState.email = action.payload;
@@ -174,6 +177,7 @@ export const {
   addRoom,
   setLastRoomVisited,
   removeRoom,
+  setPic,
   setRooms,
   setUsername,
   setEmail,

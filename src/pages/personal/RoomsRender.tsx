@@ -20,6 +20,7 @@ import { fetchToken } from "@/utils/login";
 import axios from "axios";
 import { fetchRooms } from "@/utils/roomService";
 import { setRooms } from "@/state/userSlice";
+import routes from "@/utils/routes";
 
 // Fetch token as needed (ensure this function call is valid in your environment)
 const token = await fetchToken();
@@ -40,7 +41,7 @@ const roomUpdater = async (dispatch: any) => {
 const createRoomRequest = async (newRoomName: string, dispatch: any) => {
   try {
     const response = await axios.post(
-      `http://10.1.1.207:8000/rooms/create?room_name=${newRoomName}`,
+      `${routes.createRoom}?room_name=${newRoomName}`,
       null,
       {
         headers: {
@@ -124,7 +125,7 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
                         onClick={async () => {
                           await createRoomRequest(roomName, onRoomCreated);
                           onRoomCreated(roomName); // Callback to parent component
-                          onOpenChange(false); // Close the modal after creation
+                          onOpenChange(); // Close the modal after creation
                         }}
                       >
                         Create
