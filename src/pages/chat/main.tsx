@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { fetchToken } from "@/utils/login";
+
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/state/store";
+
 import {
   decrementRoomNotification,
   setLastRoomVisited,
@@ -14,18 +16,23 @@ import formatDateTime from "./timeFormatter";
 import ChatComponent from "./chatComponent";
 import { _createNewChannel } from "./fetchers";
 
-const Socket = async () => {
+const token = await fetchToken();
+
+const Socket = () => {
   const { room_id } = useParams();
+
   const baseUrl = "ws://10.1.1.170:8000/message";
   const didUnmount = useRef(false);
   const dispatch = useDispatch();
   const [message, setMessage] = useState("");
   const { isNavbarOpen } = useNavbarContext();
-  const [channels, setChannels] = useState([]);
+  const [channels, setChannels] = useState<any>(null);
   const [messageErr, flagMessageErr] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [initialCacheLoaded, setInitialCacheLoaded] = useState(false);
-  const [messageHistory, setMessageHistory] = useState([]);
+  const [messageHistory, setMessageHistory] = useState<MessageEvent<string>[]>(
+    []
+  );
   const [newChannelName, setNewChannelName] = useState("");
   const [newChannelDescription, setNewChannelDescription] = useState("");
 
@@ -38,7 +45,7 @@ const Socket = async () => {
   const roomName = roomsJoined.find((room) => room.id === room_id)?.room_name;
   const [channelId, setChannelId] = useState(lastVisitedChannel || "");
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
-    `${baseUrl}/${room_id}?token=${await fetchToken()}`,
+    `${baseUrl}/${room_id}?token=${token}`,
     {
       shouldReconnect: () => !didUnmount.current,
       reconnectAttempts: 10,
@@ -47,7 +54,7 @@ const Socket = async () => {
   );
 
   const scrollRef = useRef<HTMLUListElement>(null);
-
+  // Fetch channels when room_id changes
   useEffect(() => {
     const fetchChannels = async () => {
       if (!room_id) return;
@@ -56,7 +63,7 @@ const Socket = async () => {
           `http://10.1.1.170:8000/channel/fetch?room_id=${room_id}`,
           {
             headers: {
-              Authorization: `Bearer ${await fetchToken()}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -66,72 +73,77 @@ const Socket = async () => {
       }
     };
     fetchChannels();
-  }, [room_id]);
+  }, [room_id, token]);
 
+  // Fetch cached messages when channelId or room_id changes and initialCacheLoaded is false
   useEffect(() => {
     const fetchChannelMessagesIfNeeded = async () => {
       if (!channelId || !room_id || initialCacheLoaded) return;
+
       try {
         const response = await axios.get(
           `http://10.1.1.170:8000/message/channel/cache?room_id=${room_id}&channel_id=${channelId}`,
           {
             headers: {
-              Authorization: `Bearer ${await fetchToken()}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
+
         const cachedMessages = response.data || [];
         const parsedMessages = cachedMessages.reverse().map((msg) => ({
           data: JSON.stringify(msg),
         }));
+
         setMessageHistory(parsedMessages);
         setInitialCacheLoaded(true);
       } catch (error) {
         console.error("Error fetching cached messages:", error);
       }
     };
-    fetchChannelMessagesIfNeeded();
-  }, [room_id, channelId, initialCacheLoaded]);
 
+    fetchChannelMessagesIfNeeded();
+  }, [room_id, channelId, token, initialCacheLoaded]);
+
+  // Handle new incoming WebSocket messages
   useEffect(() => {
     if (lastMessage !== null && initialCacheLoaded) {
       const messageData = JSON.parse(lastMessage.data);
-      if (messageData.channel_id === channelId) {
-        const messageExists = messageHistory.some(
-          (msg) => JSON.parse(msg.data).mid === messageData.mid
-        );
-        if (!messageExists) {
-          setMessageHistory((prev) => [...prev, lastMessage]);
-          dispatch(decrementRoomNotification(room_id));
-        }
+      const messageExists = messageHistory.some(
+        (msg) => JSON.parse(msg.data).mid === messageData.mid
+      );
+
+      if (!messageExists) {
+        setMessageHistory((prev) => [...prev, lastMessage]);
+        dispatch(decrementRoomNotification(room_id));
       }
     }
-  }, [lastMessage, initialCacheLoaded, messageHistory, channelId]);
+  }, [lastMessage, initialCacheLoaded, messageHistory, dispatch, room_id]);
 
+  // Scroll to bottom whenever message history updates
   useEffect(() => {
     const scrollToBottom = () => {
       if (scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     };
+
     const timeoutId = setTimeout(scrollToBottom, 100);
+
     return () => clearTimeout(timeoutId);
   }, [messageHistory]);
 
-  const handleSendMessage = useCallback(async () => {
+  // Send message handler
+  const handleSendMessage = useCallback(() => {
     if (message.trim()) {
       const newMessage = {
-        message,
-        room_id,
+        message: message,
+        room_id: room_id,
         channel_id: channelId,
         timestamp: formatDateTime(new Date()),
       };
-      try {
-        await sendJsonMessage(newMessage);
-        setMessage("");
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
+      sendJsonMessage(newMessage);
+      setMessage("");
     } else {
       flagMessageErr(true);
     }
@@ -145,9 +157,12 @@ const Socket = async () => {
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
 
+  // Handle channel change and fetch new messages
   useEffect(() => {
+    // Reset message history and initialCacheLoaded when channelId or room_id changes
     setMessageHistory([]);
     setInitialCacheLoaded(false);
+
     if (channelId && room_id) {
       const fetchNewChannelMessages = async () => {
         try {
@@ -155,7 +170,7 @@ const Socket = async () => {
             `http://10.1.1.170:8000/message/channel/cache?room_id=${room_id}&channel_id=${channelId}`,
             {
               headers: {
-                Authorization: `Bearer ${await fetchToken()}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );
@@ -163,24 +178,42 @@ const Socket = async () => {
           const parsedMessages = cachedMessages.reverse().map((msg) => ({
             data: JSON.stringify(msg),
           }));
+
           setMessageHistory(parsedMessages);
           setInitialCacheLoaded(true);
         } catch (error) {
           console.error("Error fetching cached messages:", error);
         }
       };
+
       fetchNewChannelMessages();
     }
-  }, [channelId, room_id]);
+  }, [channelId, room_id, token]);
 
-  const handleClick = (newChannelId) => {
+  // Scroll to bottom whenever message history updates
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    };
+
+    const timeoutId = setTimeout(scrollToBottom, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [messageHistory]);
+
+  // Handle channel change and fetch new messages
+  const handleClick = (newChannelId: string) => {
     setChannelId(newChannelId);
     dispatch(setLastRoomVisited({ roomId: room_id, channelId: newChannelId }));
   };
 
+  // Function to create a new channel and update the channels state
   const createNewChannel = async (name, description, roomId) => {
     try {
       const response = await _createNewChannel(name, description, roomId);
+
       const newChannel = response.data;
       setChannels((prevChannels) => [...prevChannels, newChannel]);
     } catch (error) {
@@ -188,10 +221,6 @@ const Socket = async () => {
     }
   };
 
-  if (!initialCacheLoaded) {
-    return <div>Loading...</div>; // Render a loading indicator while data is being fetched
-  }
-  console.log(messageHistory);
   return (
     <ChatComponent
       message={message}
@@ -214,7 +243,7 @@ const Socket = async () => {
       setNewChannelDescription={setNewChannelDescription}
       newChannelName={newChannelName}
       newChannelDescription={newChannelDescription}
-      createNewChannel={createNewChannel}
+      createNewChannel={createNewChannel} // Pass the function as a prop
     />
   );
 };

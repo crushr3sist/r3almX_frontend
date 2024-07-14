@@ -303,7 +303,6 @@ const ChatComponent = ({
                   key={channel.id}
                   className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
                   onClick={() => {
-                    console.log(channel, channel.id);
                     handleClick(channel.id);
                   }}
                 >
