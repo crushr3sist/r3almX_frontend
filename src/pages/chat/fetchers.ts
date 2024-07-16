@@ -49,7 +49,7 @@ const fetchChannelMessages = async (
 ) => {
   try {
     const response = await axios.get(
-      `http://10.1.1.207:8000/message/channel/cache?room_id=${room_id}&channel_id=${channel_id}`,
+      `http://172.29.160.1:8000/message/channel/cache?room_id=${room_id}&channel_id=${channel_id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

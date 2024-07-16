@@ -21,7 +21,7 @@ const token = await fetchToken();
 const Socket = () => {
   const { room_id } = useParams();
 
-  const baseUrl = "ws://10.1.1.170:8000/message";
+  const baseUrl = "ws://172.29.160.1:8000/message";
   const didUnmount = useRef(false);
   const dispatch = useDispatch();
   const [message, setMessage] = useState("");
@@ -60,7 +60,7 @@ const Socket = () => {
       if (!room_id) return;
       try {
         const response = await axios.get(
-          `http://10.1.1.170:8000/channel/fetch?room_id=${room_id}`,
+          `http://172.29.160.1:8000/channel/fetch?room_id=${room_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const Socket = () => {
 
       try {
         const response = await axios.get(
-          `http://10.1.1.170:8000/message/channel/cache?room_id=${room_id}&channel_id=${channelId}`,
+          `http://172.29.160.1:8000/message/channel/cache?room_id=${room_id}&channel_id=${channelId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -167,7 +167,7 @@ const Socket = () => {
       const fetchNewChannelMessages = async () => {
         try {
           const response = await axios.get(
-            `http://10.1.1.170:8000/message/channel/cache?room_id=${room_id}&channel_id=${channelId}`,
+            `http://172.29.160.1:8000/message/channel/cache?room_id=${room_id}&channel_id=${channelId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -215,7 +215,7 @@ const Socket = () => {
       const response = await _createNewChannel(name, description, roomId);
 
       const newChannel = response.data;
-      setChannels((prevChannels) => [...prevChannels, newChannel]);
+      setChannels(() => [...channels, newChannel]);
     } catch (error) {
       console.error("Error creating new channel:", error);
     }
