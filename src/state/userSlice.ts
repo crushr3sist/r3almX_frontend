@@ -28,12 +28,16 @@ export interface IRoom {
   room_owner: string;
   invite_key: string;
   notifications: number;
-  last_channel_visited: string;
+  last_channel_visited_id: string;
+  last_channel_visited_name: string;
+  last_channel_visited_desc: string;
 }
 
 interface ISetLastRoomVisitedPayload {
   roomId: string;
   channelId: string;
+  channelName: string;
+  channelDesc: string;
 }
 
 interface IUserStateSlice {
@@ -110,10 +114,12 @@ const userSlice = createSlice({
       state,
       action: PayloadAction<ISetLastRoomVisitedPayload>
     ) => {
-      const { roomId, channelId } = action.payload;
+      const { roomId, channelId, channelName, channelDesc } = action.payload;
       const room = state.roomsJoined.find((room) => room.id === roomId);
       if (room) {
-        room.last_channel_visited = channelId;
+        room.last_channel_visited_id = channelId;
+        room.last_channel_visited_desc = channelDesc;
+        room.last_channel_visited_name = channelName;
       } else {
         console.error("Room not found for the given roomId:", roomId);
       }
@@ -156,7 +162,9 @@ const userSlice = createSlice({
         state.roomsJoined = rooms.map((room) => ({
           ...room,
           notifications: 0,
-          last_channel_visited: "",
+          last_channel_visited_id: "",
+          last_channel_visited_name: "",
+          last_channel_visited_desc: "",
         }));
       } else {
         console.error(

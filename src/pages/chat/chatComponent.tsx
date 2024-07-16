@@ -57,6 +57,9 @@ interface ICHatProps {
   newChannelName: any;
   newChannelDescription: any;
   createNewChannel; // Accept the function as a prop
+  updateRoom;
+  channelName;
+  channelDesc;
 }
 
 const ChatComponent = ({
@@ -78,9 +81,12 @@ const ChatComponent = ({
   handleClick,
   setNewChannelName,
   setNewChannelDescription,
+  channelName,
+  channelDesc,
   newChannelName,
   newChannelDescription,
   createNewChannel, // Accept the function as a prop
+  updateRoom,
 }: ICHatProps) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -92,8 +98,8 @@ const ChatComponent = ({
   };
   const editChannelName = (channelId, roomId) => {};
 
-  const deleteChannel = (channelId, roomId) => {
-    axios.delete(
+  const deleteChannel = async (channelId, roomId) => {
+    await axios.delete(
       `${routes.channelDelete}?channel_id=${channelId}&room_id=${roomId}`,
       {
         headers: {
@@ -101,6 +107,7 @@ const ChatComponent = ({
         },
       }
     );
+    updateRoom();
   };
   return (
     <div
@@ -115,7 +122,14 @@ const ChatComponent = ({
           } rounded-lg shadow-lg bg-black/90 border border-sepia text-sepia backdrop-blur-md transition-width duration-300`}
         >
           <CardHeader className="flex items-center justify-between px-4 py-2 bg-black/80 rounded-t-lg">
-            <span className="text-lg font-semibold">Room - {roomName}</span>
+            <span className="text-lg font-semibold">
+              Room - {roomName}
+              <div className="flex flex-col">
+                <p className="gap-2">{channelName}</p>
+                <p className="gap-2">{channelDesc}</p>
+              </div>
+            </span>
+
             <span
               className={`text-sm ${
                 connectionStatus === "Open" ? "text-green-500" : "text-red-500"
@@ -273,22 +287,9 @@ const ChatComponent = ({
                             }
                             required
                           ></Input>
-                          <Button
-                            type="submit"
-                            // onPress={() => {
-                            //   console.log(
-                            //     newChannelName,
-                            //     newChannelDescription,
-                            //     roomId
-                            //   );
-
-                            //   createNewChannel(
-                            //     newChannelName,
-                            //     newChannelDescription,
-                            //     roomId
-                            //   );
-                            // }}
-                          ></Button>
+                          <Button onPress={_onClose} type="submit">
+                            create
+                          </Button>
                         </form>
                       </div>
                     </ModalBody>
@@ -304,7 +305,11 @@ const ChatComponent = ({
                   key={channel.id}
                   className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
                   onClick={() => {
-                    handleClick(channel.id);
+                    handleClick(
+                      channel.id,
+                      channel.channel_name,
+                      channel.channel_description
+                    );
                   }}
                 >
                   <div className="w-full">
