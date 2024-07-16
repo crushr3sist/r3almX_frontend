@@ -8,7 +8,7 @@ import { setToken, setTokenExpire, expTime, fetchToken } from "@/utils/login";
 import { useDispatch } from "react-redux";
 import { GoogleLogin } from "@react-oauth/google";
 
-const API_BASE_URL = "http://10.1.1.170:8000/auth";
+const API_BASE_URL = "http://localhost:8000/auth";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
