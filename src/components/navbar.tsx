@@ -72,80 +72,90 @@ export default function NavBar() {
   return (
     <div
       id="drawer-trigger"
-      className={`fixed inset-x-0 bottom-0 h-20 flex justify-center items-center transition-transform duration-300 
-      ${isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"}`}
+      className={`fixed inset-x-0 bottom-0 h-20 flex justify-center items-center transition-transform duration-300
+        
+        ${isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"}
+        `}
     >
       <div
         id="drawer-trigger"
-        className="isolate flex justify-center items-center gap-6 p-4 mx-4 w-full max-w-4xl rounded-t-lg backdrop-blur-md bg-black/70 border border-sepia/30 shadow-lg"
+        className={`isolate 
+          flex justify-between 
+          items-center gap-6 p-4 mx-4 w-full 
+          max-w-4xl rounded-t-lg backdrop-blur-md border border-sepia/30 
+          transition-shadow duration-300 hover:shadow-lg shadow-orange-500
+          `}
       >
-        <Dropdown>
-          <DropdownTrigger>
-            <Badge
-              content="0"
-              color={
-                colorMap[status] as
-                  | "success"
-                  | "danger"
-                  | "warning"
-                  | "default"
-                  | "primary"
-                  | "secondary"
-                  | undefined
-              }
-            >
+        <Badge
+          content="0"
+          color={
+            colorMap[status] as
+              | "success"
+              | "danger"
+              | "warning"
+              | "default"
+              | "primary"
+              | "secondary"
+              | undefined
+          }
+        >
+          <Dropdown>
+            <DropdownTrigger>
               <Avatar
-                className=" transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia "
+                className="justify-content transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia "
                 src={pfp}
-              />
-            </Badge>
-          </DropdownTrigger>
-          <DropdownMenu
-            aria-label="User Actions"
-            className="bg-black/80 text-sepia shadow-lg"
-          >
-            <DropdownSection showDivider>
-              <DropdownItem onClick={() => navigate("/profile")} key="profile">
-                Profile
-              </DropdownItem>
-            </DropdownSection>
-            <DropdownSection title="Status" showDivider>
-              <DropdownItem key="online">
-                <span className="flex items-center">
-                  Online <StatusDot status="online" />
-                </span>
-              </DropdownItem>
-              <DropdownItem key="idle">
-                <span className="flex items-center">
-                  Idle <StatusDot status="idle" />
-                </span>
-              </DropdownItem>
-              <DropdownItem key="dnd">
-                <span className="flex items-center">
-                  Do Not Disturb <StatusDot status="dnd" />
-                </span>
-              </DropdownItem>
-            </DropdownSection>
-          </DropdownMenu>
-        </Dropdown>
+              ></Avatar>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="User Actions"
+              className="bg-black/80 text-sepia shadow-lg"
+            >
+              <DropdownSection showDivider>
+                <DropdownItem
+                  onClick={() => navigate("/profile")}
+                  key="profile"
+                >
+                  Profile
+                </DropdownItem>
+              </DropdownSection>
+              <DropdownSection title="Status" showDivider>
+                <DropdownItem key="online">
+                  <span className="flex items-center">
+                    Online <StatusDot status="online" />
+                  </span>
+                </DropdownItem>
+                <DropdownItem key="idle">
+                  <span className="flex items-center">
+                    Idle <StatusDot status="idle" />
+                  </span>
+                </DropdownItem>
+                <DropdownItem key="dnd">
+                  <span className="flex items-center">
+                    Do Not Disturb <StatusDot status="dnd" />
+                  </span>
+                </DropdownItem>
+              </DropdownSection>
+            </DropdownMenu>
+          </Dropdown>
+        </Badge>
 
         <Divider orientation="vertical" className="h-full bg-sepia/30" />
-
-        <AvatarGroup className="space-x-2">
-          <Avatar
-            className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
-            src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-          />
-          <Avatar
-            className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
-            src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-          />
-          <Avatar
-            className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
-            src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-          />
-        </AvatarGroup>
-
+        <div className="">
+          <AvatarGroup className="space-x-2">
+            <Avatar
+              className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
+              src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+            />
+            <Avatar
+              className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
+              src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+            />
+            <Avatar
+              className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
+              src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+            />
+          </AvatarGroup>
+        </div>
         <div className="flex flex-row ml-6">
           {roomsJoined.map((room) => {
             const roomNotifications = notifications.filter(
@@ -154,7 +164,7 @@ export default function NavBar() {
             return (
               <div
                 key={room.id as string} // Add type assertion here
-                className="flex flex-row  items-center gap-2 p-2 rounded-md bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg transition-all duration-300 cursor-pointer"
+                className="flex flex-row items-center gap-2 p-2 rounded-md bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg transition-all duration-300 cursor-pointer"
                 onClick={() => handleRoomNavigation(room.id.toString())}
               >
                 <div className="font-semibold">{room.room_name}</div>

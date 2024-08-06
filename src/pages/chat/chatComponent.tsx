@@ -307,8 +307,8 @@ const ChatComponent = ({
                   onClick={() => {
                     handleClick(
                       channel.id,
-                      channel.channel_name,
-                      channel.channel_description
+                      channel.channel_description,
+                      channel.channel_name
                     );
                   }}
                 >

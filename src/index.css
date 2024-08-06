@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Bianzhidai Bubble';
+  src: url('./fonts/bianzhidai-Bubble.otf'); /* Adjust the format and path accordingly */
+  font-weight: normal;
+  font-style: normal;
+}
+
 .frosted-glass {
   backdrop-filter: blur(10px);
   background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent white */

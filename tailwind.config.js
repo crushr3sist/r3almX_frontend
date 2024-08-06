@@ -21,6 +21,9 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        bianzhidai: ["Bianzhidai Bubble", "sans-serif"], // Add your font here
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

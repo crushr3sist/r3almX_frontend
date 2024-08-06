@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import {
   Card,
   CardHeader,
@@ -37,8 +37,6 @@ const HomePage: React.FC = () => {
     (state: RootState) => state.userState.userState.username
   );
 
-  // Handle click outside the search bar to collapse it
-
   return (
     <div
       className={`w-screen h-screen transition-padding duration-300 ${
@@ -48,12 +46,23 @@ const HomePage: React.FC = () => {
       <div className="flex w-full h-full p-5">
         <Card className="h-full w-full rounded-lg shadow-lg bg-black/90 border border-sepia text-sepia backdrop-blur-md transition-width duration-300">
           <CardHeader>
-            <Image className="pr-2" width={100} src={logo} isBlurred={true} />
             <div className="w-full flex flex-row items-center justify-between">
-              <p className="font-bold">R3almx - Create your way</p>
-              <div className="flex flex-row items-center relative">
-                <p className="mr-2">Welcome Back - {username}</p>
+              <div className="flex items-center">
+                <Image
+                  className="pr-2"
+                  width={100}
+                  src={logo}
+                  isBlurred={true}
+                />
+                <p className="font-bianzhidai text-pretty text-sepia">
+                  R3almx - Create your way
+                </p>
+              </div>
+              <div className="flex flex-row items-center space-x-4">
                 <SearchComponent />
+              </div>
+              <div className="flex flex-row items-center space-x-4">
+                <p className="mr-2">Welcome Back - {username}</p>
               </div>
             </div>
           </CardHeader>
@@ -73,7 +82,6 @@ const HomePage: React.FC = () => {
               </div>
             </div>
             <Divider />
-
             <div id="feed">
               <h4>Your Friends feed:</h4>
             </div>

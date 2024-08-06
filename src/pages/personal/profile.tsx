@@ -5,6 +5,9 @@ import { useSelector } from "react-redux";
 
 function ProfilePage() {
   const pfp = useSelector((state: RootState) => state.userState.userState.pic);
+  const username = useSelector(
+    (state: RootState) => state.userState.userState.username
+  );
 
   return (
     <div className="flex flex-col items-center p-8 bg-black text-white min-h-screen">
@@ -17,7 +20,7 @@ function ProfilePage() {
         />
         {/* User Info */}
         <div className="flex flex-col items-center md:items-start">
-          <h1 className="text-3xl font-bold">LaMieilleuse</h1>
+          <h1 className="text-3xl font-bold">{username}</h1>
           <p className="text-lg text-gray-400 mt-2">
             Full Stack Developer. Passionate about building innovative solutions
             and exploring new technologies.

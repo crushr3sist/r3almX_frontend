@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { setToken, setTokenExpire, expTime, fetchToken } from "@/utils/login";
 import { GoogleLogin } from "@react-oauth/google";
 
-const API_BASE_URL = "http://172.29.160.1:8000/auth";
+const API_BASE_URL = "http://localhost:8000/auth";
 
 function LoginPage() {
   const [username, setUsername] = useState("");

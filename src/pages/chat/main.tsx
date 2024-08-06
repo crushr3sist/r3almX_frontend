@@ -15,13 +15,13 @@ import axios from "axios";
 import formatDateTime from "./timeFormatter";
 import ChatComponent from "./chatComponent";
 import { _createNewChannel } from "./fetchers";
+import routes from "@/utils/routes";
 
 const token = await fetchToken();
 
 const Socket = () => {
   const { room_id } = useParams();
 
-  const baseUrl = "ws://172.29.160.1:8000/message";
   const didUnmount = useRef(false);
   const dispatch = useDispatch();
   const [message, setMessage] = useState("");
@@ -39,6 +39,7 @@ const Socket = () => {
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined
   );
+
   const lastVisitedChannel = roomsJoined.find(
     (room) => room.id === room_id
   )?.last_channel_visited_id;
@@ -46,6 +47,7 @@ const Socket = () => {
   const lastVisitedChannelName = roomsJoined.find(
     (room) => room.id === room_id
   )?.last_channel_visited_name;
+
   const lastVisitedChannelDesc = roomsJoined.find(
     (room) => room.id === room_id
   )?.last_channel_visited_desc;
@@ -53,7 +55,7 @@ const Socket = () => {
   const roomName = roomsJoined.find((room) => room.id === room_id)?.room_name;
   const [channelId, setChannelId] = useState(lastVisitedChannel || "");
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
-    `${baseUrl}/${room_id}?token=${token}`,
+    `${routes.messageSocket}/${room_id}?token=${token}`,
     {
       shouldReconnect: () => !didUnmount.current,
       reconnectAttempts: 10,
@@ -64,7 +66,7 @@ const Socket = () => {
     if (!room_id) return;
     try {
       const response = await axios.get(
-        `http://172.29.160.1:8000/channel/fetch?room_id=${room_id}`,
+        `${routes.channelFetch}?room_id=${room_id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -77,13 +79,14 @@ const Socket = () => {
     }
   };
   const scrollRef = useRef<HTMLUListElement>(null);
+
   // Fetch channels when room_id changes
   useEffect(() => {
     const fetchChannels = async () => {
       if (!room_id) return;
       try {
         const response = await axios.get(
-          `http://172.29.160.1:8000/channel/fetch?room_id=${room_id}`,
+          `${routes.channelFetch}?room_id=${room_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -105,7 +108,7 @@ const Socket = () => {
 
       try {
         const response = await axios.get(
-          `http://172.29.160.1:8000/message/channel/cache?room_id=${room_id}&channel_id=${channelId}`,
+          `${routes.channelCache}?room_id=${room_id}&channel_id=${channelId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -190,15 +193,18 @@ const Socket = () => {
       const fetchNewChannelMessages = async () => {
         try {
           const response = await axios.get(
-            `http://172.29.160.1:8000/message/channel/cache?room_id=${room_id}&channel_id=${channelId}`,
+            `${routes.channelCache}?room_id=${room_id}&channel_id=${channelId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             }
           );
+
           const cachedMessages = response.data || [];
-          const parsedMessages = cachedMessages.reverse().map((msg) => ({
+
+          console.log(`${JSON.parse(cachedMessages)}`);
+          const parsedMessages = cachedMessages.map((msg) => ({
             data: JSON.stringify(msg),
           }));
 
@@ -277,7 +283,7 @@ const Socket = () => {
       setNewChannelDescription={setNewChannelDescription}
       newChannelName={newChannelName}
       newChannelDescription={newChannelDescription}
-      createNewChannel={createNewChannel} // Pass the function as a prop
+      createNewChannel={createNewChannel}
       updateRoom={updateRoom}
     />
   );
