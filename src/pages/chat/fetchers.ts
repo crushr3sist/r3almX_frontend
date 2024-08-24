@@ -1,16 +1,13 @@
-import { fetchToken } from "@/utils/login";
 import routes from "@/utils/routes";
 import axios from "axios";
 
-const token = await fetchToken();
-
-const fetchChannels = async (roomId: string, setChannels, token) => {
+const fetchChannels = async (roomId: string, setChannels) => {
   try {
     const response = await axios.get(
       `${routes.channelFetch}?room_id=${roomId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${routes.userToken}`,
         },
       }
     );
@@ -31,7 +28,7 @@ const _createNewChannel = async (
       null,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${routes.userToken}`,
         },
       }
     );
@@ -41,18 +38,13 @@ const _createNewChannel = async (
   }
 };
 
-const fetchChannelMessages = async (
-  setMessageHistory,
-  token,
-  room_id,
-  channel_id
-) => {
+const fetchChannelMessages = async (setMessageHistory, room_id, channel_id) => {
   try {
     const response = await axios.get(
       `${routes.channelCache}?room_id=${room_id}&channel_id=${channel_id}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${routes.userToken}`,
         },
       }
     );

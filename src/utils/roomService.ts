@@ -1,5 +1,5 @@
 import axios from "axios";
-import { fetchToken } from "./login";
+
 import { IRoom } from "@/state/userSlice";
 import routes from "./routes";
 
@@ -7,10 +7,9 @@ export const fetchRooms = async (): Promise<{
   rooms: IRoom[];
 }> => {
   try {
-    const token = await fetchToken();
     const response = await axios.get(routes.roomFetch, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${routes.userToken}`,
       },
     });
 

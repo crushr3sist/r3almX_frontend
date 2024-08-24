@@ -1,10 +1,8 @@
-import { fetchToken } from "./login";
 import routes from "./routes";
 
 class ConnectionSocket {
   connectionSocket: WebSocket;
-  WEBSOCKET_URL = `${routes.connectionSocket}?token=${async () =>
-    await fetchToken()}`;
+  WEBSOCKET_URL = `${routes.connectionSocket}?token=${routes.userToken}`;
 
   constructor() {
     this.connectionSocket = new WebSocket(this.WEBSOCKET_URL);

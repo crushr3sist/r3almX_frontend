@@ -1,4 +1,3 @@
-import { fetchToken } from "@/utils/login";
 import routes from "@/utils/routes";
 import {
   Card,
@@ -33,7 +32,6 @@ import {
 } from "react-icons/bs";
 
 import { ReadyState } from "react-use-websocket";
-const token = await fetchToken();
 
 interface ICHatProps {
   isNavbarOpen: any;
@@ -103,7 +101,7 @@ const ChatComponent = ({
       `${routes.channelDelete}?channel_id=${channelId}&room_id=${roomId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${routes.userToken}`,
         },
       }
     );

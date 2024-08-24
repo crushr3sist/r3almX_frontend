@@ -2,12 +2,12 @@ import React from "react";
 import { Avatar, Button } from "@nextui-org/react";
 import { RootState } from "@/state/store";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { fetchToken } from "@/utils/login";
 
-function ProfilePage() {
+function ProfilePageFactory() {
   const pfp = useSelector((state: RootState) => state.userState.userState.pic);
-  const username = useSelector(
-    (state: RootState) => state.userState.userState.username
-  );
+  const { username } = useParams();
 
   return (
     <div className="flex flex-col items-center p-8 bg-black text-white min-h-screen">
@@ -35,7 +35,10 @@ function ProfilePage() {
           className="bg-green-500 text-black hover:bg-green-400 transition"
           onClick={() => {}}
         >
-          Edit Profile
+          Follow
+        </Button>
+        <Button className="bg-gray-700 text-white hover:bg-gray-600 transition">
+          Message
         </Button>
       </div>
 
@@ -49,4 +52,4 @@ function ProfilePage() {
   );
 }
 
-export default ProfilePage;
+export default ProfilePageFactory;

@@ -2,10 +2,10 @@ import { Button, Card, CardBody, Input, Avatar } from "@nextui-org/react";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import routes from "@/utils/routes";
-import { fetchToken } from "@/utils/login";
 import { debounce } from "lodash";
-
-const token = await fetchToken();
+import { BsFillPersonPlusFill } from "react-icons/bs";
+import { Divider } from "@nextui-org/divider";
+import { useNavigate } from "react-router-dom";
 
 export const SearchComponent = () => {
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -13,7 +13,8 @@ export const SearchComponent = () => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -39,7 +40,7 @@ export const SearchComponent = () => {
         `${routes.friendsSearch}?query=${queryText}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${routes.userToken}`,
           },
         }
       );
@@ -52,22 +53,26 @@ export const SearchComponent = () => {
   }, 300); // Debounce delay
 
   return (
-    <div>
+    <div className="relative" ref={searchRef}>
       <div
         className={`transition-all duration-300 ease-in-out ${
-          searchExpanded ? "w-80" : "w-64"
+          searchExpanded ? "w-80" : "z-50 w-64"
         }`}
-        style={{ overflow: "hidden" }} // Optional: To hide content when collapsed
+        style={{ overflow: "hidden" }}
       >
         <div className="flex flex-col justify-normal">
           <Input
-            ref={searchRef}
             type="text"
             classNames={{
-              inputWrapper: ["text-sepia", "bg-black/90", "border"],
-              innerWrapper: ["text-sepia", "bg-black/90"],
+              inputWrapper: [
+                "text-sepia",
+                "bg-black/90",
+                "border",
+                "hover:bg-black/90",
+              ],
+              innerWrapper: ["text-sepia", "hover:bg-black/90", "bg-black/90"],
             }}
-            className=""
+            className="z-100"
             placeholder="Search..."
             onClick={() => setSearchExpanded(true)}
             onChange={(searchEvent) => {
@@ -77,29 +82,35 @@ export const SearchComponent = () => {
             }}
             value={query}
           />
-          {searchExpanded && (
-            <div>
-              {loading && <p>Loading...</p>}
-              {error && <p className="text-red-500">{error}</p>}
-              {results.length > 0 && (
-                <div>
+          {searchExpanded && results.length > 0 && (
+            <div className="absolute top-full mt-2 z-50 w-full">
+              <Card className="flex flex-col bg-black/90 border border-sepia text-sepia">
+                <CardBody>
+                  {loading && <p>Loading...</p>}
+                  {error && <p className="text-red-500">{error}</p>}
                   <ul className="pb-1">
-                    <Card className="flex flex-col bg-black/90 border border-sepia text-sepia">
-                      <CardBody>
-                        {results.map((result, index) => (
-                          <div
-                            key={index}
-                            className="flex p-2 flex-row items-center "
-                          >
-                            <Avatar src={result.pfp} />
-                            <h2 className="ml-2">{result.username}</h2>
-                          </div>
-                        ))}
-                      </CardBody>
-                    </Card>
+                    {results.map((result, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          console.log(`Navigating to /@${result.username}`);
+                          navigate(`/@/${result.username}`);
+                        }}
+                        className="flex p-2 items-center justify-between cursor-pointer hover:bg-black/80"
+                      >
+                        <div className="flex items-center">
+                          <Avatar src={result.pfp} />
+                          <h2 className="text-lg ml-2">{result.username}</h2>
+                        </div>
+                        <Divider orientation="vertical" />
+                        <div className="flex items-center">
+                          <BsFillPersonPlusFill />
+                        </div>
+                      </div>
+                    ))}
                   </ul>
-                </div>
-              )}
+                </CardBody>
+              </Card>
             </div>
           )}
         </div>

@@ -57,16 +57,18 @@ export const userDataFetcher = async (): Promise<{
   email: string;
   pic: string;
 }> => {
-  const token = await fetchToken();
-  const response = await axios.get(`${routes.userFetch}?token=${token}`);
+  const response = await axios.get(
+    `${routes.userFetch}?token=${routes.userToken}`
+  );
   const user = response.data.user;
   console.log(user);
   return user;
 };
 
 export const statusFetcher = async (): Promise<string | "offline"> => {
-  const token = await fetchToken();
-  const response = await axios.get(`${routes.statusFetch}?token=${token}`);
+  const response = await axios.get(
+    `${routes.statusFetch}?token=${routes.userToken}`
+  );
   const status = response.data[Object.keys(response.data)[0]];
   return status;
 };

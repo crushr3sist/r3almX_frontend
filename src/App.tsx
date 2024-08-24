@@ -26,15 +26,14 @@ import { fetchRooms } from "./utils/roomService";
 import { statusFetcher } from "./state/userSlice"; // Import statusFetcher here
 import HomePage from "./pages/personal/home";
 import routes from "./utils/routes";
+import ProfilePageFactory from "./pages/personal/profileRender";
 
 const ClientController = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     const initializeData = async () => {
-      const token = await fetchToken();
-
-      if (token) {
+      if (routes.userToken) {
         const user = await userDataFetcher();
         dispatch(setUsername(user.username));
         dispatch(setEmail(user.email));
@@ -50,7 +49,7 @@ const ClientController = () => {
       let webSocketService: Worker;
 
       try {
-        const WEBSOCKET_URL = `${routes.connectionSocket}?token=${token}`;
+        const WEBSOCKET_URL = `${routes.connectionSocket}?token=${routes.userToken}`;
         webSocketService = new Worker(
           new URL("utils/webSocketWorker.js", import.meta.url)
         );
@@ -101,6 +100,10 @@ const ClientController = () => {
     {
       path: "/profile",
       element: <AuthProvider ProtectedPage={<ProfilePage />} />,
+    },
+    {
+      path: "/@/:username",
+      element: <AuthProvider ProtectedPage={<ProfilePageFactory />} />,
     },
     {
       path: "/",

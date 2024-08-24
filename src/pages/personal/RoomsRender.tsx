@@ -16,14 +16,12 @@ import { RootState } from "@/state/store";
 import { clearRoomNotifications } from "@/state/connectionSlice";
 import { useNavigate } from "react-router-dom";
 import { BsPlusCircle } from "react-icons/bs";
-import { fetchToken } from "@/utils/login";
 import axios from "axios";
 import { fetchRooms } from "@/utils/roomService";
 import { setRooms } from "@/state/userSlice";
 import routes from "@/utils/routes";
 
 // Fetch token as needed (ensure this function call is valid in your environment)
-const token = await fetchToken();
 
 // Handle room navigation (moved inside component to use hooks properly)
 const handleRoomNavigation = (roomId: string, navigate: any, dispatch: any) => {
@@ -45,7 +43,7 @@ const createRoomRequest = async (newRoomName: string, dispatch: any) => {
       null,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${routes.userToken}`,
         },
       }
     );
