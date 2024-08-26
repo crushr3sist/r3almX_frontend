@@ -79,7 +79,7 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
         className={`
           border 
           border-sepia 
-          rounded-lg 
+          rounded-sm 
           shadow-lg 
           m-1 
           bg-black/50 
@@ -166,7 +166,7 @@ const RoomsRender: React.FC = () => {
               className={`
                 border 
                 border-sepia 
-                rounded-lg 
+                rounded-sm 
                 shadow-lg 
                 m-1 
                 bg-black/50 

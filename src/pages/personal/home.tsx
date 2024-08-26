@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Divider,
-  Input,
-  Image,
-} from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Divider, Image } from "@nextui-org/react";
 import logo from "../../assets/logo.gif";
 import { useNavbarContext } from "@/providers/NavbarContext";
 import RoomsRender from "./RoomsRender";
@@ -39,12 +32,12 @@ const HomePage: React.FC = () => {
 
   return (
     <div
-      className={`w-screen h-screen transition-padding duration-300 ${
-        isNavbarOpen ? "pb-28" : "pb-20"
-      } flex flex-col bg-black text-sepia relative`}
+      className={`w-screen h-screen transition-padding grain-bg duration-300  ${
+        isNavbarOpen ? "pb-28" : "pb-5"
+      } flex flex-col text-sepia relative`}
     >
       <div className="flex w-full h-full p-5">
-        <Card className="h-full w-full rounded-lg shadow-lg bg-black/90 border border-sepia text-sepia backdrop-blur-md transition-width duration-300">
+        <Card className="h-full w-full rounded-sm shadow-lg bg-black/90 border border-sepia text-sepia backdrop-blur-md transition-width duration-300">
           <CardHeader>
             <div className="w-full flex flex-row items-center justify-between">
               <div className="flex items-center">
@@ -54,7 +47,7 @@ const HomePage: React.FC = () => {
                   src={logo}
                   isBlurred={true}
                 />
-                <p className="font-bianzhidai text-pretty text-sepia">
+                <p className="font-bianzhidai backdrop-blur-md text-lg text-pretty text-sepia">
                   R3almx - Create your way
                 </p>
               </div>
@@ -67,7 +60,7 @@ const HomePage: React.FC = () => {
             </div>
           </CardHeader>
           <Divider />
-          <CardBody className="flex-1 flex flex-col overflow-hidden p-4 space-y-4">
+          <CardBody className="flex-1 flex flex-col overflow-y-auto  pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50 p-4 space-y-4">
             <div id="rooms" className="h-50">
               <h4>Your Rooms</h4>
               <div className="flex flex-row justify-items-start overflow-x-auto p-2">

@@ -1,4 +1,3 @@
-import React from "react";
 import { Avatar, Button } from "@nextui-org/react";
 import { RootState } from "@/state/store";
 import { useSelector } from "react-redux";

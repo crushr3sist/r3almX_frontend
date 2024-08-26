@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, Input, Avatar } from "@nextui-org/react";
+import { Card, CardBody, Input, Avatar } from "@nextui-org/react";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import routes from "@/utils/routes";
@@ -65,14 +65,15 @@ export const SearchComponent = () => {
             type="text"
             classNames={{
               inputWrapper: [
-                "text-sepia",
-                "bg-black/90",
+                "!text-sepia",
+                "!bg-black/90",
                 "border",
-                "hover:bg-black/90",
+                "hover:!bg-black/90",
+                "focus-within:!bg-black/90",
+                "dark:hover:!bg-black/90",
               ],
-              innerWrapper: ["text-sepia", "hover:bg-black/90", "bg-black/90"],
             }}
-            className="z-100"
+            className="z-100 bg-black/90 hover:bg-black/90"
             placeholder="Search..."
             onClick={() => setSearchExpanded(true)}
             onChange={(searchEvent) => {
@@ -93,8 +94,9 @@ export const SearchComponent = () => {
                       <div
                         key={index}
                         onClick={() => {
-                          console.log(`Navigating to /@${result.username}`);
-                          navigate(`/@/${result.username}`);
+                          navigate(`/@/${result.username}`, {
+                            state: { userId: result.id },
+                          });
                         }}
                         className="flex p-2 items-center justify-between cursor-pointer hover:bg-black/80"
                       >

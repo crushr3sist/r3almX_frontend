@@ -22,7 +22,7 @@ const AuthProvider = ({ ProtectedPage }: any) => {
 
   if (canRender) {
     return (
-      <div>
+      <div className="grain-bg">
         <NavbarProvider>
           {ProtectedPage}
           <NavBar />

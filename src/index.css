@@ -2,9 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
+
+@layer utilities {
+  .grain-bg {
+    @apply relative bg-black overflow-hidden;
+  }
+
+  .grain-bg::before {
+    content: "";
+    @apply absolute inset-0 pointer-events-none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><rect width="1" height="1" fill="rgba(255,255,255,0.05)"/></svg>');
+    background-size: 3px 3px;
+    opacity: 0.5;
+    z-index: 1;
+  }
+}
+
 @font-face {
   font-family: 'Bianzhidai Bubble';
-  src: url('./fonts/bianzhidai-Bubble.otf'); /* Adjust the format and path accordingly */
+  src: url('./fonts/bianzhidai_noBG-Bubble.otf'); /* Adjust the format and path accordingly */
   font-weight: normal;
   font-style: normal;
 }

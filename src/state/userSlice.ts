@@ -1,57 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { fetchToken } from "@/utils/login";
 import routes from "@/utils/routes";
+import {
+  IUserStateSlice,
+  TSstatus,
+  ISetLastRoomVisitedPayload,
+  IRoom,
+  IPinnedFriends,
+} from "./userSliceInterfaces";
 
-export type TSstatus = "online" | "idle" | "dnd" | "offline";
-
-export interface IUserState {
-  userStatus: TSstatus;
-  tokenChecked: boolean;
-  isAuthenticated: boolean;
-  notifications: number;
-  username: string;
-}
-
-// Define the Channel interface
-export interface IChannel {
-  id: string;
-  channel_name: string;
-  time_created: string;
-  channel_description: string;
-  author: string;
-}
-export interface IRoom {
-  id: string;
-  room_name: string;
-  members: string[];
-  room_owner: string;
-  invite_key: string;
-  notifications: number;
-  last_channel_visited_id: string;
-  last_channel_visited_name: string;
-  last_channel_visited_desc: string;
-}
-
-interface ISetLastRoomVisitedPayload {
-  roomId: string;
-  channelId: string;
-  channelName: string;
-  channelDesc: string;
-}
-
-interface IUserStateSlice {
-  userState: {
-    userStatus: "online" | "idle" | "dnd" | "offline";
-    tokenChecked: boolean;
-    isAuthenticated: boolean;
-    notifications: number;
-    username: string;
-    email: string;
-    pic: string;
-  };
-  roomsJoined: IRoom[];
-}
 export const userDataFetcher = async (): Promise<{
   username: string;
   email: string;
@@ -70,6 +27,8 @@ export const statusFetcher = async (): Promise<string | "offline"> => {
     `${routes.statusFetch}?token=${routes.userToken}`
   );
   const status = response.data[Object.keys(response.data)[0]];
+  console.log("Fetched status:", status);
+
   return status;
 };
 
@@ -84,6 +43,7 @@ const initialState: IUserStateSlice = {
     pic: "",
   },
   roomsJoined: [],
+  pinnedFriends: [],
 };
 
 const userSlice = createSlice({
@@ -149,6 +109,9 @@ const userSlice = createSlice({
         state.roomsJoined.push({ ...newRoom, notifications: 0 });
       }
     },
+    addPinnedFriends: (state, action: PayloadAction<IPinnedFriends[]>) => {
+      state.pinnedFriends = action.payload;
+    },
 
     removeRoom: (state, action: PayloadAction<string>) => {
       const roomIdToRemove = action.payload;
@@ -190,6 +153,7 @@ export const {
   setPic,
   setRooms,
   setUsername,
+  addPinnedFriends,
   setEmail,
   incrementRoomNotification,
   decrementRoomNotification,

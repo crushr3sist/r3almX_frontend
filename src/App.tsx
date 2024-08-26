@@ -12,21 +12,30 @@ import {
   setRooms,
   setStatus,
   incrementRoomNotification,
-  TSstatus,
-  IRoom,
   userDataFetcher,
   setUsername,
   setEmail,
+  addPinnedFriends,
   setPic,
 } from "./state/userSlice";
 import { addNotification } from "./state/connectionSlice";
 
-import { fetchToken } from "./utils/login";
 import { fetchRooms } from "./utils/roomService";
 import { statusFetcher } from "./state/userSlice"; // Import statusFetcher here
 import HomePage from "./pages/personal/home";
 import routes from "./utils/routes";
 import ProfilePageFactory from "./pages/personal/profileRender";
+import { TSstatus } from "./state/userSliceInterfaces";
+import axios from "axios";
+
+const fetchFriends = async () => {
+  const response = await axios.get(`${routes.friendsGet}`, {
+    headers: {
+      Authorization: `Bearer ${routes.userToken}`,
+    },
+  });
+  return response.data;
+};
 
 const ClientController = () => {
   const dispatch = useDispatch();
@@ -46,6 +55,10 @@ const ClientController = () => {
         dispatch(setRooms(rooms));
       }
 
+      const pinnedFriendsFetch = await fetchFriends();
+
+      dispatch(addPinnedFriends(pinnedFriendsFetch.friends));
+
       let webSocketService: Worker;
 
       try {
@@ -60,6 +73,9 @@ const ClientController = () => {
         webSocketService.onmessage = async (e) => {
           const { type, payload } = e.data;
           const status = await statusFetcher();
+          if (type === "STATUS_UPDATE") {
+            dispatch(setStatus(payload.status));
+          }
           if (type === "WEBSOCKET_MESSAGE") {
             dispatch(setStatus(status as TSstatus));
 
