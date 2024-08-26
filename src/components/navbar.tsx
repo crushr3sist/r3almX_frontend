@@ -107,7 +107,13 @@ export default function NavBar() {
               | undefined
           }
         >
-          <Dropdown>
+          <Dropdown
+            radius="sm"
+            classNames={{
+              base: "before:bg-default-200", // change arrow background
+              content: "p-0 border-divider bg-background",
+            }}
+          >
             <DropdownTrigger>
               <Avatar
                 className="justify-content transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia "
@@ -116,7 +122,20 @@ export default function NavBar() {
             </DropdownTrigger>
             <DropdownMenu
               aria-label="User Actions"
-              className="bg-black/80 text-sepia shadow-lg"
+              className="bg-black/90 text-white shadow-lg"
+              itemClasses={{
+                base: [
+                  "rounded-md",
+                  "text-sepia",
+                  "transition-opacity",
+                  "data-[hover=true]:text-foreground",
+                  "data-[hover=true]:bg-default-100",
+                  "dark:data-[hover=true]:bg-default-50",
+                  "data-[selectable=true]:focus:bg-default-50",
+                  "data-[pressed=true]:opacity-70",
+                  "data-[focus-visible=true]:ring-default-500",
+                ],
+              }}
             >
               <DropdownSection showDivider>
                 <DropdownItem
