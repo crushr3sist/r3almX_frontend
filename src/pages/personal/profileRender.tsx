@@ -5,7 +5,6 @@ import axios from "axios";
 import routes from "@/utils/routes";
 import { useLocation } from "react-router-dom";
 
-// Function to fetch user info
 const fetchUserInfo = async (
   username: string,
   userId: string
@@ -80,13 +79,11 @@ function ProfilePageFactory() {
   return (
     <div className="flex flex-col items-center p-8 bg-black text-white min-h-screen">
       <div className="flex flex-col md:flex-row items-center mb-8 w-full max-w-4xl border-b border-gray-800 pb-8">
-        {/* Avatar */}
         <Avatar
-          src={userInfo?.user.pic} // Fallback to state if userInfo.pic is not available
+          src={userInfo?.user.pic}
           alt="User Avatar"
           className="w-36 h-36 mb-4 md:mb-0 md:mr-8"
         />
-        {/* User Info */}
         <div className="flex flex-col items-center md:items-start">
           <h1 className="text-3xl font-bold">{username}</h1>
           <p className="text-lg text-gray-400 mt-2">

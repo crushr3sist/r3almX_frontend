@@ -18,7 +18,6 @@ export const userDataFetcher = async (): Promise<{
     `${routes.userFetch}?token=${routes.userToken}`
   );
   const user = response.data.user;
-  console.log(user);
   return user;
 };
 

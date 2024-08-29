@@ -1,13 +1,16 @@
-// ClientController.tsx
-
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthProvider from "@/providers/AuthProviders";
 import LoggedOutUserProvider from "./providers/NonAuthProvider";
 import LoginPage from "./pages/auth/Login";
 import ProfilePage from "./pages/personal/profile";
 import Socket from "./pages/chat/main";
+import ProfilePageFactory from "./pages/personal/profileRender";
+import routes from "./utils/routes";
+import HomePage from "./pages/personal/home";
+import axios from "axios";
+
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
   setRooms,
   setStatus,
@@ -18,15 +21,11 @@ import {
   addPinnedFriends,
   setPic,
 } from "./state/userSlice";
-import { addNotification } from "./state/connectionSlice";
 
+import { addNotification } from "./state/connectionSlice";
 import { fetchRooms } from "./utils/roomService";
-import { statusFetcher } from "./state/userSlice"; // Import statusFetcher here
-import HomePage from "./pages/personal/home";
-import routes from "./utils/routes";
-import ProfilePageFactory from "./pages/personal/profileRender";
+import { statusFetcher } from "./state/userSlice";
 import { TSstatus } from "./state/userSliceInterfaces";
-import axios from "axios";
 
 const fetchFriends = async () => {
   const response = await axios.get(`${routes.friendsGet}`, {
@@ -43,16 +42,21 @@ const ClientController = () => {
   useEffect(() => {
     const initializeData = async () => {
       if (routes.userToken) {
+        
         const user = await userDataFetcher();
+
         dispatch(setUsername(user.username));
         dispatch(setEmail(user.email));
         dispatch(setPic(user.pic));
       }
 
-      const rooms = await fetchRooms();
-
-      if (rooms[0] !== null) {
-        dispatch(setRooms(rooms));
+      try {
+        const rooms = await fetchRooms();
+        if (rooms[0] !== null) {
+          dispatch(setRooms(rooms));
+        }
+      } catch (e) {
+        console.log("you dont have rooms");
       }
 
       const pinnedFriendsFetch = await fetchFriends();
@@ -69,13 +73,17 @@ const ClientController = () => {
 
         webSocketService.postMessage({ type: "connect", url: WEBSOCKET_URL });
 
-        // Fetch the initial status and update the Redux state
         webSocketService.onmessage = async (e) => {
           const { type, payload } = e.data;
+
           const status = await statusFetcher();
+
+          console.log("status", status);
+
           if (type === "STATUS_UPDATE") {
             dispatch(setStatus(payload.status));
           }
+
           if (type === "WEBSOCKET_MESSAGE") {
             dispatch(setStatus(status as TSstatus));
 
@@ -105,6 +113,7 @@ const ClientController = () => {
         webSocketService.terminate();
       };
     };
+
     initializeData();
   }, [dispatch]);
 
