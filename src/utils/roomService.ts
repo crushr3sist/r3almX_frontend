@@ -1,10 +1,10 @@
 import axios from "axios";
 
-import { IRoom } from "@/state/userSlice";
 import routes from "./routes";
+import { IRoom } from "@/state/userSliceInterfaces";
 
 export const fetchRooms = async (): Promise<{
-  rooms: IRoom[];
+  rooms: IRoom[] | null;
 }> => {
   try {
     const response = await axios.get(routes.roomFetch, {
@@ -18,10 +18,9 @@ export const fetchRooms = async (): Promise<{
         rooms: response.data.rooms,
       };
     } else {
-      throw new Error("Failed to fetch rooms");
+      console.log("Failed to fetch rooms");
     }
   } catch (error) {
-    console.error("Error fetching rooms:", error);
-    throw error;
+    console.log("Error fetching rooms:", error);
   }
 };

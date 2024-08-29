@@ -9,11 +9,13 @@ import {
   IPinnedFriends,
 } from "./userSliceInterfaces";
 
-export const userDataFetcher = async (): Promise<{
+export interface IUserFetch {
   username: string;
   email: string;
   pic: string;
-}> => {
+}
+
+export const userDataFetcher = async (): Promise<IUserFetch> => {
   const response = await axios.get(
     `${routes.userFetch}?token=${routes.userToken}`
   );
@@ -55,9 +57,11 @@ const userSlice = createSlice({
     setStatus: (state, action: PayloadAction<TSstatus>) => {
       state.userState.userStatus = action.payload;
     },
-
     incrementNotification: (state) => {
       state.userState.notifications++;
+    },
+    setAuthenticated: (state) => {
+      state.userState.isAuthenticated = true;
     },
     decrementNotification: (state) => {
       state.userState.notifications = 0;
@@ -71,6 +75,10 @@ const userSlice = createSlice({
     setEmail: (state, action) => {
       state.userState.email = action.payload;
     },
+    clearUserData: (state) => {
+      state = initialState;
+    },
+
     setLastRoomVisited: (
       state,
       action: PayloadAction<ISetLastRoomVisitedPayload>
@@ -122,7 +130,7 @@ const userSlice = createSlice({
     setRooms: (state, action: PayloadAction<{ rooms: IRoom[] }>) => {
       const { rooms } = action.payload;
 
-      if (Array.isArray(rooms)) {
+      if (Array.isArray(rooms) && rooms.length > 0) {
         state.roomsJoined = rooms.map((room) => ({
           ...room,
           notifications: 0,
@@ -131,10 +139,7 @@ const userSlice = createSlice({
           last_channel_visited_desc: "",
         }));
       } else {
-        console.error(
-          "Expected an array for setRooms payload.rooms, but got:",
-          rooms
-        );
+        console.log("no rooms");
         state.roomsJoined = [];
       }
     },
@@ -144,6 +149,7 @@ const userSlice = createSlice({
 export const {
   changeStatus,
   setStatus,
+  clearUserData,
   incrementNotification,
   decrementNotification,
   addRoom,
@@ -151,6 +157,7 @@ export const {
   removeRoom,
   setPic,
   setRooms,
+  setAuthenticated,
   setUsername,
   addPinnedFriends,
   setEmail,

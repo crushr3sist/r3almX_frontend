@@ -19,7 +19,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <ClientController />
             </NavbarProvider>
           </main>
-          
         </NextUIProvider>
       </Provider>
     </GoogleOAuthProvider>

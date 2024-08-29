@@ -1,4 +1,4 @@
-import { Card, CardBody, Input, Avatar } from "@nextui-org/react";
+import { Card, CardBody, Input, Avatar, Spinner } from "@nextui-org/react";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import routes from "@/utils/routes";
@@ -87,7 +87,11 @@ export const SearchComponent = () => {
             <div className="absolute top-full mt-2 z-50 w-full">
               <Card className="flex flex-col bg-black/90 border border-sepia text-sepia">
                 <CardBody>
-                  {loading && <p>Loading...</p>}
+                  {loading && (
+                    <p>
+                      <Spinner />
+                    </p>
+                  )}
                   {error && <p className="text-red-500">{error}</p>}
                   <ul className="pb-1">
                     {results.map((result, index) => (

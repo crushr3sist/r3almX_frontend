@@ -27,6 +27,7 @@ import { useNavbarContext } from "../providers/NavbarContext";
 import { clearRoomNotifications } from "@/state/connectionSlice";
 import { BsArrowBarRight, BsGear, BsHouseExclamation } from "react-icons/bs";
 import { logOff } from "./logOff";
+import { IPinnedFriends } from "@/state/userSliceInterfaces";
 
 export default function NavBar() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -78,20 +79,33 @@ export default function NavBar() {
   return (
     <div
       id="drawer-trigger"
-      className={`fixed inset-x-0 bottom-0 h-20 flex 
-      justify-center items-center transition-transform duration-300
-      
+      className={`
+      fixed inset-x-0 bottom-0 h-20 flex 
       ${isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"}
-        
+          p-5
+
+        justify-center items-center transition-transform duration-300
         `}
     >
       <div
         id="drawer-trigger"
-        className={`isolate 
-          flex justify-between 
-          items-center gap-6 p-4 mx-4 w-full 
-          max-w-4xl rounded-t-sm backdrop-blur-md border border-sepia/30 
-          transition-shadow duration-300 hover:shadow-lg shadow-orange-500
+        className={`
+          isolate 
+          flex 
+          justify-between 
+          relative
+          items-center 
+          p-5
+          gap-6 
+          w-full 
+          rounded-t-sm 
+          backdrop-blur-md 
+          border 
+          border-sepia/30 
+          transition-shadow 
+          duration-300 
+          hover:shadow-lg 
+          shadow-orange-500
           `}
       >
         <Badge
@@ -169,21 +183,25 @@ export default function NavBar() {
         <Divider orientation="vertical" className="h-full bg-sepia/30" />
         <div className="">
           <AvatarGroup className="space-x-2">
-            {pinnedFriends.map((friend, index) => (
-              <Avatar
-                key={index} // Use a unique key for each Avatar, index is used here but ideally, you should use a unique id from the friend object if available
-                className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
-                src={friend.pic} // Assuming `pic` is the image URL of the friend's avatar
-                onClick={() => {
-                  navigate(`/@/${friend.username}`, {
-                    state: { userId: friend.user_id },
-                  });
-                }}
-              />
-            ))}
+            {Array.isArray(pinnedFriends) && pinnedFriends.length > 0 ? (
+              pinnedFriends.map((friend, index) => (
+                <Avatar
+                  key={index}
+                  className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-sepia"
+                  src={friend.pic}
+                  onClick={() => {
+                    navigate(`/@/${friend.username}`, {
+                      state: { userId: friend.user_id },
+                    });
+                  }}
+                />
+              ))
+            ) : (
+              <div></div> // Optional: Handle empty state
+            )}
           </AvatarGroup>
         </div>
-        <div className="flex flex-row ml-6">
+        <div className="flex flex-row ml-6 overflow-auto ">
           {roomsJoined.map((room) => {
             const roomNotifications = notifications.filter(
               (n) => n.roomId === room.id

@@ -1,8 +1,7 @@
 import { fetchToken } from "./login";
 
-const _userToken = await fetchToken();
 export default {
-  userToken: _userToken,
+  userToken: await fetchToken(),
   login: "http://localhost:8000/auth/login",
   statusFetch: "http://localhost:8000/status",
   userFetch: "http://localhost:8000/auth/fetch",

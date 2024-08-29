@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -10,6 +10,7 @@ import {
   ModalBody,
   Input,
   Button,
+  Spinner,
 } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/state/store";
@@ -21,21 +22,16 @@ import { fetchRooms } from "@/utils/roomService";
 import { setRooms } from "@/state/userSlice";
 import routes from "@/utils/routes";
 
-// Fetch token as needed (ensure this function call is valid in your environment)
-
-// Handle room navigation (moved inside component to use hooks properly)
 const handleRoomNavigation = (roomId: string, navigate: any, dispatch: any) => {
   dispatch(clearRoomNotifications(roomId));
   navigate(`/room/${roomId}`);
 };
 
-// Update rooms in Redux (moved inside component to use hooks properly)
 const roomUpdater = async (dispatch: any) => {
   const rooms = await fetchRooms();
   dispatch(setRooms(rooms));
 };
 
-// Create a new room and update the state immediately
 const createRoomRequest = async (newRoomName: string, dispatch: any) => {
   try {
     const response = await axios.post(
@@ -48,10 +44,8 @@ const createRoomRequest = async (newRoomName: string, dispatch: any) => {
       }
     );
 
-    // Assuming the API returns the newly created room
     const newRoom = response.data;
 
-    // Update the rooms in the state immediately after creating the room
     dispatch((prevState: RootState) => ({
       ...prevState,
       userState: {
@@ -66,7 +60,6 @@ const createRoomRequest = async (newRoomName: string, dispatch: any) => {
   }
 };
 
-// CreationBox Component
 const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
   onRoomCreated,
 }) => {
@@ -122,8 +115,8 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
                       <Button
                         onClick={async () => {
                           await createRoomRequest(roomName, onRoomCreated);
-                          onRoomCreated(roomName); // Callback to parent component
-                          onOpenChange(); // Close the modal after creation
+                          onRoomCreated(roomName);
+                          onOpenChange();
                         }}
                       >
                         Create
@@ -140,64 +133,85 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
   );
 };
 
-// RoomsRender Component
 const RoomsRender: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined
   );
 
-  const handleRoomCreated = async (roomName: string) => {
+  useEffect(() => {
+    const fetchAndSetRooms = async () => {
+      await roomUpdater(dispatch);
+      setLoading(false); // Set loading to false after rooms are fetched and set in state
+    };
+
+    fetchAndSetRooms();
+  }, [dispatch]);
+
+  const handleRoomCreated = async () => {
+    setLoading(true); // Set loading to true when a new room is created
     await roomUpdater(dispatch);
+    setLoading(false); // Set loading to false after rooms are updated
   };
 
+  if (loading) {
+    return <Spinner />;
+  }
+
   return (
-    <>
+    <div className="flex flex-row relative">
       {roomsJoined.length === 0 ? (
         <>
           <CreationBox onRoomCreated={handleRoomCreated} />
         </>
       ) : (
         <>
-          {roomsJoined.map((room) => (
-            <Card
-              key={room.id}
-              className={`
-                border 
-                border-sepia 
-                rounded-sm 
-                shadow-lg 
-                m-1 
-                bg-black/50 
-                hover:bg-black/70 
-                text-sepia 
-                hover:shadow-lg  
-                cursor-pointer
-                h-full
-                w-60
-              `}
-            >
-              <CardHeader className="font-semibold justify-center">
-                {room.room_name}
-              </CardHeader>
-              <CardBody
-                onClick={() => {
-                  handleRoomNavigation(room.id.toString(), navigate, dispatch);
-                }}
+          {roomsJoined.map((room) => {
+            return (
+              <Card
+                key={room.id}
+                className={`
+                  border 
+                  border-sepia 
+                  rounded-sm 
+                  shadow-lg 
+                  m-1 
+                  bg-black/50 
+                  hover:bg-black/70 
+                  text-sepia 
+                  hover:shadow-lg  
+                  cursor-pointer
+                  h-60
+                  w-60
+                `}
               >
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ac
-                  purus in massa egestas mollis varius; dignissim elementum.
-                </p>
-              </CardBody>
-            </Card>
-          ))}
+                <CardHeader className="font-semibold justify-center">
+                  {room.room_name}
+                </CardHeader>
+                <CardBody
+                  onClick={() => {
+                    handleRoomNavigation(
+                      room.id.toString(),
+                      navigate,
+                      dispatch
+                    );
+                  }}
+                >
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ac
+                    purus in massa egestas mollis varius; dignissim elementum.
+                  </p>
+                </CardBody>
+              </Card>
+            );
+          })}
           <CreationBox onRoomCreated={handleRoomCreated} />
-          {/* Render CreationBox at the end */}
         </>
       )}
-    </>
+    </div>
   );
 };
 

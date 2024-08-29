@@ -6,6 +6,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setToken, setTokenExpire, expTime, fetchToken } from "@/utils/login";
 import { GoogleLogin } from "@react-oauth/google";
+import { useDispatch } from "react-redux";
+import { setAuthenticated } from "@/state/userSlice";
 
 const API_BASE_URL = "http://localhost:8000/auth";
 
@@ -16,7 +18,7 @@ function LoginPage() {
   const [authPhase, setAuthPhase] = useState(1); // Use useState for authPhase
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   // Handle input changes
   const handleInputChange = (setter) => (event) => {
     setter(event.target.value);
@@ -63,6 +65,8 @@ function LoginPage() {
 
       if (response.data.username_set) {
         await handleLoginSuccess(response.data.access_token);
+        await dispatch(setAuthenticated());
+        
         navigate("/");
       } else {
         await setToken(response.data.access_token);
@@ -81,6 +85,7 @@ function LoginPage() {
     if (verifyTokenStatus.status === 200) {
       await setToken(token);
       await setTokenExpire(expTime().toString());
+      await dispatch(setAuthenticated());
     }
   };
 
@@ -94,9 +99,10 @@ function LoginPage() {
           `${API_BASE_URL}/change_username?username=${newUsername}&token=${token}`,
           null
         );
-
+        console.log(response.status);
         if (response.status === 200) {
           await setToken(response.data.access_token);
+          await dispatch(setAuthenticated());
           navigate("/");
         }
       } catch (error) {

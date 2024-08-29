@@ -11,9 +11,9 @@ import {
 } from "@/state/userSlice";
 import { useNavbarContext } from "@/providers/NavbarContext";
 import axios from "axios";
-import formatDateTime from "./timeFormatter";
+import formatDateTime from "../../utils/timeFormatter";
 import ChatComponent from "./chatComponent";
-import { _createNewChannel } from "./fetchers";
+import { _createNewChannel } from "../../utils/fetchers";
 import routes from "@/utils/routes";
 
 const Socket = () => {

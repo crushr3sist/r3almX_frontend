@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div
-      className={`w-screen h-screen transition-padding grain-bg duration-300  ${
+      className={`w-screen h-screen transition-padding grain-bg duration-300 ${
         isNavbarOpen ? "pb-28" : "pb-5"
       } flex flex-col text-sepia relative`}
     >
@@ -42,28 +42,28 @@ const HomePage: React.FC = () => {
             <div className="w-full flex flex-row items-center justify-between">
               <div className="flex items-center">
                 <Image
-                  className="pr-2"
+                  className="pr-2 md:shrink-0"
                   width={100}
                   src={logo}
                   isBlurred={true}
                 />
-                <p className="font-bianzhidai backdrop-blur-md text-lg text-pretty text-sepia">
+                <p className="font-bianzhidai backdrop-blur-md sm: text-lg text-pretty text-sepia">
                   R3almx - Create your way
                 </p>
               </div>
-              <div className="flex flex-row items-center space-x-4">
+              <div className="flex flex-row items-center space-x-4 m-2">
                 <SearchComponent />
               </div>
               <div className="flex flex-row items-center space-x-4">
-                <p className="mr-2">Welcome Back - {username}</p>
+                <p className="ml-2 mr-2">Welcome Back - {username}</p>
               </div>
             </div>
           </CardHeader>
           <Divider />
-          <CardBody className="flex-1 flex flex-col overflow-y-auto  pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50 p-4 space-y-4">
+          <CardBody className="flex-1 flex flex-col overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50 p-4 space-y-4">
             <div id="rooms" className="h-50">
               <h4>Your Rooms</h4>
-              <div className="flex flex-row justify-items-start overflow-x-auto p-2">
+              <div className="flex flex-row overflow-x-auto  p-2 space-x-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50">
                 <RoomsRender />
               </div>
             </div>
@@ -77,6 +77,7 @@ const HomePage: React.FC = () => {
             <Divider />
             <div id="feed">
               <h4>Your Friends feed:</h4>
+              <FeedRender />
             </div>
           </CardBody>
         </Card>
