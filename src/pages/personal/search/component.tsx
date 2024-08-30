@@ -6,6 +6,7 @@ import { debounce } from "lodash";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 import { Divider } from "@nextui-org/divider";
 import { useNavigate } from "react-router-dom";
+import { fetchToken } from "@/utils/login";
 
 export const SearchComponent = () => {
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -36,11 +37,13 @@ export const SearchComponent = () => {
     setLoading(true);
     setError(null);
     try {
+  const token = await fetchToken();
+
       const response = await axios.get(
         `${routes.friendsSearch}?query=${queryText}`,
         {
           headers: {
-            Authorization: `Bearer ${routes.userToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

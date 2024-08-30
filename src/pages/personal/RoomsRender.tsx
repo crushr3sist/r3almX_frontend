@@ -13,33 +13,31 @@ import {
   Spinner,
 } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/state/store";
+import { AppDispatch, RootState } from "@/state/store";
 import { clearRoomNotifications } from "@/state/connectionSlice";
 import { useNavigate } from "react-router-dom";
 import { BsPlusCircle } from "react-icons/bs";
 import axios from "axios";
-import { fetchRooms } from "@/utils/roomService";
 import { setRooms } from "@/state/userSlice";
 import routes from "@/utils/routes";
+import { fetchRoomsThunk } from "@/state/userThunks";
+import { fetchToken } from "@/utils/login";
 
 const handleRoomNavigation = (roomId: string, navigate: any, dispatch: any) => {
   dispatch(clearRoomNotifications(roomId));
   navigate(`/room/${roomId}`);
 };
 
-const roomUpdater = async (dispatch: any) => {
-  const rooms = await fetchRooms();
-  dispatch(setRooms(rooms));
-};
-
 const createRoomRequest = async (newRoomName: string, dispatch: any) => {
   try {
+  const token = await fetchToken();
+
     const response = await axios.post(
       `${routes.createRoom}?room_name=${newRoomName}`,
       null,
       {
         headers: {
-          Authorization: `Bearer ${routes.userToken}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -135,7 +133,7 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
 
 const RoomsRender: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(true);
 
   const roomsJoined = useSelector(
@@ -144,7 +142,8 @@ const RoomsRender: React.FC = () => {
 
   useEffect(() => {
     const fetchAndSetRooms = async () => {
-      await roomUpdater(dispatch);
+      await dispatch(fetchRoomsThunk());
+
       setLoading(false); // Set loading to false after rooms are fetched and set in state
     };
 
@@ -153,7 +152,7 @@ const RoomsRender: React.FC = () => {
 
   const handleRoomCreated = async () => {
     setLoading(true); // Set loading to true when a new room is created
-    await roomUpdater(dispatch);
+    await dispatch(fetchRoomsThunk());
     setLoading(false); // Set loading to false after rooms are updated
   };
 

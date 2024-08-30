@@ -40,7 +40,11 @@ export interface IPinnedFriends {
   username: string;
   pic: string;
 }
-
+export interface IUserFetch {
+  username: string;
+  email: string;
+  pic: string;
+}
 export interface IUserStateSlice {
   userState: {
     userStatus: "online" | "idle" | "dnd" | "offline";

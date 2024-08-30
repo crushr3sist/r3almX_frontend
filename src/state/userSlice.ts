@@ -1,6 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
-import routes from "@/utils/routes";
 import {
   IUserStateSlice,
   TSstatus,
@@ -8,30 +6,6 @@ import {
   IRoom,
   IPinnedFriends,
 } from "./userSliceInterfaces";
-
-export interface IUserFetch {
-  username: string;
-  email: string;
-  pic: string;
-}
-
-export const userDataFetcher = async (): Promise<IUserFetch> => {
-  const response = await axios.get(
-    `${routes.userFetch}?token=${routes.userToken}`
-  );
-  const user = response.data.user;
-  return user;
-};
-
-export const statusFetcher = async (): Promise<string | "offline"> => {
-  const response = await axios.get(
-    `${routes.statusFetch}?token=${routes.userToken}`
-  );
-  const status = response.data[Object.keys(response.data)[0]];
-  console.log("Fetched status:", status);
-
-  return status;
-};
 
 const initialState: IUserStateSlice = {
   userState: {

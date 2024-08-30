@@ -1,3 +1,4 @@
+import { fetchToken } from "@/utils/login";
 import routes from "@/utils/routes";
 import {
   Card,
@@ -97,11 +98,12 @@ const ChatComponent = ({
   const editChannelName = (channelId, roomId) => {};
 
   const deleteChannel = async (channelId, roomId) => {
+    const token = await fetchToken()
     await axios.delete(
       `${routes.channelDelete}?channel_id=${channelId}&room_id=${roomId}`,
       {
         headers: {
-          Authorization: `Bearer ${routes.userToken}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );

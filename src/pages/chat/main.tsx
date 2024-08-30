@@ -15,8 +15,9 @@ import formatDateTime from "../../utils/timeFormatter";
 import ChatComponent from "./chatComponent";
 import { _createNewChannel } from "../../utils/fetchers";
 import routes from "@/utils/routes";
+import { fetchToken } from "@/utils/login";
 
-const Socket = () => {
+const Socket = async () => {
   const { room_id } = useParams();
 
   const didUnmount = useRef(false);
@@ -51,8 +52,10 @@ const Socket = () => {
 
   const roomName = roomsJoined.find((room) => room.id === room_id)?.room_name;
   const [channelId, setChannelId] = useState(lastVisitedChannel || "");
+  const token = fetchToken();
+
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
-    `${routes.messageSocket}/${room_id}?token=${routes.userToken}`,
+    `${routes.messageSocket}/${room_id}?token=${token}`,
     {
       shouldReconnect: () => !didUnmount.current,
       reconnectAttempts: 10,
@@ -66,7 +69,7 @@ const Socket = () => {
         `${routes.channelFetch}?room_id=${room_id}`,
         {
           headers: {
-            Authorization: `Bearer ${routes.userToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -86,7 +89,7 @@ const Socket = () => {
           `${routes.channelFetch}?room_id=${room_id}`,
           {
             headers: {
-              Authorization: `Bearer ${routes.userToken}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -96,7 +99,7 @@ const Socket = () => {
       }
     };
     fetchChannels();
-  }, [room_id, routes.userToken]);
+  }, [room_id, token]);
 
   // Fetch cached messages when channelId or room_id changes and initialCacheLoaded is false
   useEffect(() => {
@@ -108,7 +111,7 @@ const Socket = () => {
           `${routes.channelCache}?room_id=${room_id}&channel_id=${channelId}`,
           {
             headers: {
-              Authorization: `Bearer ${routes.userToken}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -126,7 +129,7 @@ const Socket = () => {
     };
 
     fetchChannelMessagesIfNeeded();
-  }, [room_id, channelId, routes.userToken, initialCacheLoaded]);
+  }, [room_id, channelId, token, initialCacheLoaded]);
 
   // Handle new incoming WebSocket messages
   useEffect(() => {
@@ -193,7 +196,7 @@ const Socket = () => {
             `${routes.channelCache}?room_id=${room_id}&channel_id=${channelId}`,
             {
               headers: {
-                Authorization: `Bearer ${routes.userToken}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );
@@ -214,7 +217,7 @@ const Socket = () => {
 
       fetchNewChannelMessages();
     }
-  }, [channelId, room_id, routes.userToken]);
+  }, [channelId, room_id, token]);
 
   // Scroll to bottom whenever message history updates
   useEffect(() => {

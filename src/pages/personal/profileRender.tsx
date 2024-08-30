@@ -4,24 +4,28 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import routes from "@/utils/routes";
 import { useLocation } from "react-router-dom";
+import { fetchToken } from "@/utils/login";
 
 const fetchUserInfo = async (
   username: string,
   userId: string
 ): Promise<any> => {
+  const token = await fetchToken()
   const response = await axios.get(
-    `${routes.fetchUser}?token=${routes.userToken}&username=${username}&userid=${userId}`
+    `${routes.fetchUser}?token=${token}&username=${username}&userid=${userId}`
   );
   return response.data;
 };
 
 const sendFriendRequest = async (username: string, userId: string) => {
+  const token = await fetchToken();
+  
   const response = await axios.post(
     `${routes.friendRequest}?username=${username}&user_id=${userId}`,
     {},
     {
       headers: {
-        Authorization: `Bearer ${routes.userToken}`,
+        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -29,9 +33,11 @@ const sendFriendRequest = async (username: string, userId: string) => {
 };
 
 const checkFriendStatus = async (userId: string) => {
+  const token = await fetchToken();
+ 
   const response = await axios.get(`${routes.friendStatus}?user_id=${userId}`, {
     headers: {
-      Authorization: `Bearer ${routes.userToken}`,
+      Authorization: `Bearer ${token}`,
     },
   });
   return response.data;
