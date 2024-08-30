@@ -17,6 +17,7 @@ import {
   fetchRoomsThunk,
   fetchFriendsThunk,
   fetchStatusThunk,
+  checkAuthenticationThunk,
 } from "./state/userThunks";
 import { fetchToken } from "./utils/login";
 
@@ -50,13 +51,12 @@ const ClientController = () => {
         webSocketService.onmessage = async (e) => {
           const { type, payload } = e.data;
 
-          if (type === "STATUS_UPDATE") {
-            await dispatch(fetchStatusThunk());
-          }
+          // if (type === "STATUS_UPDATE") {
+          //   await dispatch(fetchStatusThunk());
+          // }
 
+          dispatch(fetchStatusThunk());
           if (type === "WEBSOCKET_MESSAGE") {
-            dispatch(fetchStatusThunk());
-
             if (payload.message) {
               const { room_id, channel_id, mid } = payload.message;
               const sender = payload.sender;
@@ -75,7 +75,7 @@ const ClientController = () => {
           }
         };
       } else {
-        dispatch(checkAuthentication())
+        dispatch(checkAuthenticationThunk())
       }
     };
 

@@ -4,6 +4,7 @@ import {
   fetchFriends,
   fetchRooms,
   statusFetcher,
+  verifyToken,
 } from "@/utils/backendCalls";
 
 import {
@@ -13,9 +14,11 @@ import {
   setRooms,
   setStatus,
   addPinnedFriends,
+  setAuthenticated,
 } from "./userSlice";
 
 import { TSstatus } from "./userSliceInterfaces";
+import { fetchToken } from "@/utils/login";
 
 export const fetchUserDataThunk = createAsyncThunk(
   "user/fetchUserData",
@@ -25,6 +28,18 @@ export const fetchUserDataThunk = createAsyncThunk(
     dispatch(setEmail(user.email));
     dispatch(setPic(user.pic));
     return user;
+  }
+);
+
+export const checkAuthenticationThunk = createAsyncThunk(
+  "user/checkAuthentication",
+  async (_, { dispatch }) => {
+    const token = await fetchToken();
+    const tokenValidation = verifyToken(token);
+    if ((await tokenValidation).status === 200) {
+      dispatch(setAuthenticated());
+      return tokenValidation;
+    }
   }
 );
 
@@ -47,6 +62,7 @@ export const fetchFriendsThunk = createAsyncThunk(
     return pinnedFriends;
   }
 );
+
 export const fetchStatusThunk = createAsyncThunk(
   "users/fetchStatus",
   async (_, { dispatch }) => {
