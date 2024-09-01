@@ -17,7 +17,9 @@ import { _createNewChannel } from "../../utils/fetchers";
 import routes from "@/utils/routes";
 import { fetchToken } from "@/utils/login";
 
-const Socket = async () => {
+const token = await fetchToken();
+
+const Socket = () => {
   const { room_id } = useParams();
 
   const didUnmount = useRef(false);
@@ -52,7 +54,6 @@ const Socket = async () => {
 
   const roomName = roomsJoined.find((room) => room.id === room_id)?.room_name;
   const [channelId, setChannelId] = useState(lastVisitedChannel || "");
-  const token = fetchToken();
 
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
     `${routes.messageSocket}/${room_id}?token=${token}`,
@@ -63,6 +64,8 @@ const Socket = async () => {
     }
   );
   const updateRoom = async () => {
+    const token = await fetchToken();
+
     if (!room_id) return;
     try {
       const response = await axios.get(
