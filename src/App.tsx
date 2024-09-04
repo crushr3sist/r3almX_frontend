@@ -75,7 +75,12 @@ const ClientController = () => {
           }
         };
       } else {
-        dispatch(checkAuthenticationThunk())
+        if (window.performance) {
+          if (!(performance.navigation.type == 1)) {
+            dispatch(checkAuthenticationThunk());
+          }
+        }
+        dispatch(checkAuthenticationThunk());
       }
     };
 
