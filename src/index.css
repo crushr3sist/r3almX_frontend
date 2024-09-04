@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
+.texture-background {
+  background-image: url("./assets/texture.jpg");
+  background-size: cover; 
+  height: 100vh;
+  background-attachment: fixed; 
+}
 
 @layer utilities {
   .grain-bg {
@@ -15,33 +19,37 @@
     @apply absolute inset-0 pointer-events-none;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><rect width="1" height="1" fill="rgba(255,255,255,0.05)"/></svg>');
     background-size: 3px 3px;
-    opacity: 0.5;
+    opacity: 0.4; /* Slightly less opaque for subtle texture */
     z-index: 1;
   }
 }
 
 @font-face {
   font-family: 'Bianzhidai Bubble';
-  src: url('./fonts/bianzhidai_noBG-Bubble.otf'); /* Adjust the format and path accordingly */
+  src: url('./fonts/bianzhidai_noBG-Bubble.otf');
   font-weight: normal;
   font-style: normal;
 }
 
+/* Frosted glass effect with refined borders */
 .frosted-glass {
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent white */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Semi-transparent border */
+  backdrop-filter: blur(12px); /* Slightly more blur for softness */
+  background-color: rgba(255, 255, 255, 0.2); /* Softer transparency */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius); /* Adds smooth curves to the corners */
 }
 
+/* Sepia tones for text and accents */
 .text-sepia {
-  color: #f4ecd8; /* or any other sepia color value */
+  color: #f4ecd8;
 }
 
 .bg-sepia {
-  background-color: #f4ecd8; /* or any other sepia color value */
+  background-color: #f4ecd8;
 }
 
-/* Scrollbar styles */
+
+/* Scrollbar styling */
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -52,11 +60,11 @@
   border-radius: 3px;
 }
 
-.scrollbar-track-black\/50::-webkit-scrollbar-track {
+.scrollbar-track-black::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-/* Animation styles */
+/* Animation enhancements */
 @keyframes slideIn {
   0% {
     opacity: 0;
@@ -72,14 +80,13 @@
   animation: slideIn 0.3s ease-in-out;
 }
 
+/* Root color variables for dark mode */
 @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
@@ -93,23 +100,23 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Slightly more rounded corners */
   }
 
   .dark {
     --background: 0 100% 0%; /* Black */
     --foreground: 210 40% 98%;
-    --card: 222 30% 10%; /* Black */
+    --card: 222 30% 10%; /* Dark black */
     --card-foreground: 210 40% 98%;
-    --popover: 222 30% 10%; /* Black */
+    --popover: 222 30% 10%; /* Dark black */
     --popover-foreground: 210 40% 98%;
-    --primary: 240 60% 60%; /* Blue */
+    --primary: 240 60% 60%; /* Subtle Blue */
     --primary-foreground: 210 40% 98%;
-    --secondary: 280 60% 60%; /* Purple */
+    --secondary: 280 60% 60%; /* Subtle Purple */
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 280 60% 60%; /* Purple */
+    --accent: 280 60% 60%; /* Subtle Purple */
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -117,8 +124,13 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+.sepia-border {
+
+  --border: #f4ecd8 
+}
 }
 
+/* Global styling for text and backgrounds */
 @layer base {
   * {
     @apply border-border;

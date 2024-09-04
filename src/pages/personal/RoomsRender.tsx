@@ -68,8 +68,8 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
     <>
       <Card
         className={`
-          border 
-          border-sepia 
+          border
+          border-[#f4ecd8] 
           rounded-sm 
           shadow-lg 
           m-1 
@@ -173,8 +173,8 @@ const RoomsRender: React.FC = () => {
               <Card
                 key={room.id}
                 className={`
-                  border 
-                  border-sepia 
+                  border
+          border-[#f4ecd8] 
                   rounded-sm 
                   shadow-lg 
                   m-1 

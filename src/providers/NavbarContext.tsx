@@ -48,7 +48,7 @@ export const NavbarProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <NavbarContext.Provider value={{ isNavbarOpen, setIsNavbarOpen }}>
-      {children}
+      <div className="texture-background">{children}</div>
     </NavbarContext.Provider>
   );
 };

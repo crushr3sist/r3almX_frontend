@@ -98,7 +98,7 @@ const ChatComponent = ({
   const editChannelName = (channelId, roomId) => {};
 
   const deleteChannel = async (channelId, roomId) => {
-    const token = await fetchToken()
+    const token = await fetchToken();
     await axios.delete(
       `${routes.channelDelete}?channel_id=${channelId}&room_id=${roomId}`,
       {
@@ -119,7 +119,8 @@ const ChatComponent = ({
         <Card
           className={`flex flex-col h-full ${
             isSidebarOpen ? "w-3/4" : "w-full"
-          } rounded-lg shadow-lg bg-black/90 border border-sepia text-sepia backdrop-blur-md transition-width duration-300`}
+          } rounded-lg shadow-lg bg-black/90 border
+          border-[#f4ecd8]  text-sepia backdrop-blur-md transition-width duration-300`}
         >
           <CardHeader className="flex items-center justify-between px-4 py-2 bg-black/80 rounded-t-lg">
             <span className="text-lg font-semibold">
@@ -212,7 +213,8 @@ const ChatComponent = ({
                   }
                 }}
                 placeholder="Enter your message"
-                className="flex-1 bg-black/70 text-sepia placeholder-gray-500 border-sepia focus:border-sepia focus:ring-0 rounded-lg"
+                className="flex-1 bg-black/70 text-sepia placeholder-gray-500 border
+          border-[#f4ecd8]  focus:ring-0 rounded-lg"
                 endContent={
                   <BsEmojiSmile
                     size={20}
@@ -256,11 +258,13 @@ const ChatComponent = ({
           <div className="p-4">
             <Input
               placeholder="Search members"
-              className="w-full bg-black/70 text-sepia placeholder-gray-500 border-sepia focus:border-sepia focus:ring-0 rounded-lg"
+              className="w-full bg-black/70 text-sepia placeholder-gray-500 border
+          border-[#f4ecd8]  focus:ring-0 rounded-lg"
             />
             <Button
               onPress={onOpen}
-              className="w-full bg-black/70 text-sepia placeholder-gray-500 border-sepia focus:border-sepia focus:ring-0 rounded-lg"
+              className="w-full bg-black/70 text-sepia placeholder-gray-500 border
+          border-[#f4ecd8]  focus:ring-0 rounded-lg"
             >
               Add Channel <BsPlusCircleDotted size={20} />
             </Button>

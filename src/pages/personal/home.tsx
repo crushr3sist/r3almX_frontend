@@ -9,23 +9,24 @@ import { SearchComponent } from "./search/component";
 
 const NewsRender: React.FC = () => {
   return (
-    <>
-      <h1>ff</h1>
-    </>
+    <div className="animate-slideIn">
+      <h1 className="text-lg font-bianzhidai">News:</h1>
+      <p className="text-sepia">Latest updates will be displayed here.</p>
+    </div>
   );
 };
 
 const FeedRender: React.FC = () => {
   return (
-    <>
-      <h1>ff</h1>
-    </>
+    <div className="animate-slideIn">
+      <h1 className="text-lg font-bianzhidai">Your Friends Feed:</h1>
+      <p className="text-sepia">Check out what your friends are up to.</p>
+    </div>
   );
 };
 
 const HomePage: React.FC = () => {
   const { isNavbarOpen } = useNavbarContext();
-
   const username = useSelector(
     (state: RootState) => state.userState.userState.username
   );
@@ -36,8 +37,8 @@ const HomePage: React.FC = () => {
         isNavbarOpen ? "pb-28" : "pb-5"
       } flex flex-col text-sepia relative`}
     >
-      <div className="flex w-full h-full p-5">
-        <Card className="h-full w-full rounded-sm shadow-lg bg-black/90 border border-sepia text-sepia backdrop-blur-md transition-width duration-300">
+      <div className="flex  w-full h-full p-5">
+        <Card className="h-full w-full rounded-lg shadow-lg bg-black/90 border border-[#f4ecd8] text-sepia backdrop-blur-md transition-width duration-300">
           <CardHeader>
             <div className="w-full flex flex-row items-center justify-between">
               <div className="flex items-center">
@@ -46,8 +47,9 @@ const HomePage: React.FC = () => {
                   width={100}
                   src={logo}
                   isBlurred={true}
+                  alt="R3almx Logo"
                 />
-                <p className="font-bianzhidai backdrop-blur-md sm: text-lg text-pretty text-sepia">
+                <p className="font-bianzhidai text-lg text-pretty text-sepia">
                   R3almx - Create your way
                 </p>
               </div>
@@ -59,26 +61,13 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </CardHeader>
-          <Divider />
-          <CardBody className="flex-1 flex flex-col overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50 p-4 space-y-4">
-            <div id="rooms" className="h-50">
-              <h4>Your Rooms</h4>
-              <div className="flex flex-row overflow-x-auto  p-2 space-x-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50">
-                <RoomsRender />
-              </div>
-            </div>
+          <Divider className="bg-sepia" />
+          <CardBody className="p-2 text-sepia flex flex-col space-y-4">
+            <RoomsRender />
             <Divider />
-            <div id="news">
-              <h4>News:</h4>
-              <div className="flex flex-row justify-items-start overflow-x-auto p-2">
-                <NewsRender />
-              </div>
-            </div>
+            <FeedRender />
             <Divider />
-            <div id="feed">
-              <h4>Your Friends feed:</h4>
-              <FeedRender />
-            </div>
+            <NewsRender />
           </CardBody>
         </Card>
       </div>

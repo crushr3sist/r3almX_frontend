@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <GoogleOAuthProvider clientId="1033716509262-h52etdps8cab2p2ab7gfh8li40u8opsa.apps.googleusercontent.com">
       <Provider store={store}>
         <NextUIProvider>
-          <main className="dark text-foreground !grain-bg h-screen w-screen">
+          <main className="dark text-foreground   h-screen w-screen">
             <NavbarProvider>
               <ClientController />
             </NavbarProvider>

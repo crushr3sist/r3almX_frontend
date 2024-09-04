@@ -37,7 +37,7 @@ export const SearchComponent = () => {
     setLoading(true);
     setError(null);
     try {
-  const token = await fetchToken();
+      const token = await fetchToken();
 
       const response = await axios.get(
         `${routes.friendsSearch}?query=${queryText}`,
@@ -88,7 +88,10 @@ export const SearchComponent = () => {
           />
           {searchExpanded && results.length > 0 && (
             <div className="absolute top-full mt-2 z-50 w-full">
-              <Card className="flex flex-col bg-black/90 border border-sepia text-sepia">
+              <Card
+                className="flex flex-col bg-black/90 border
+          border-[#f4ecd8]  text-sepia"
+              >
                 <CardBody>
                   {loading && (
                     <p>
