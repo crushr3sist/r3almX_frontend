@@ -5,6 +5,7 @@ import {
   AvatarGroup,
   Badge,
   Button,
+  Divider,
   Spinner,
   useDisclosure,
 } from "@nextui-org/react";
@@ -28,6 +29,7 @@ import { RootState } from "@/state/store";
 import { useNavbarContext } from "../providers/NavbarContext";
 import { clearRoomNotifications } from "@/state/connectionSlice";
 import { logOff } from "./logOff";
+import { IPinnedFriends } from "@/state/userSliceInterfaces";
 
 export default function NavBar() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -43,7 +45,7 @@ export default function NavBar() {
   );
   const pinnedFriends = useSelector(
     (state: RootState) => state.userState.pinnedFriends
-  );
+  ) as IPinnedFriends[] | string[];
   const status = useSelector(
     (state: RootState) => state.userState.userState.userStatus
   );
@@ -78,22 +80,34 @@ export default function NavBar() {
     <div
       id="drawer-trigger"
       className={`
-      fixed 
-      inset-x-0 
-      bottom-0 
-      h-20 
-      flex 
-      border 
-      border-[#f4ecd8] 
-      p-5
-      ${isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"} 
-      justify-center 
-      items-center 
-      transition-transform 
-      duration-300
-      `}
+      fixed inset-x-0 bottom-0 h-20 flex 
+      ${isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"}
+          p-5
+
+        justify-center items-center transition-transform duration-300
+        `}
     >
-      <div className="flex items-center justify-between w-full p-2 bg-black/80 backdrop-blur-md">
+      <div
+        id="drawer-trigger"
+        className={`
+          isolate 
+          flex 
+          justify-between 
+          relative
+          items-center 
+          p-5
+          gap-6 
+          w-full 
+          rounded-t-sm 
+          backdrop-blur-md 
+          border 
+          border-[#f4ecd8] 
+          transition-shadow 
+          duration-300 
+          hover:shadow-lg 
+          shadow-orange-500
+          `}
+      >
         <div className="flex items-center space-x-4">
           <Avatar src={pfp} className="border-2 border-[#f4ecd8]" />
           <Badge
@@ -111,7 +125,7 @@ export default function NavBar() {
           >
             <Dropdown radius="sm">
               <DropdownTrigger>
-                <Button>
+                <Button variant="bordered" className="border-[#f4ecd8] ">
                   Status: <StatusDot status={status} />
                 </Button>
               </DropdownTrigger>
@@ -145,93 +159,101 @@ export default function NavBar() {
             </Dropdown>
           </Badge>
         </div>
-        <div className="flex items-center space-x-4">
-          <Button variant="bordered" onClick={() => navigate("/settings")}>
-            <BsGear size={20} />
-          </Button>
-          <Button
-            variant="bordered"
-            onClick={onOpen}
-          >
-            <BsArrowBarRight size={20} />
-          </Button>
-          <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    R3almx
-                  </ModalHeader>
-                  <ModalBody>Are you sure you want to Log Out?</ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={logOff}>
-                      Log Out
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                      Close
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
-        </div>
-      </div>
-      {/* Main Section */}
-      <div className="flex items-center justify-between w-full p-2 overflow-x-auto bg-black/60 backdrop-blur-md">
-        <div className="flex items-center space-x-2">
-          <AvatarGroup size="md">
-            {pinnedFriends.length ? (
+        <Divider orientation="vertical" className="h-full bg-sepia/30" />
+        <div className="">
+          <AvatarGroup className="space-x-2">
+            {Array.isArray(pinnedFriends) && pinnedFriends.length > 0 ? (
               pinnedFriends.map((friend, index) => (
                 <Avatar
                   key={index}
+                  className="transition-transform duration-300 hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-[#f4ecd8] "
                   src={friend.pic}
-                  className="cursor-pointer hover:-translate-y-1 transition-transform duration-300"
-                  onClick={() =>
+                  onClick={() => {
                     navigate(`/@/${friend.username}`, {
                       state: { userId: friend.user_id },
-                    })
-                  }
+                    });
+                  }}
                 />
               ))
             ) : (
-              <Spinner />
+              <div></div> // Optional: Handle empty state
             )}
           </AvatarGroup>
         </div>
-
-        <div className="flex flex-wrap space-x-4 ml-6">
+        <div className="flex flex-row ml-6 overflow-auto ">
           {roomsJoined.map((room) => {
             const roomNotifications = notifications.filter(
               (n) => n.roomId === room.id
             ).length;
             return (
-              <Button
-                key={room.id}
-                variant="flat"
-                className="transition-transform duration-300"
-                onClick={() => handleRoomNavigation(room.id)}
+              <div
+                key={room.id as string} // Add type assertion here
+                className="flex flex-row items-center gap-2 p-2  bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={() => handleRoomNavigation(room.id.toString())}
               >
-                {room.room_name}
+                <div className="font-semibold">{room.room_name}</div>
                 {roomNotifications > 0 && (
-                  <Badge
-                    color="danger"
-                    content={roomNotifications}
-                    className="ml-2"
-                  >
-                    <span>{roomNotifications}</span>
-                  </Badge>
+                  <div className="text-sm text-red-500">
+                    {roomNotifications}
+                  </div>
                 )}
-              </Button>
+              </div>
             );
           })}
         </div>
-      </div>
-      {/* Bottom Section */}
-      <div className="flex justify-end w-full p-2 bg-black/70 backdrop-blur-md">
-        <Button variant="bordered" onClick={() => navigate("/")}>
-          <BsHouseExclamation size={20} />
-        </Button>
+        <div className="flex justify-end ml-6">
+          <div className="flex justify-end gap-2 p-2  items-center text-sepia bg-black/50 hover:bg-black/70 transition-all duration-300 cursor-pointer space-x-2">
+            <Button
+              onClick={() => {
+                navigate("/");
+              }}
+              className="rounded-sm border-[#f4ecd8] "
+              variant="bordered"
+            >
+              <BsHouseExclamation size={20} />
+            </Button>
+            <Button
+              className="rounded-sm border-[#f4ecd8] "
+              onClick={() => {
+                navigate("/settings");
+              }}
+              variant="bordered"
+            >
+              <BsGear size={20} />
+            </Button>
+            <Button
+              onPress={onOpen}
+              className="rounded-sm border-[#f4ecd8] "
+              variant="bordered"
+            >
+              Log Out
+              <BsArrowBarRight size={20} />
+            </Button>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+              <ModalContent>
+                {(onClose) => (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      {
+                        // add logo with name
+                      }{" "}
+                      R3almx{" "}
+                    </ModalHeader>
+                    <ModalBody>Are you sure you want to Log Out</ModalBody>
+                    <ModalFooter>
+                      <Button color="danger" variant="light" onPress={logOff}>
+                        Log Out
+                      </Button>
+                      <Button color="primary" onPress={onClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -130,7 +130,6 @@ const ChatComponent = ({
                 <p className="gap-2">{channelDesc}</p>
               </div>
             </span>
-
             <span
               className={`text-sm ${
                 connectionStatus === "Open" ? "text-green-500" : "text-red-500"
@@ -215,13 +214,6 @@ const ChatComponent = ({
                 placeholder="Enter your message"
                 className="flex-1 bg-black/70 text-sepia placeholder-gray-500 border
           border-[#f4ecd8]  focus:ring-0 rounded-lg"
-                endContent={
-                  <BsEmojiSmile
-                    size={20}
-                    onClick={() => <EmojiPicker open={true} />}
-                    className="cursor-pointer text-sepia hover:text-sepia/80 transition-colors duration-200"
-                  />
-                }
               />
               <Button
                 onClick={handleSendMessage}

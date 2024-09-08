@@ -81,9 +81,17 @@ const Socket = () => {
       console.error("Error fetching channels:", error);
     }
   };
+
   const scrollRef = useRef<HTMLUListElement>(null);
 
-  // Fetch channels when room_id changes
+  /**
+   * FetchChannels
+   * operations:
+   *  - check current room_id
+   *  - fetch user's channels from backend
+   *  - setChannels in component state
+   *  - calls itself and watches for the room id or token changes
+   */
   useEffect(() => {
     const fetchChannels = async () => {
       if (!room_id) return;
@@ -104,10 +112,21 @@ const Socket = () => {
     fetchChannels();
   }, [room_id, token]);
 
-  // Fetch cached messages when channelId or room_id changes and initialCacheLoaded is false
+  /**
+   * fetchChannelMessagesIfNeeded
+   * operations:
+   *  - checks to see if channelId, room_id or initialCacheLoaded is failed
+   *  - fetches the channel's cache
+   *  - set's the cached messages before any more messages polled in events
+   *  - watches room_id, channelId, token and initialCacheLoaded
+   */
   useEffect(() => {
     const fetchChannelMessagesIfNeeded = async () => {
       if (!channelId || !room_id || initialCacheLoaded) return;
+      // we're going to observe the effect watchers
+      console.log(
+        `{channelId: ${channelId}\nroom_id: ${room_id}\ninitialCacheLoaded:${initialCacheLoaded}}`
+      );
 
       try {
         const response = await axios.get(
@@ -119,10 +138,21 @@ const Socket = () => {
           }
         );
 
-        const cachedMessages = response.data || [];
+        const cachedMessages = JSON.parse(response.data || []);
+        console.log(
+          `cachedMessages: ${cachedMessages}, ${typeof cachedMessages}`
+        );
+
         const parsedMessages = cachedMessages.reverse().map((msg) => ({
           data: JSON.stringify(msg),
         }));
+
+        console.log(
+          `parsedMessages: ${parsedMessages}, ${typeof parsedMessages}`
+        );
+
+        console.log(cachedMessages);
+        console.log(parsedMessages);
 
         setMessageHistory(parsedMessages);
         setInitialCacheLoaded(true);
