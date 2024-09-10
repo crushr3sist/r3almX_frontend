@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.texture-background {
-  background-image: url("./assets/texture.jpg");
-  background-size: cover; 
-  height: 100vh;
-  background-attachment: fixed; 
-}
-
 @layer utilities {
   .grain-bg {
     @apply relative bg-black overflow-hidden;
@@ -29,6 +22,13 @@
   src: url('./fonts/bianzhidai_noBG-Bubble.otf');
   font-weight: normal;
   font-style: normal;
+  
+
+}
+.text-glow {
+  background:#000000;
+  color:#fff;
+  text-shadow:1px 1px 10px #fff, 1px 1px 10px #ccc;
 }
 
 /* Frosted glass effect with refined borders */

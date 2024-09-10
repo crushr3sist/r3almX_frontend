@@ -17,10 +17,9 @@ import { _createNewChannel } from "../../utils/fetchers";
 import routes from "@/utils/routes";
 import { fetchToken } from "@/utils/login";
 
-const token = await fetchToken();
-
 const Socket = () => {
   const { room_id } = useParams();
+  const token = localStorage.getItem("token");
 
   const didUnmount = useRef(false);
   const dispatch = useDispatch();

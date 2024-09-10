@@ -49,7 +49,7 @@ const HomePage: React.FC = () => {
                   isBlurred={true}
                   alt="R3almx Logo"
                 />
-                <p className="font-bianzhidai text-lg text-pretty text-sepia">
+                <p className="font-bianzhidai text-glow text-lg text-pretty text-sepia">
                   R3almx - Create your way
                 </p>
               </div>

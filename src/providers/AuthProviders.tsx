@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../components/navbar";
 import { NavbarProvider } from "./NavbarContext";
+import { logOff } from "@/components/logOff";
 
 const AuthProvider = ({ ProtectedPage }: any) => {
   const navigate = useNavigate();
@@ -10,9 +11,11 @@ const AuthProvider = ({ ProtectedPage }: any) => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (token === "" || token === null) {
+    if (token === "" || token === null || token === undefined) {
       console.log("user's token isnt true");
       allowRender(false);
+      logOff()
+      navigate("/auth/login");
     } else {
       allowRender(true);
     }
