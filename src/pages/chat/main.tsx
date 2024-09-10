@@ -124,9 +124,6 @@ const Socket = () => {
     const fetchChannelMessagesIfNeeded = async () => {
       if (!channelId || !room_id || initialCacheLoaded) return;
       // we're going to observe the effect watchers
-      console.log(
-        `{channelId: ${channelId}\nroom_id: ${room_id}\ninitialCacheLoaded:${initialCacheLoaded}}`
-      );
 
       try {
         const response = await axios.get(
@@ -139,20 +136,9 @@ const Socket = () => {
         );
 
         const cachedMessages = JSON.parse(response.data || []);
-        console.log(
-          `cachedMessages: ${cachedMessages}, ${typeof cachedMessages}`
-        );
-
         const parsedMessages = cachedMessages.reverse().map((msg) => ({
           data: JSON.stringify(msg),
         }));
-
-        console.log(
-          `parsedMessages: ${parsedMessages}, ${typeof parsedMessages}`
-        );
-
-        console.log(cachedMessages);
-        console.log(parsedMessages);
 
         setMessageHistory(parsedMessages);
         setInitialCacheLoaded(true);

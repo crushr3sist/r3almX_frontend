@@ -37,6 +37,9 @@ export const checkAuthenticationThunk = createAsyncThunk(
   async (_, { dispatch }) => {
     const token = await fetchToken();
     const tokenValidation = verifyToken(token);
+    if (token === null) {
+      return tokenValidation;
+    }
     if ((await tokenValidation).status === 200) {
       dispatch(setAuthenticated());
       return tokenValidation;
