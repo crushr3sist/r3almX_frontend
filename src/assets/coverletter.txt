@@ -1,0 +1,58 @@
+Queensland, Australia | rohaanerodasahmed@gmail.com | +61 450074058
+LinkedIn: https://www.linkedin.com/in/rohaan-erodas-ahmed/ | GitHub: https://github.com/crushr3sist
+[Current Date]
+Hiring Manager
+Emesent
+Milton, Brisbane QLD
+Re: Application for Graduate Software Engineer Position
+Dear Hiring Manager,
+I am writing to apply for the Graduate Software Engineer position with Emesent's Commander Team in Brisbane. As a final-year Bachelor of Computer Science student at the University of Southern Queensland with a GPA of 6.6/7.0, I am excited about contributing to Emesent's innovative robotics and autonomous mapping technology.
+Key qualifications that align with your requirements:
+
+React and JavaScript Development:
+
+Developed full-stack applications using React, including CrowBank with a React frontend
+Strong proficiency in JavaScript and TypeScript
+Eager to apply and expand skills to React Native development
+
+
+Frontend and UI Development:
+
+Experience in creating user interfaces with React, Tailwind CSS, and SASS
+Passionate about building great front ends for excellent user experience
+Keen to work on tablet-based UI for autonomous robot control and real-time visualization
+
+
+Software Engineering Practices:
+
+Familiar with writing clear, concise, and well-documented code
+Experience with version control using Git
+Ready to learn and implement unit and functional testing with Jest
+
+
+API Integration and Backend Development:
+
+Developed RESTful APIs using FastAPI and Express
+Experience integrating frontend applications with backend services
+Knowledgeable in working with databases like PostgreSQL and MongoDB
+
+
+Collaborative Development:
+
+Engaged in project planning and feature design in freelance work
+Committed to delivering high-quality code on time
+Eager to contribute to team knowledge and implement best practices
+
+
+Relevant Projects:
+
+NucleiSystems: FastAPI backend with IPFS storage and Redis cache
+r3almX: FastAPI backend with PostgreSQL, Redis, and RabbitMQ
+CrowBank: Express TypeScript backend with React frontend
+
+
+
+I am enthusiastic about the opportunity to apply my skills to Emesent's cutting-edge robotics projects. My strong foundation in software development, combined with my eagerness to learn and adapt to new technologies like React Native, positions me well to contribute effectively to your team.
+Thank you for considering my application. I look forward to the opportunity to discuss how I can contribute to Emesent's mission of autonomously mapping the inaccessible.
+Sincerely,
+Rohaan Ahmed

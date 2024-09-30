@@ -24,18 +24,18 @@ export const userDataFetcher = async (): Promise<IUserFetch> => {
   return user;
 };
 
-export const statusFetcher = async (): Promise<string | "offline"> => {
+export const statusFetcher = async (): Promise<string> => {
   const token = await fetchToken();
   const response = await axios.get(`${routes.statusFetch}?token=${token}`);
-  const status = response.data[Object.keys(response.data)[0]];
+  console.log(response.data);
 
-  return status;
+  return response.data;
 };
 
 export const fetchRooms = async (): Promise<{
   rooms: IRoom[] | null;
 }> => {
-  const token = await fetchToken()
+  const token = await fetchToken();
   try {
     const response = await axios.get(routes.roomFetch, {
       headers: {
@@ -61,7 +61,7 @@ export const loginUser = async (
   setErrorMessage
 ) => {
   const navigate = useNavigate();
-  
+
   try {
     const response = await axios.post(
       `${routes.createToken}?username=${username}&password=${password}`

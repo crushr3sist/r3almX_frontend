@@ -51,9 +51,9 @@ const ClientController = () => {
         webSocketService.onmessage = async (e) => {
           const { type, payload } = e.data;
 
-          // if (type === "STATUS_UPDATE") {
-          //   await dispatch(fetchStatusThunk());
-          // }
+          if (type === "STATUS_UPDATE") {
+            await dispatch(fetchStatusThunk());
+          }
 
           dispatch(fetchStatusThunk());
           if (type === "WEBSOCKET_MESSAGE") {
