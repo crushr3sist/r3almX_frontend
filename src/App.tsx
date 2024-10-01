@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AuthProvider from "@/providers/AuthProviders";
 import LoggedOutUserProvider from "./providers/NonAuthProvider";
 import LoginPage from "./pages/auth/Login";
@@ -23,86 +23,114 @@ import { fetchToken } from "./utils/login";
 
 const ClientController = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [connection, setConnectionInstance] = useState<Worker | null>(null); // Ensure null is an acceptable type
   const isAuthenticated = useSelector(
     (state: RootState) => state.userState.userState.isAuthenticated
   );
-  console.log(isAuthenticated);
+
+  let statusDebounceTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  const debounceFetchStatus = (dispatch: AppDispatch, delay = 5000) => {
+    if (statusDebounceTimeout) {
+      clearTimeout(statusDebounceTimeout);
+    }
+    statusDebounceTimeout = setTimeout(() => {
+      dispatch(fetchStatusThunk());
+    }, delay);
+  };
 
   useEffect(() => {
     const initializeData = async () => {
       if (isAuthenticated) {
         console.log("user's authentication was checked", isAuthenticated);
 
-        // Dispatch thunks instead of directly calling the functions
         await dispatch(fetchUserDataThunk());
         await dispatch(fetchRoomsThunk());
         await dispatch(fetchFriendsThunk());
         await dispatch(fetchStatusThunk());
 
-        let webSocketService: Worker;
         const token = await fetchToken();
         const WEBSOCKET_URL = `${routes.connectionSocket}?token=${token}`;
-        webSocketService = new Worker(
+
+        const wsService = new Worker(
           new URL("utils/webSocketWorker.js", import.meta.url)
         );
 
-        webSocketService.postMessage({ type: "connect", url: WEBSOCKET_URL });
+        setConnectionInstance(wsService);
 
-        webSocketService.onmessage = async (e) => {
+        wsService.postMessage({ type: "connect", url: WEBSOCKET_URL });
+
+        wsService.onmessage = (e) => {
           const { type, payload } = e.data;
 
           if (type === "STATUS_UPDATE") {
-            await dispatch(fetchStatusThunk());
+            debounceFetchStatus(dispatch);
           }
 
-          dispatch(fetchStatusThunk());
-          if (type === "WEBSOCKET_MESSAGE") {
-            if (payload.message) {
-              const { room_id, channel_id, mid } = payload.message;
-              const sender = payload.sender;
+          if (type === "WEBSOCKET_MESSAGE" && payload.message) {
+            const { room_id, channel_id, mid } = payload.message;
+            const sender = payload.sender;
 
-              dispatch(incrementRoomNotification(room_id));
-              dispatch(
-                addNotification({
-                  message: `New message in room ${room_id}, channel ${channel_id}`,
-                  hint: `From sender: ${sender}`,
-                  roomId: room_id,
-                  channelId: channel_id,
-                  messageId: mid,
-                })
-              );
-            }
+            dispatch(incrementRoomNotification(room_id));
+            dispatch(
+              addNotification({
+                message: `New message in room ${room_id}, channel ${channel_id}`,
+                hint: `From sender: ${sender}`,
+                roomId: room_id,
+                channelId: channel_id,
+                messageId: mid,
+              })
+            );
           }
         };
+
+        // Ensure worker is properly terminated on cleanup
+        return () => {
+          console.log("Cleaning up connection...");
+          wsService.terminate(); // Ensure the WebSocket worker is terminated
+          setConnectionInstance(null); // Clear connection instance
+        };
       } else {
-        if (window.performance) {
-          if (!(performance.navigation.type == 1)) {
-            dispatch(checkAuthenticationThunk());
-          }
-        }
         dispatch(checkAuthenticationThunk());
       }
     };
 
     initializeData();
+
+    // Cleanup debounce timeout on unmount
+    return () => {
+      if (statusDebounceTimeout) {
+        clearTimeout(statusDebounceTimeout);
+      }
+    };
   }, [dispatch, isAuthenticated]);
 
   const router = createBrowserRouter([
     {
       path: "/room/:room_id",
-      element: <AuthProvider ProtectedPage={<Socket />} />,
+      element: (
+        <AuthProvider ProtectedPage={<Socket connection={connection} />} />
+      ),
     },
     {
       path: "/profile",
-      element: <AuthProvider ProtectedPage={<ProfilePage />} />,
+      element: (
+        <AuthProvider ProtectedPage={<ProfilePage connection={connection} />} />
+      ),
     },
     {
       path: "/@/:username",
-      element: <AuthProvider ProtectedPage={<ProfilePageFactory />} />,
+      element: (
+        <AuthProvider
+          ProtectedPage={<ProfilePageFactory connection={connection} />}
+        />
+      ),
     },
     {
       path: "/",
-      element: <AuthProvider ProtectedPage={<HomePage />} />,
+      element: (
+        <AuthProvider ProtectedPage={<HomePage connection={connection} />} />
+      ),
     },
     {
       path: "/auth/login",

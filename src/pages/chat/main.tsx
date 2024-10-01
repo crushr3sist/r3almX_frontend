@@ -17,7 +17,11 @@ import { _createNewChannel } from "../../utils/fetchers";
 import routes from "@/utils/routes";
 import { fetchToken } from "@/utils/login";
 
-const Socket = () => {
+interface SocketProps {
+  connection: Worker;
+}
+
+const Socket: React.FC<SocketProps> = ({ connection }) => {
   const { room_id } = useParams();
   const token = localStorage.getItem("token");
 

@@ -29,7 +29,11 @@ import { RootState } from "@/state/store";
 import { useNavbarContext } from "../providers/NavbarContext";
 import { clearRoomNotifications } from "@/state/connectionSlice";
 import { logOff } from "./logOff";
-import { IPinnedFriends } from "@/state/userSliceInterfaces";
+import { IPinnedFriends, TSstatus } from "@/state/userSliceInterfaces";
+import { setStatus } from "@/state/userSlice";
+import { fetchToken } from "@/utils/login";
+import axios from "axios";
+import routes from "@/utils/routes";
 
 export default function NavBar() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -40,15 +44,19 @@ export default function NavBar() {
   const notifications = useSelector(
     (state: RootState) => state.webSocket.notifications
   );
+
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined
   );
+
   const pinnedFriends = useSelector(
     (state: RootState) => state.userState.pinnedFriends
   ) as IPinnedFriends[] | string[];
+
   const status = useSelector(
     (state: RootState) => state.userState.userState.userStatus
   );
+
   const pfp = useSelector((state: RootState) => state.userState.userState.pic);
 
   const handleRoomNavigation = (roomId: string) => {
@@ -68,6 +76,19 @@ export default function NavBar() {
     dnd: "danger",
     idle: "warning",
     offline: "default",
+  };
+  const updateStatus = async (newStatus) => {
+    return await axios.post(
+      `${routes.statusChange}?token=${fetchToken}&new_status=${newStatus}`
+    );
+  };
+  const changeStatus = async (newStatus: string) => {
+    if (newStatus == status) return;
+    else {
+      await dispatch(setStatus(newStatus as TSstatus));
+      await updateStatus(newStatus);
+    }
+    return;
   };
 
   const StatusDot = ({ status }: { status: keyof typeof _colorMap }) => (
@@ -131,17 +152,32 @@ export default function NavBar() {
               </DropdownTrigger>
               <DropdownMenu>
                 <DropdownSection title="Status">
-                  <DropdownItem key="online">
+                  <DropdownItem
+                    key="online"
+                    onClick={() => {
+                      changeStatus("online");
+                    }}
+                  >
                     <span className="flex items-center">
                       Online <StatusDot status="online" />
                     </span>
                   </DropdownItem>
-                  <DropdownItem key="idle">
+                  <DropdownItem
+                    key="idle"
+                    onClick={() => {
+                      changeStatus("idle");
+                    }}
+                  >
                     <span className="flex items-center">
                       Idle <StatusDot status="idle" />
                     </span>
                   </DropdownItem>
-                  <DropdownItem key="dnd">
+                  <DropdownItem
+                    key="dnd"
+                    onClick={() => {
+                      changeStatus("dnd");
+                    }}
+                  >
                     <span className="flex items-center">
                       Do Not Disturb <StatusDot status="dnd" />
                     </span>

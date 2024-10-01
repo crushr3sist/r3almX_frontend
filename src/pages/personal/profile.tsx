@@ -2,12 +2,16 @@ import { Avatar, Button } from "@nextui-org/react";
 import { RootState } from "@/state/store";
 import { useSelector } from "react-redux";
 
-function ProfilePage() {
+interface ProfilePageProps {
+  connection: Worker;
+}
+
+const ProfilePage: React.FC<ProfilePageProps> = ({ connection }) => {
   const pfp = useSelector((state: RootState) => state.userState.userState.pic);
   const username = useSelector(
     (state: RootState) => state.userState.userState.username
   );
-
+  
   return (
     <div className="flex flex-col items-center p-8 bg-black text-white min-h-screen">
       <div className="flex flex-col md:flex-row items-center mb-8 w-full max-w-4xl border-b border-gray-800 pb-8">
@@ -46,6 +50,6 @@ function ProfilePage() {
       </div>
     </div>
   );
-}
+};
 
 export default ProfilePage;

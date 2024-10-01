@@ -2,7 +2,9 @@ import { fetchToken } from "./login";
 
 export default {
   userToken: await fetchToken(),
-  statusFetch: "http://localhost:8000/status",
+  statusFetch: "http://localhost:8000/status/get",
+  statusChange: "http://localhost:8000/status/change",
+
   userFetch: "http://localhost:8000/auth/fetch",
   roomFetch: "http://localhost:8000/rooms/fetch",
   messageSocket: "ws://localhost:8000/message",
