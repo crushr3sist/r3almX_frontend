@@ -9,7 +9,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
 import { setAuthenticated } from "@/state/userSlice";
 
-const API_BASE_URL = "http://localhost:8000/auth";
+const API_BASE_URL = "http://localhost:5000/auth";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -33,7 +33,7 @@ function LoginPage() {
       );
 
       if (response.status === 200) {
-        await handleLoginSuccess(response.data.access_token);
+        await handleLoginSuccess(response.data.accessToken);
         navigate("/");
       }
     } catch (error) {
@@ -64,12 +64,12 @@ function LoginPage() {
       console.log(response.data.username_set);
 
       if (response.data.username_set) {
-        await handleLoginSuccess(response.data.access_token);
+        await handleLoginSuccess(response.data.accessToken);
         await dispatch(setAuthenticated());
-        
+
         navigate("/");
       } else {
-        await setToken(response.data.access_token);
+        await setToken(response.data.accessToken);
         setAuthPhase(2); // Set authPhase to 2 using state setter
       }
     } catch (error) {
@@ -96,12 +96,16 @@ function LoginPage() {
         const token = await fetchToken();
 
         const response = await axios.patch(
-          `${API_BASE_URL}/change_username?username=${newUsername}&token=${token}`,
-          null
+          `${API_BASE_URL}/change_username?username=${newUsername}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
         console.log(response.status);
         if (response.status === 200) {
-          await setToken(response.data.access_token);
+          await setToken(response.data.accessToken);
           await dispatch(setAuthenticated());
           navigate("/");
         }

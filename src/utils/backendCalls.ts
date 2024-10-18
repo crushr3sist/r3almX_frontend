@@ -19,14 +19,22 @@ export const fetchFriends = async () => {
 
 export const userDataFetcher = async (): Promise<IUserFetch> => {
   const token = await fetchToken();
-  const response = await axios.get(`${routes.userFetch}?token=${token}`);
+  const response = await axios.get(`${routes.userFetch}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   const user = response.data.user;
   return user;
 };
 
 export const statusFetcher = async (): Promise<string> => {
   const token = await fetchToken();
-  const response = await axios.get(`${routes.statusFetch}?token=${token}`);
+  const response = await axios.get(`${routes.statusFetch}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   console.log(response.data);
 
   return response.data;
@@ -77,7 +85,11 @@ export const loginUser = async (
 };
 
 export const verifyToken = (token) => {
-  return axios.get(`${routes.checkToken}?token=${token}`);
+  return axios.get(`${routes.checkToken}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 export const handleGoogleLogin = async (
@@ -133,7 +145,11 @@ export const finaliseAuth = async (newUsername, setErrorMessage) => {
 
       const response = await axios.patch(
         `${routes.changeUsername}?username=${newUsername}&token=${token}`,
-        null
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       console.log(response.status);
       if (response.status === 200) {

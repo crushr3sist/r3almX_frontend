@@ -78,9 +78,12 @@ export default function NavBar() {
     offline: "default",
   };
   const updateStatus = async (newStatus) => {
-    return await axios.post(
-      `${routes.statusChange}?token=${fetchToken}&new_status=${newStatus}`
-    );
+    const token = await fetchToken();
+    return await axios.post(`${routes.statusChange}?new_status=${newStatus}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   };
   const changeStatus = async (newStatus: string) => {
     if (newStatus == status) return;

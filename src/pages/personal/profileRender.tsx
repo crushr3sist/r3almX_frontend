@@ -12,7 +12,12 @@ const fetchUserInfo = async (
 ): Promise<any> => {
   const token = await fetchToken();
   const response = await axios.get(
-    `${routes.fetchUser}?token=${token}&username=${username}&userid=${userId}`
+    `${routes.fetchUser}?username=${username}&userid=${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
   return response.data;
 };
