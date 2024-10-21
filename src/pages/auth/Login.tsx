@@ -8,8 +8,7 @@ import { setToken, setTokenExpire, expTime, fetchToken } from "@/utils/login";
 import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
 import { setAuthenticated } from "@/state/userSlice";
-
-const API_BASE_URL = "http://localhost:5000/auth";
+import routes from "@/utils/routes";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -27,10 +26,10 @@ function LoginPage() {
   // Function to handle login with username and password
   const loginUser = async ({ username, password }) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/token`,
-        new URLSearchParams({ username, password })
-      );
+      const response = await axios.post(routes.createToken, {
+        username: username,
+        password: password,
+      });
 
       if (response.status === 200) {
         await handleLoginSuccess(response.data.accessToken);
@@ -44,8 +43,10 @@ function LoginPage() {
 
   // Function to verify the token
   const verifyToken = (token) => {
-    return axios.get(`${API_BASE_URL}/token/check`, {
-      params: { token },
+    return axios.get(routes.checkToken, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
   };
 
@@ -55,7 +56,7 @@ function LoginPage() {
       console.log(credentialResponse);
 
       const response = await axios.post(
-        `${API_BASE_URL}/google/callback`,
+        routes.googleCallback,
         {
           code: credentialResponse.credential,
         },
@@ -94,14 +95,16 @@ function LoginPage() {
     if (newUsername) {
       try {
         const token = await fetchToken();
-
+        console.log(token);
         const response = await axios.patch(
-          `${API_BASE_URL}/change_username?username=${newUsername}`,
+          routes.changeUsername,
+          { newUsername: newUsername }, // Request body
           {
             headers: {
+              // Request headers
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
         console.log(response.status);
         if (response.status === 200) {
