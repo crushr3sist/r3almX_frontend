@@ -4,7 +4,12 @@ import { Button } from "@nextui-org/react";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { setToken, setTokenExpire, expTime, fetchToken } from "@/utils/login";
+import {
+  setToken,
+  setTokenExpire,
+  fetchToken,
+  getTokenExpire,
+} from "@/utils/login";
 import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
 import { setAuthenticated } from "@/state/userSlice";
@@ -32,7 +37,7 @@ function LoginPage() {
       });
 
       if (response.status === 200) {
-        await handleLoginSuccess(response.data.accessToken);
+        await handleLoginSuccess(response.data.access_token);
         navigate("/");
       }
     } catch (error) {
@@ -42,12 +47,18 @@ function LoginPage() {
   };
 
   // Function to verify the token
-  const verifyToken = (token) => {
-    return axios.get(routes.checkToken, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  const verifyToken = (token: String) => {
+    return axios.post(
+      routes.checkToken,
+      {
+        expireTime: getTokenExpire(),
       },
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
   };
 
   // Function to handle Google login
@@ -65,12 +76,12 @@ function LoginPage() {
       console.log(response.data.username_set);
 
       if (response.data.username_set) {
-        await handleLoginSuccess(response.data.accessToken);
+        await handleLoginSuccess(response.data);
         await dispatch(setAuthenticated());
 
         navigate("/");
       } else {
-        await setToken(response.data.accessToken);
+        await setToken(response.data.access_token);
         setAuthPhase(2); // Set authPhase to 2 using state setter
       }
     } catch (error) {
@@ -80,12 +91,12 @@ function LoginPage() {
   };
 
   // Function to handle login success
-  const handleLoginSuccess = async (token) => {
-    const verifyTokenStatus = await verifyToken(token);
+  const handleLoginSuccess = async (tokenResponse) => {
+    const verifyTokenStatus = await verifyToken(tokenResponse.access_token);
 
     if (verifyTokenStatus.status === 200) {
-      await setToken(token);
-      await setTokenExpire(expTime().toString());
+      await setToken(tokenResponse.access_token);
+      await setTokenExpire(tokenResponse.expire_time.toString());
       await dispatch(setAuthenticated());
     }
   };
@@ -108,7 +119,7 @@ function LoginPage() {
         );
         console.log(response.status);
         if (response.status === 200) {
-          await setToken(response.data.accessToken);
+          await setToken(response.data.access_token);
           await dispatch(setAuthenticated());
           navigate("/");
         }

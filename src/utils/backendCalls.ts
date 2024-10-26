@@ -1,6 +1,6 @@
 import axios from "axios";
 import routes from "./routes";
-import { expTime, fetchToken, setToken, setTokenExpire } from "./login";
+import { fetchToken, setToken, setTokenExpire } from "./login";
 import { IRoom, IUserFetch } from "@/state/userSliceInterfaces";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -63,103 +63,10 @@ export const fetchRooms = async (): Promise<{
   }
 };
 
-export const loginUser = async (
-  username: string,
-  password: string,
-  setErrorMessage
-) => {
-  const navigate = useNavigate();
-
-  try {
-    const response = await axios.post(
-      `${routes.createToken}?username=${username}&password=${password}`
-    );
-
-    if (response.status === 200) {
-      await handleLoginSuccess(response.data.access_token);
-      navigate("/");
-    }
-  } catch (error) {
-    setErrorMessage("Login failed. Please check your credentials.");
-  }
-};
-
 export const verifyToken = (token) => {
-  return axios.get(`${routes.checkToken}`, {
+  axios.get(`${routes.checkToken}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-};
-
-export const handleGoogleLogin = async (
-  credentialResponse,
-  setErrorMessage,
-  setAuthPhase
-) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  try {
-    console.log(credentialResponse);
-
-    const response = await axios.post(
-      `${routes.googleCallBack}`,
-      {
-        code: credentialResponse.credential,
-      },
-      { headers: { "Content-Type": "application/json" } }
-    );
-
-    if (response.data.username_set) {
-      await handleLoginSuccess(response.data.access_token);
-      await dispatch(setAuthenticated());
-
-      navigate("/");
-    } else {
-      await setToken(response.data.access_token);
-      setAuthPhase(2); // Set authPhase to 2 using state setter
-    }
-  } catch (error) {
-    console.error("Google login failed", error);
-    setErrorMessage("Google login failed. Please try again.");
-  }
-};
-
-export const handleLoginSuccess = async (token) => {
-  const verifyTokenStatus = await verifyToken(token);
-  const dispatch = useDispatch();
-
-  if (verifyTokenStatus.status === 200) {
-    await setToken(token);
-    await setTokenExpire(expTime().toString());
-    await dispatch(setAuthenticated());
-  }
-};
-
-export const finaliseAuth = async (newUsername, setErrorMessage) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  if (newUsername) {
-    try {
-      const token = await fetchToken();
-
-      const response = await axios.patch(
-        `${routes.changeUsername}?username=${newUsername}&token=${token}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(response.status);
-      if (response.status === 200) {
-        await setToken(response.data.access_token);
-        await dispatch(setAuthenticated());
-        navigate("/");
-      }
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Failed to set new username. Please try again.");
-    }
-  }
 };

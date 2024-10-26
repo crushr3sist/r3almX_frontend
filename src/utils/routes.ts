@@ -1,8 +1,8 @@
 // Authentication Routes
 const authRoutes = {
   googleCallback: "http://localhost:5000/auth/google/callback",
-  createToken: "http://localhost:5000/auth/token",
-  checkToken: "http://localhost:5000/auth/token/check",
+  createToken: "http://localhost:5000/auth/token/create",
+  checkToken: "http://localhost:5000/auth/token/verify",
   fetchUser: "http://localhost:5000/auth/fetch/user",
   userFetch: "http://localhost:5000/auth/fetch",
 };
