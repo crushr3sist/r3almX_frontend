@@ -50,7 +50,7 @@ const ClientController = () => {
         await dispatch(fetchStatusThunk());
 
         const token = await fetchToken();
-        const WEBSOCKET_URL = `${routes.connectionSocket}?token=${token}`;
+        const WEBSOCKET_URL = `${routes.connectionSocket}`;
 
         const wsService = new Worker(
           new URL("utils/webSocketWorker.js", import.meta.url)

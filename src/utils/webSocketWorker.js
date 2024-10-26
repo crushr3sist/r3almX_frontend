@@ -2,7 +2,7 @@ let connectionSocket;
 
 onmessage = function (event) {
   if (event.data.type === "connect") {
-    connectionSocket = new WebSocket(event.data.url);
+    connectionSocket = new WebSocket(event.data.url, {});
     connectionSocket.onmessage = function (wsEvent) {
       const receivedData = JSON.parse(wsEvent.data);
       postMessage({
