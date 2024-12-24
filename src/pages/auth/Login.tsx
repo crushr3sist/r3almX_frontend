@@ -48,11 +48,9 @@ function LoginPage() {
 
   // Function to verify the token
   const verifyToken = (token: String) => {
-    return axios.post(
+    return axios.get(
       routes.checkToken,
-      {
-        expireTime: getTokenExpire(),
-      },
+
       {
         headers: {
           Authorization: `Bearer ${token}`,
