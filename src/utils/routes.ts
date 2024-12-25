@@ -18,7 +18,7 @@ const userRoutes = {
 
 // Status Routes
 const statusRoutes = {
-  statusFetch: "http://localhost:8080/status/get",
+  statusFetch: "http://localhost:8080/status",
   statusChange: "http://localhost:8080/status/change",
 };
 

@@ -49,7 +49,6 @@ const ClientController = () => {
         await dispatch(fetchFriendsThunk());
         await dispatch(fetchStatusThunk());
 
-        const token = await fetchToken();
         const WEBSOCKET_URL = `${routes.connectionSocket}`;
 
         const wsService = new Worker(

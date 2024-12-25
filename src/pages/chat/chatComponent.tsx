@@ -57,6 +57,7 @@ interface ICHatProps {
   newChannelDescription: any;
   createNewChannel; // Accept the function as a prop
   updateRoom;
+  channelSelected;
   channelName;
   channelDesc;
 }
@@ -81,6 +82,7 @@ const ChatComponent = ({
   setNewChannelName,
   setNewChannelDescription,
   channelName,
+  channelSelected,
   channelDesc,
   newChannelName,
   newChannelDescription,
@@ -144,6 +146,50 @@ const ChatComponent = ({
               ref={scrollRef}
               className="flex-1 overflow-y-auto space-y-4 pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50"
             >
+              {channels && !channelSelected &&
+                channels.map((channel) => (
+                  <li
+                    key={channel.id}
+                    className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
+                    onClick={() => {
+                      handleClick(
+                        channel.id,
+                        channel.channel_description,
+                        channel.channel_name
+                      );
+                    }}
+                  >
+                    <div className="w-full">
+                      <div className="font-semibold text-sm">
+                        {channel.channel_name}
+                      </div>
+                      <div className="text-xs text-gray-400 truncate">
+                        {channel.channel_description}
+                      </div>
+                    </div>
+                    <Dropdown placement="bottom-end">
+                      <DropdownTrigger>
+                        <Button isIconOnly>:</Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        disallowEmptySelection
+                        aria-label="Merge options"
+                        className="max-w-[300px]"
+                      >
+                        <DropdownItem key="edit" description={""}>
+                          edit
+                        </DropdownItem>
+
+                        <DropdownItem
+                          key="delete"
+                          onPress={() => deleteChannel(channel.id, roomId)}
+                        >
+                          delete
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </li>
+                ))}
               {messageHistory.map((msg) => {
                 const messageData = JSON.parse(msg.data);
 

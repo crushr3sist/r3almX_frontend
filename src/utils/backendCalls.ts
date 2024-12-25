@@ -1,10 +1,7 @@
 import axios from "axios";
 import routes from "./routes";
-import { fetchToken, setToken, setTokenExpire } from "./login";
+import { fetchToken } from "./login";
 import { IRoom, IUserFetch } from "@/state/userSliceInterfaces";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setAuthenticated } from "@/state/userSlice";
 
 export const fetchFriends = async () => {
   const token = await fetchToken();
@@ -63,10 +60,11 @@ export const fetchRooms = async (): Promise<{
   }
 };
 
-export const verifyToken = (token) => {
-  axios.get(`${routes.checkToken}`, {
+export const verifyToken = async (token) => {
+  const response = axios.get(`${routes.checkToken}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+  return response;
 };
