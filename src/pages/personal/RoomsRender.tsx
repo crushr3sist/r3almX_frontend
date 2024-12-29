@@ -22,12 +22,19 @@ import routes from "@/utils/routes";
 import { fetchRoomsThunk } from "@/state/userThunks";
 import { fetchToken } from "@/utils/login";
 
-const handleRoomNavigation = (roomId: string, navigate: any, dispatch: any) => {
+const handleRoomNavigation = (
+  roomId: string,
+  navigate: (path: string) => void,
+  dispatch: AppDispatch
+) => {
   dispatch(clearRoomNotifications(roomId));
   navigate(`/room/${roomId}`);
 };
 
-const createRoomRequest = async (newRoomName: string, dispatch: any) => {
+const createRoomRequest = async (
+  newRoomName: string,
+  dispatch: AppDispatch
+) => {
   try {
     const token = await fetchToken();
 
@@ -43,17 +50,12 @@ const createRoomRequest = async (newRoomName: string, dispatch: any) => {
 
     const newRoom = response.data;
 
-    dispatch((prevState: RootState) => ({
-      ...prevState,
-      userState: {
-        ...prevState.userState,
-        roomsJoined: [...prevState.userState.roomsJoined, newRoom],
-      },
-    }));
-
-    console.log(newRoom);
+    dispatch({
+      type: "user/addRoom",
+      payload: newRoom,
+    });
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };
 
@@ -61,6 +63,7 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
   onRoomCreated,
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const dispatch = useDispatch<AppDispatch>();
   const [roomName, setRoomName] = useState("");
 
   return (
@@ -111,7 +114,7 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
                       />
                       <Button
                         onClick={async () => {
-                          await createRoomRequest(roomName, onRoomCreated);
+                          await createRoomRequest(roomName, dispatch);
                           onRoomCreated(roomName);
                           onOpenChange();
                         }}

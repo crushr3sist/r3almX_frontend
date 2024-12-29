@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
  */
 export const useMessageHandling = (
   roomId: string,
-  lastMessage: any,
+  lastMessage: MessageEvent<any>,
   channelId: string,
   sendJsonMessage: (message: any) => void
 ) => {
@@ -51,7 +51,7 @@ export const useMessageHandling = (
     };
     fetchChannelMessages();
   }, [roomId, channelId, initialCacheLoaded]);
-  
+
   useEffect(() => {
     if (lastMessage !== null && initialCacheLoaded) {
       const messageData = JSON.parse(lastMessage.data);

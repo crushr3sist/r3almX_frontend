@@ -24,6 +24,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "emoji-picker-react": "^4.9.4",
+    "eslint-plugin-react": "^7.37.3",
     "framer-motion": "^11.0.28",
     "lodash": "^4.17.21",
     "lucide-react": "^0.368.0",

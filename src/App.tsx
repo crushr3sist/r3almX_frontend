@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AuthProvider from "@/providers/AuthProviders";
 import LoggedOutUserProvider from "./providers/NonAuthProvider";
 import LoginPage from "./pages/auth/Login";
@@ -27,16 +27,21 @@ const ClientController = () => {
     (state: RootState) => state.userState.userState.isAuthenticated
   );
 
-  let statusDebounceTimeout: ReturnType<typeof setTimeout> | null = null;
+  const statusDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
-  const debounceFetchStatus = (dispatch: AppDispatch, delay = 5000) => {
-    if (statusDebounceTimeout) {
-      clearTimeout(statusDebounceTimeout);
-    }
-    statusDebounceTimeout = setTimeout(() => {
-      dispatch(fetchStatusThunk());
-    }, delay);
-  };
+  const debounceFetchStatus = useCallback(
+    (dispatch: AppDispatch, delay = 5000) => {
+      if (statusDebounceTimeout.current) {
+        clearTimeout(statusDebounceTimeout.current);
+      }
+      statusDebounceTimeout.current = setTimeout(() => {
+        dispatch(fetchStatusThunk());
+      }, delay);
+    },
+    []
+  );
 
   useEffect(() => {
     const initializeData = async () => {
@@ -97,10 +102,10 @@ const ClientController = () => {
     // Cleanup debounce timeout on unmount
     return () => {
       if (statusDebounceTimeout) {
-        clearTimeout(statusDebounceTimeout);
+        clearTimeout(statusDebounceTimeout.current as NodeJS.Timeout);
       }
     };
-  }, [dispatch, isAuthenticated]);
+  }, [debounceFetchStatus, dispatch, isAuthenticated, statusDebounceTimeout]);
 
   const router = createBrowserRouter([
     {

@@ -9,7 +9,7 @@ import { _createNewChannel } from "@/utils/fetchers";
 
 export const useChannelManagement = (roomId: string) => {
   const dispatch = useDispatch();
-  const [channels, setChannels] = useState<any>(null);
+  const [channels, setChannels] = useState(null);
 
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined

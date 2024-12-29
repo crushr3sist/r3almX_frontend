@@ -19,6 +19,7 @@ import {
   ModalHeader,
   ModalBody,
 } from "@nextui-org/react";
+
 import axios from "axios";
 
 import {
@@ -30,58 +31,66 @@ import {
 import { ReadyState } from "react-use-websocket";
 
 interface ICHatProps {
-  isNavbarOpen: any;
-  isSidebarOpen: any;
-  connectionStatus: any;
-  roomName: any;
-  roomId: any;
-  scrollRef: any;
-  messageHistory: any;
-  setMessage: any;
-  flagMessageErr: any;
-  message: any;
-  handleSendMessage: any;
-  readyState: any;
-  messageErr: any;
-  setIsSidebarOpen: any;
-  channels: any;
-  handleClick: any;
-  setNewChannelName: any;
-  setNewChannelDescription: any;
-  newChannelName: any;
-  newChannelDescription: any;
-  createNewChannel; // Accept the function as a prop
-  updateRoom;
-  channelId;
-  channelName;
-  channelDesc;
+  message: string;
+  roomName: string;
+  roomId: string;
+  channelId: string;
+  channels: string;
+  channelName: string;
+  channelDesc: string;
+  scrollRef: React.MutableRefObject<HTMLUListElement>;
+  readyState: ReadyState;
+  setMessage: React.Dispatch<React.SetStateAction<string>>;
+  messageErr: boolean;
+  handleClick: (
+    newChannelId: string,
+    channelName: string,
+    channelDesc: string
+  ) => void;
+  isNavbarOpen: boolean;
+  isSidebarOpen: boolean;
+  messageHistory: MessageEvent<string>[];
+  flagMessageErr: React.Dispatch<React.SetStateAction<boolean>>;
+  connectionStatus: string;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSendMessage: () => void;
+  setNewChannelName: React.Dispatch<React.SetStateAction<string>>;
+  setNewChannelDescription: React.Dispatch<React.SetStateAction<string>>;
+  newChannelName: string;
+  newChannelDescription: string;
+  createNewChannel: (
+    channel_description: string,
+    channel_name: string,
+    room_id: string
+  ) => Promise<{ [key: string]: string }>;
+  updateRoom: () => Promise<void>;
 }
 
 const ChatComponent = ({
-  isNavbarOpen,
-  isSidebarOpen,
-  connectionStatus,
+  message,
   roomName,
   roomId,
-  scrollRef,
-  messageHistory,
-  setMessage,
-  flagMessageErr,
-  message,
-  handleSendMessage,
-  readyState,
-  messageErr,
-  setIsSidebarOpen,
+  channelId,
   channels,
+  channelName,
+  channelDesc,
+  scrollRef,
+  readyState,
+  setMessage,
+  messageErr,
   handleClick,
+  isNavbarOpen,
+  isSidebarOpen,
+  messageHistory,
+  flagMessageErr,
+  connectionStatus,
+  setIsSidebarOpen,
+  handleSendMessage,
   setNewChannelName,
   setNewChannelDescription,
-  channelName,
-  channelId,
-  channelDesc,
   newChannelName,
   newChannelDescription,
-  createNewChannel, // Accept the function as a prop
+  createNewChannel,
   updateRoom,
 }: ICHatProps) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

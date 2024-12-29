@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 
 import { useNavbarContext } from "@/providers/NavbarContext";
 import ChatComponent from "./chatComponent";
-import { _createNewChannel } from "../../utils/fetchers";
 import { useWebSocketConnection } from "./hooks/useWebSocketConnection";
 import { useChannelManagement } from "./hooks/useChannelManagement";
 import { useMessageHandling } from "./hooks/useMessageHandling";

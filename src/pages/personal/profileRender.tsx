@@ -65,18 +65,17 @@ const ProfilePageFactory: React.FC<ProfilePageProps> = () => {
         .then((data) => setUserInfo(data))
         .catch((error) => console.error("Failed to fetch user info:", error));
     }
-  }, [username]);
+  }, [username, userId]);
 
   useEffect(() => {
     if (friendStatus === null) {
       checkFriendStatus(userId)
         .then((data) => {
           setFriendStatus(data.friend_status);
-          console.log(data.friend_status);
         })
         .catch((error) => console.error("Failed to check user info:", error));
     }
-  }, [friendStatus]);
+  }, [friendStatus, userId]);
 
   const handleFriendRequest = async () => {
     try {

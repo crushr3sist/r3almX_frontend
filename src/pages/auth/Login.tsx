@@ -46,7 +46,7 @@ function LoginPage() {
   };
 
   // Function to verify the token
-  const verifyToken = (token: String) => {
+  const verifyToken = (token: string) => {
     return axios.get(
       routes.checkToken,
 

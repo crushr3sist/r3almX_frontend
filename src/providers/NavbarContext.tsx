@@ -1,17 +1,5 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-
-interface NavbarContextProps {
-  isNavbarOpen: boolean;
-  setIsNavbarOpen: (isOpen: boolean) => void;
-}
-
-const NavbarContext = createContext<NavbarContextProps | undefined>(undefined);
+import { useContext } from "react";
+import { NavbarContext, NavbarContextProps } from "./NavbarProvider";
 
 export const useNavbarContext = (): NavbarContextProps => {
   const context = useContext(NavbarContext);
@@ -19,34 +7,4 @@ export const useNavbarContext = (): NavbarContextProps => {
     throw new Error("useNavbarContext must be used within a NavbarProvider");
   }
   return context;
-};
-
-export const NavbarProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
-
-  useEffect(() => {
-    const handleMouseEnter = () => setIsNavbarOpen(true);
-    const handleMouseLeave = () => setIsNavbarOpen(false);
-
-    const drawerTrigger = document.getElementById("drawer-trigger");
-    if (drawerTrigger) {
-      drawerTrigger.addEventListener("mouseenter", handleMouseEnter);
-      drawerTrigger.addEventListener("mouseleave", handleMouseLeave);
-    }
-
-    return () => {
-      if (drawerTrigger) {
-        drawerTrigger.removeEventListener("mouseenter", handleMouseEnter);
-        drawerTrigger.removeEventListener("mouseleave", handleMouseLeave);
-      }
-    };
-  }, []);
-
-  return (
-    <NavbarContext.Provider value={{ isNavbarOpen, setIsNavbarOpen }}>
-      <div className="texture-background">{children}</div>
-    </NavbarContext.Provider>
-  );
 };

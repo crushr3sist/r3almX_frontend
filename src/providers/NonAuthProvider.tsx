@@ -2,7 +2,7 @@ import { logOff } from "@/components/logOff";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const LoggedOutUserProvider = ({ Children }: any) => {
+const LoggedOutUserProvider = ({ Children }) => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const token = localStorage.getItem("token");

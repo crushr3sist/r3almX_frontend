@@ -6,8 +6,8 @@ import "./index.css";
 import { NextUIProvider } from "@nextui-org/react";
 import store from "./state/store.ts";
 import ClientController from "./App.tsx";
-import { NavbarProvider } from "./providers/NavbarContext.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { NavbarProvider } from "./providers/NavbarProvider.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

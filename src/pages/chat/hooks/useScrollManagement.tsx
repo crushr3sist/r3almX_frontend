@@ -12,5 +12,5 @@ export const useScrollManagement = (
     };
     const timeoutId = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timeoutId);
-  }, [messageHIstory]);
+  }, [messageHIstory, scrollRef]);
 };
