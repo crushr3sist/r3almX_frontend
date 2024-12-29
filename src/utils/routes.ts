@@ -9,7 +9,7 @@ const authRoutes = {
 
 // User Routes
 const userRoutes = {
-  changeUsername: "http://localhost:8080/users/change_username",
+  changeUsername: "http://localhost:8080/auth/change_username",
   friendsSearch: "http://localhost:8080/search/friends",
   friendRequest: "http://localhost:8080/friends/add",
   friendStatus: "http://localhost:8080/friends/status",

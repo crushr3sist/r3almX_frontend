@@ -113,7 +113,7 @@ const userSlice = createSlice({
           last_channel_visited_desc: "",
         }));
       } else {
-        console.log("no rooms");
+        console.error("no rooms");
         state.roomsJoined = [];
       }
     },

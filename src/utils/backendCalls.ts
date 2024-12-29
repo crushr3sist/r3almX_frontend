@@ -32,7 +32,6 @@ export const statusFetcher = async (): Promise<string> => {
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log(response.data);
 
   return response.data;
 };
@@ -53,10 +52,10 @@ export const fetchRooms = async (): Promise<{
         rooms: response.data.rooms,
       };
     } else {
-      console.log("Failed to fetch rooms");
+      console.error("Failed to fetch rooms");
     }
   } catch (error) {
-    console.log("Error fetching rooms:", error);
+    console.error("Error fetching rooms:", error);
   }
 };
 interface IUserStub {

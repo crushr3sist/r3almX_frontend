@@ -15,10 +15,7 @@ export const useMessageHandling = (
     []
   );
   const [initialCacheLoaded, setInitialCacheLoaded] = useState(false);
-  console.log(
-    `room_id: ${roomId} and channel_id:${channelId} from the useMessageHandling`
-  );
-  
+
   useEffect(() => {
     const fetchChannelMessages = async () => {
       if (!channelId || !roomId || initialCacheLoaded) return;
@@ -32,11 +29,13 @@ export const useMessageHandling = (
             },
           }
         );
-        const parsedMessages = response.data.map((msg) => ({
-          data: JSON.stringify(msg),
-        }));
-        setMessageHistory(parsedMessages);
-        setInitialCacheLoaded(true);
+        if (response.data.status_code !== 500) {
+          const parsedMessages = response.data.map((msg) => ({
+            data: JSON.stringify(msg),
+          }));
+          setMessageHistory(parsedMessages);
+          setInitialCacheLoaded(true);
+        }
       } catch (error) {
         console.error("Error fetching cached messages: ", error);
       }

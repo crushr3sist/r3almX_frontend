@@ -36,7 +36,7 @@ export const useChannelManagement = (roomId: string) => {
         );
         setChannels(response.data.channels);
       } catch (error) {
-        console.log("Error fetching channels: ", error);
+        console.error("Error fetching channels: ", error);
       }
     };
     fetchChannels();
@@ -45,12 +45,7 @@ export const useChannelManagement = (roomId: string) => {
   const handleClick = useCallback(
     (newChannelId: string, channelName: string, channelDesc: string) => {
       setChannelId(newChannelId);
-      console.log({
-        roomId,
-        channelId: newChannelId,
-        channelName,
-        channelDesc,
-      });
+
       dispatch(
         setLastRoomVisited({
           roomId,

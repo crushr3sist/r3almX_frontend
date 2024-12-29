@@ -29,8 +29,6 @@ export const NavbarProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const handleMouseEnter = () => setIsNavbarOpen(true);
     const handleMouseLeave = () => setIsNavbarOpen(false);
-    console.log(handleMouseEnter);
-    console.log(handleMouseLeave);
 
     const drawerTrigger = document.getElementById("drawer-trigger");
     if (drawerTrigger) {

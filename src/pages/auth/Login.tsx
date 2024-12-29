@@ -62,8 +62,6 @@ function LoginPage() {
   // Function to handle Google login
   const handleGoogleLogin = async (credentialResponse) => {
     try {
-      console.log(credentialResponse);
-
       const response = await axios.post(
         routes.googleCallback,
         {
@@ -71,7 +69,6 @@ function LoginPage() {
         },
         { headers: { "Content-Type": "application/json" } }
       );
-      console.log(response.data.username_set);
 
       if (response.data.username_set) {
         await handleLoginSuccess(response.data);
@@ -99,23 +96,19 @@ function LoginPage() {
     }
   };
 
-  // Function to finalize authentication (set new username)
   const finaliseAuth = async () => {
     if (newUsername) {
       try {
         const token = await fetchToken();
-        console.log(token);
-        const response = await axios.patch(
-          routes.changeUsername,
-          { newUsername: newUsername }, // Request body
+        const response = await axios.post(
+          `${routes.changeUsername}?username=${newUsername}`,
+          {},
           {
             headers: {
-              // Request headers
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        console.log(response.status);
         if (response.status === 200) {
           await setToken(response.data.access_token);
           await dispatch(setAuthenticated());

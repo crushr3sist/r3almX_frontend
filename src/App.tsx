@@ -19,7 +19,6 @@ import {
   fetchStatusThunk,
   checkAuthenticationThunk,
 } from "./state/userThunks";
-import { fetchToken } from "./utils/login";
 
 const ClientController = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -42,8 +41,6 @@ const ClientController = () => {
   useEffect(() => {
     const initializeData = async () => {
       if (isAuthenticated) {
-        console.log("user's authentication was checked", isAuthenticated);
-
         await dispatch(fetchUserDataThunk());
         await dispatch(fetchRoomsThunk());
         await dispatch(fetchFriendsThunk());
@@ -87,7 +84,6 @@ const ClientController = () => {
 
         // Ensure worker is properly terminated on cleanup
         return () => {
-          console.log("Cleaning up connection...");
           wsService.terminate(); // Ensure the WebSocket worker is terminated
           setConnectionInstance(null); // Clear connection instance
         };

@@ -12,7 +12,7 @@ const AuthProvider = ({ ProtectedPage }: any) => {
 
   useEffect(() => {
     if (token === "" || token === null || token === undefined) {
-      console.log("user's token isnt true");
+      console.error("user's token isnt true");
       allowRender(false);
       logOff()
       navigate("/auth/login");

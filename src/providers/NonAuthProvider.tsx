@@ -9,7 +9,6 @@ const LoggedOutUserProvider = ({ Children }: any) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log(token);
     if (token) {
       setIsAuthenticated(true);
       navigate("/");
@@ -27,7 +26,7 @@ const LoggedOutUserProvider = ({ Children }: any) => {
     return <>{Children}</>;
   } else {
     {
-      console.log("user's token isnt true");
+      console.error("user's token isnt true");
       setIsAuthenticated(false);
       logOff();
       navigate("/auth/login");
