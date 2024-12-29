@@ -3,7 +3,6 @@ import routes from "@/utils/routes";
 import formatDateTime from "@/utils/timeFormatter";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
 
 export const useMessageHandling = (
   roomId: string,

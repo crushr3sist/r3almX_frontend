@@ -142,12 +142,9 @@ const ChatComponent = ({
           </CardHeader>
           <Divider />
           <CardBody className="flex-1 flex flex-col overflow-hidden p-4 space-y-4">
-            <ul
-              ref={scrollRef}
-              className="flex-1 overflow-y-auto space-y-4 pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50"
-            >
-              {channels && !channelSelected &&
-                channels.map((channel) => (
+            {channels && !channelSelected ? (
+              <>
+                {channels.map((channel) => (
                   <li
                     key={channel.id}
                     className="flex items-center p-2 rounded bg-black/80 hover:bg-black/70 transition-colors duration-200 cursor-pointer"
@@ -179,7 +176,6 @@ const ChatComponent = ({
                         <DropdownItem key="edit" description={""}>
                           edit
                         </DropdownItem>
-
                         <DropdownItem
                           key="delete"
                           onPress={() => deleteChannel(channel.id, roomId)}
@@ -190,93 +186,80 @@ const ChatComponent = ({
                     </Dropdown>
                   </li>
                 ))}
-              {messageHistory.map((msg) => {
-                const messageData = JSON.parse(msg.data);
-
-                return (
-                  <li
-                    key={messageData.id || messageData.mid}
-                    className="flex flex-col w-full space-y-1 animate-slideIn"
-                    onContextMenu={() => {
-                      console.log("right clicked", messageData.id);
-                      return (
-                        <Popover placement="right">
-                          <PopoverTrigger>
-                            <Button>Open Popover</Button>
-                          </PopoverTrigger>
-                          <PopoverContent>
-                            <div className="px-1 py-2">
-                              <div className="text-small font-bold">
-                                Popover Content
-                              </div>
-                              <div className="text-tiny">
-                                This is the popover content
-                              </div>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      );
-                    }}
+              </>
+            ) : (
+              <>
+                <ul
+                  ref={scrollRef}
+                  className="flex-1 overflow-y-auto space-y-4 pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50"
+                >
+                  {messageHistory.map((msg) => {
+                    const messageData = JSON.parse(msg.data);
+                    return (
+                      <li
+                        key={messageData.id || messageData.mid}
+                        className="flex flex-col w-full space-y-1 animate-slideIn"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <span className="font-semibold text-sepia">
+                            {messageData.username}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {messageData.timestamp}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-300">
+                          {messageData.message}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div className="flex items-center mt-4 space-x-2">
+                  <Button
+                    color="secondary"
+                    className="p-2 bg-sepia text-black rounded-lg hover:bg-sepia/80 transition-all duration-200"
                   >
-                    <div className="flex items-center space-x-2">
-                      <span className="font-semibold text-sepia">
-                        {messageData.username}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {messageData.timestamp}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-300">
-                      {messageData.message}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="flex items-center mt-4 space-x-2">
-              <Button
-                color="secondary"
-                className="p-2 bg-sepia text-black rounded-lg hover:bg-sepia/80 transition-all duration-200"
-              >
-                <BsPaperclip size={20} />
-                <Input type="file" className="absolute opacity-0" />
-              </Button>
-              <Input
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setMessage(value);
-                  if (value.trim()) {
-                    flagMessageErr(false);
-                  } else {
-                    flagMessageErr(true);
-                  }
-                }}
-                value={message}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSendMessage();
-                  }
-                }}
-                placeholder="Enter your message"
-                className="flex-1 bg-black/70 text-sepia placeholder-gray-500 border
+                    <BsPaperclip size={20} />
+                    <Input type="file" className="absolute opacity-0" />
+                  </Button>
+                  <Input
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setMessage(value);
+                      if (value.trim()) {
+                        flagMessageErr(false);
+                      } else {
+                        flagMessageErr(true);
+                      }
+                    }}
+                    value={message}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSendMessage();
+                      }
+                    }}
+                    placeholder="Enter your message"
+                    className="flex-1 bg-black/70 text-sepia placeholder-gray-500 border
           border-[#f4ecd8]  focus:ring-0 rounded-lg"
-              />
-              <Button
-                onClick={handleSendMessage}
-                disabled={readyState !== ReadyState.OPEN}
-                className="px-4 py-2 bg-sepia text-black rounded-lg hover:bg-sepia/80 transition-all duration-200"
-              >
-                Send
-              </Button>
-            </div>
-            {messageErr && (
-              <div className="mt-2 text-sm text-red-600">
-                Message cannot be empty
-              </div>
+                  />
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={readyState !== ReadyState.OPEN}
+                    className="px-4 py-2 bg-sepia text-black rounded-lg hover:bg-sepia/80 transition-all duration-200"
+                  >
+                    Send
+                  </Button>
+                </div>
+                {messageErr && (
+                  <div className="mt-2 text-sm text-red-600">
+                    Message cannot be empty
+                  </div>
+                )}
+              </>
             )}
           </CardBody>
         </Card>
-
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className={`absolute right-0 top-0 mt-20 p-2 bg-sepia rounded-l-lg text-black hover:bg-sepia/80 transition-all duration-300 ${
@@ -374,7 +357,6 @@ const ChatComponent = ({
                       <DropdownItem key="edit" description={""}>
                         edit
                       </DropdownItem>
-
                       <DropdownItem
                         key="delete"
                         onPress={() => deleteChannel(channel.id, roomId)}

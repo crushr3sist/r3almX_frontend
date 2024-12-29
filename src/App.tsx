@@ -57,7 +57,9 @@ const ClientController = () => {
 
         setConnectionInstance(wsService);
 
-        wsService.postMessage({ type: "connect", url: WEBSOCKET_URL });
+        wsService.postMessage(
+          JSON.stringify({ type: "connect", url: WEBSOCKET_URL })
+        );
 
         wsService.onmessage = (e) => {
           const { type, payload } = e.data;

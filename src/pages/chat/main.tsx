@@ -1,34 +1,18 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 
-import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/state/store";
 
-import {
-  decrementRoomNotification,
-  setLastRoomVisited,
-} from "@/state/userSlice";
 import { useNavbarContext } from "@/providers/NavbarContext";
-import axios from "axios";
-import formatDateTime from "../../utils/timeFormatter";
 import ChatComponent from "./chatComponent";
 import { _createNewChannel } from "../../utils/fetchers";
-import routes from "@/utils/routes";
-import { fetchToken } from "@/utils/login";
 import { useWebSocketConnection } from "./hooks/useWebSocketConnection";
 import { useChannelManagement } from "./hooks/useChannelManagement";
 import { useMessageHandling } from "./hooks/useMessageHandling";
 import { useScrollManagement } from "./hooks/useScrollManagement";
 
-interface SocketProps {
-  connection: Worker;
-}
-
-const Socket: React.FC<SocketProps> = () => {
+const Socket: React.FC = () => {
   const scrollRef = useRef<HTMLUListElement>(null);
   const { room_id } = useParams();
-  const token = localStorage.getItem("token");
 
   const { connectionStatus, readyState, sendJsonMessage } =
     useWebSocketConnection(room_id);
