@@ -59,9 +59,13 @@ export const fetchRooms = async (): Promise<{
     console.log("Error fetching rooms:", error);
   }
 };
-
+interface IUserStub {
+  status: string;
+  is_user_logged_in: boolean;
+  user: string[];
+}
 export const verifyToken = async (token) => {
-  const response = axios.get(`${routes.checkToken}`, {
+  const response = axios.get<IUserStub>(`${routes.checkToken}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

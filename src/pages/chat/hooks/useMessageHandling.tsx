@@ -15,7 +15,10 @@ export const useMessageHandling = (
     []
   );
   const [initialCacheLoaded, setInitialCacheLoaded] = useState(false);
-
+  console.log(
+    `room_id: ${roomId} and channel_id:${channelId} from the useMessageHandling`
+  );
+  
   useEffect(() => {
     const fetchChannelMessages = async () => {
       if (!channelId || !roomId || initialCacheLoaded) return;

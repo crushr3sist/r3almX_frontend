@@ -57,7 +57,7 @@ interface ICHatProps {
   newChannelDescription: any;
   createNewChannel; // Accept the function as a prop
   updateRoom;
-  channelSelected;
+  channelId;
   channelName;
   channelDesc;
 }
@@ -82,7 +82,7 @@ const ChatComponent = ({
   setNewChannelName,
   setNewChannelDescription,
   channelName,
-  channelSelected,
+  channelId,
   channelDesc,
   newChannelName,
   newChannelDescription,
@@ -97,7 +97,6 @@ const ChatComponent = ({
     setNewChannelName("");
     setNewChannelDescription("");
   };
-  const editChannelName = (channelId, roomId) => {};
 
   const deleteChannel = async (channelId, roomId) => {
     const token = await fetchToken();
@@ -142,7 +141,7 @@ const ChatComponent = ({
           </CardHeader>
           <Divider />
           <CardBody className="flex-1 flex flex-col overflow-hidden p-4 space-y-4">
-            {channels && !channelSelected ? (
+            {channels && !channelId ? (
               <>
                 {channels.map((channel) => (
                   <li

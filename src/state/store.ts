@@ -1,13 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userSlice from "./userSlice";
 import connectionSlice from "./connectionSlice";
-import appSlice from "./appSlice";
 
 const store = configureStore({
   reducer: {
     userState: userSlice,
     webSocket: connectionSlice,
-    appState: appSlice,
   },
 });
 

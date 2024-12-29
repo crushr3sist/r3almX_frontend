@@ -6,7 +6,6 @@ import { fetchToken } from "@/utils/login";
 import axios from "axios";
 import routes from "@/utils/routes";
 import { _createNewChannel } from "@/utils/fetchers";
-import { setChannelSelected } from "@/state/appSlice";
 
 export const useChannelManagement = (roomId: string) => {
   const dispatch = useDispatch();
@@ -15,9 +14,10 @@ export const useChannelManagement = (roomId: string) => {
   const roomsJoined = useSelector(
     (state: RootState) => state.userState.roomsJoined
   );
-  const channelSelected = useSelector(
-    (state: RootState) => state.appState.channelSelected
-  );
+
+  // const channelSelected = useSelector(
+  //   (state: RootState) => state.appState.channelSelected
+  // );
 
   const currentRoom = roomsJoined.find((room) => room.id === roomId);
 
@@ -45,6 +45,12 @@ export const useChannelManagement = (roomId: string) => {
   const handleClick = useCallback(
     (newChannelId: string, channelName: string, channelDesc: string) => {
       setChannelId(newChannelId);
+      console.log({
+        roomId,
+        channelId: newChannelId,
+        channelName,
+        channelDesc,
+      });
       dispatch(
         setLastRoomVisited({
           roomId,
@@ -53,7 +59,7 @@ export const useChannelManagement = (roomId: string) => {
           channelDesc,
         })
       );
-      dispatch(setChannelSelected(true));
+      // dispatch(setChannelSelected(channelId.toString()));
     },
     [dispatch, roomId]
   );
@@ -82,7 +88,6 @@ export const useChannelManagement = (roomId: string) => {
     handleClick,
     createNewChannel: _createNewChannel,
     updateRoom,
-    channelSelected,
     // https://claude.site/artifacts/174a1f10-b83a-4b2e-b5a7-d64ed3d88eac
     lastVisitedChannelName: currentRoom?.last_channel_visited_name,
     lastVisitedChannelDesc: currentRoom?.last_channel_visited_desc,

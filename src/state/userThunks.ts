@@ -40,9 +40,9 @@ export const checkAuthenticationThunk = createAsyncThunk(
     if (token === null) {
       return tokenValidation;
     }
-    if (tokenValidation.status === 200) {
+    if (tokenValidation.status === 200 && tokenValidation) {
       dispatch(setAuthenticated());
-      return tokenValidation;
+      return tokenValidation.data;
     }
   }
 );

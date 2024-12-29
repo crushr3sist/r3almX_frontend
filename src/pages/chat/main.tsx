@@ -26,7 +26,6 @@ const Socket: React.FC = () => {
     lastVisitedChannelName,
     lastVisitedChannelDesc,
     roomName,
-    channelSelected,
   } = useChannelManagement(room_id);
 
   const {
@@ -50,6 +49,7 @@ const Socket: React.FC = () => {
       message={message}
       roomName={roomName}
       roomId={room_id}
+      channelId={channelId}
       channels={channels}
       channelName={lastVisitedChannelName}
       channelDesc={lastVisitedChannelDesc}
@@ -58,7 +58,6 @@ const Socket: React.FC = () => {
       setMessage={setMessage}
       messageErr={messageErr}
       handleClick={handleClick}
-      channelSelected={channelSelected}
       isNavbarOpen={isNavbarOpen}
       isSidebarOpen={isSidebarOpen}
       messageHistory={messageHistory}
