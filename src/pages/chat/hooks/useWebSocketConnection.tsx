@@ -6,7 +6,7 @@ export const useWebSocketConnection = (roomId: string) => {
   const token = localStorage.getItem("token");
   const didUnmount = useRef(false);
 
-  const { sendJsonMessage, readyState } = useWebSocket(
+  const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
     `${routes.messageSocket}/${roomId}?token=${token}`,
     {
       shouldReconnect: () => !didUnmount.current,
@@ -23,5 +23,5 @@ export const useWebSocketConnection = (roomId: string) => {
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
 
-  return { connectionStatus, readyState, sendJsonMessage };
+  return { connectionStatus, readyState, sendJsonMessage, lastMessage };
 };

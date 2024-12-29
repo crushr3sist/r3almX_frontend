@@ -6,8 +6,9 @@ import { useCallback, useEffect, useState } from "react";
 
 export const useMessageHandling = (
   roomId: string,
+  lastMessage: any,
   channelId: string,
-  SendJsonMessage: (message: any) => void
+  sendJsonMessage: (message: any) => void
 ) => {
   const [message, setMessage] = useState("");
   const [messageErr, flagMessageErr] = useState(false);
@@ -42,6 +43,18 @@ export const useMessageHandling = (
     };
     fetchChannelMessages();
   }, [roomId, channelId, initialCacheLoaded]);
+  useEffect(() => {
+    if (lastMessage !== null && initialCacheLoaded) {
+      const messageData = JSON.parse(lastMessage.data);
+      const messageExists = messageHistory.some(
+        (msg) => JSON.parse(msg.data).mid === messageData.mid
+      );
+
+      if (!messageExists) {
+        setMessageHistory((prev) => [...prev, lastMessage]);
+      }
+    }
+  }, [lastMessage, initialCacheLoaded, messageHistory, roomId]);
 
   const handleSendMessage = useCallback(() => {
     if (message.trim()) {
@@ -51,12 +64,12 @@ export const useMessageHandling = (
         channel_id: channelId,
         timestamp: formatDateTime(new Date()),
       };
-      SendJsonMessage(newMessage);
+      sendJsonMessage(newMessage);
       setMessage("");
     } else {
       flagMessageErr(true);
     }
-  }, [message, SendJsonMessage, roomId, channelId]);
+  }, [message, sendJsonMessage, roomId, channelId]);
 
   return {
     message,

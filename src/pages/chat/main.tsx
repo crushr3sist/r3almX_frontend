@@ -14,7 +14,7 @@ const Socket: React.FC = () => {
   const scrollRef = useRef<HTMLUListElement>(null);
   const { room_id } = useParams();
 
-  const { connectionStatus, readyState, sendJsonMessage } =
+  const { connectionStatus, readyState, sendJsonMessage, lastMessage } =
     useWebSocketConnection(room_id);
 
   const {
@@ -35,7 +35,7 @@ const Socket: React.FC = () => {
     handleSendMessage,
     setMessage,
     flagMessageErr,
-  } = useMessageHandling(room_id, channelId, sendJsonMessage);
+  } = useMessageHandling(room_id, lastMessage, channelId, sendJsonMessage);
 
   useScrollManagement(scrollRef, messageHistory);
 
