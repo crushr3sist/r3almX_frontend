@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite ",
     "build": "tsc && vite build",
+    "serve": "bunx serve dist -l 5273",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

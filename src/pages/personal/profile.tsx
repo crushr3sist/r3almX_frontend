@@ -6,12 +6,12 @@ interface ProfilePageProps {
   connection: Worker;
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ connection }) => {
+const ProfilePage: React.FC<ProfilePageProps> = () => {
   const pfp = useSelector((state: RootState) => state.userState.userState.pic);
   const username = useSelector(
     (state: RootState) => state.userState.userState.username
   );
-  
+
   return (
     <div className="flex flex-col items-center p-8 bg-black text-white min-h-screen">
       <div className="flex flex-col md:flex-row items-center mb-8 w-full max-w-4xl border-b border-gray-800 pb-8">

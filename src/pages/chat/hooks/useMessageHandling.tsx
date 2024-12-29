@@ -4,6 +4,14 @@ import formatDateTime from "@/utils/timeFormatter";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
+/**
+ * The `useMessageHandling` function in TypeScript React manages message handling for a chat room, including sending messages, fetching message history, and handling message errors.
+ * @param {string} roomId - The `roomId` parameter is a string that represents the unique identifier of the room where messages are being exchanged.
+ * @param {any} lastMessage - The `lastMessage` parameter in the `useMessageHandling` hook represents the most recent message received in the chat room. It is used to update the message history and display new messages in the chat interface.
+ * @param {string} channelId - The `channelId` parameter in the `useMessageHandling` hook represents the unique identifier of the channel where messages are being sent and received. It helps in identifying the specific channel within a room where messages are exchanged.
+ * @param sendJsonMessage - The `sendJsonMessage` parameter is a function that takes a message object as an argument and sends it to a specific channel. It is used in the `handleSendMessage` function to send the message typed by the user in the chat room.
+ * @returns The `useMessageHandling` hook is returning an object with the following properties:
+ */
 export const useMessageHandling = (
   roomId: string,
   lastMessage: any,
@@ -43,6 +51,7 @@ export const useMessageHandling = (
     };
     fetchChannelMessages();
   }, [roomId, channelId, initialCacheLoaded]);
+  
   useEffect(() => {
     if (lastMessage !== null && initialCacheLoaded) {
       const messageData = JSON.parse(lastMessage.data);

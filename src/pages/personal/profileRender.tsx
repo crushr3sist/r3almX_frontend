@@ -50,7 +50,7 @@ const checkFriendStatus = async (userId: string) => {
 interface ProfilePageProps {
   connection: Worker;
 }
-const ProfilePageFactory: React.FC<ProfilePageProps> = ({ connection }) => {
+const ProfilePageFactory: React.FC<ProfilePageProps> = () => {
   const { username } = useParams();
   const location = useLocation();
   const { userId } = location.state || {};

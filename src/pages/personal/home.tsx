@@ -27,7 +27,7 @@ const FeedRender: React.FC = () => {
 interface HomePageProps {
   connection: Worker;
 }
-const HomePage: React.FC<HomePageProps> = ({ connection }) => {
+const HomePage: React.FC<HomePageProps> = () => {
   const { isNavbarOpen } = useNavbarContext();
   const username = useSelector(
     (state: RootState) => state.userState.userState.username

@@ -1,4 +1,3 @@
-import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Avatar,
@@ -6,7 +5,6 @@ import {
   Badge,
   Button,
   Divider,
-  Spinner,
   useDisclosure,
 } from "@nextui-org/react";
 import {

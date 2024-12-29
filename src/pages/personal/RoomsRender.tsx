@@ -18,7 +18,6 @@ import { clearRoomNotifications } from "@/state/connectionSlice";
 import { useNavigate } from "react-router-dom";
 import { BsPlusCircle } from "react-icons/bs";
 import axios from "axios";
-import { setRooms } from "@/state/userSlice";
 import routes from "@/utils/routes";
 import { fetchRoomsThunk } from "@/state/userThunks";
 import { fetchToken } from "@/utils/login";
@@ -30,7 +29,7 @@ const handleRoomNavigation = (roomId: string, navigate: any, dispatch: any) => {
 
 const createRoomRequest = async (newRoomName: string, dispatch: any) => {
   try {
-  const token = await fetchToken();
+    const token = await fetchToken();
 
     const response = await axios.post(
       `${routes.createRoom}?room_name=${newRoomName}`,

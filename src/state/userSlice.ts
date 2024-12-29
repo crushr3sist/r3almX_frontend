@@ -49,9 +49,6 @@ const userSlice = createSlice({
     setEmail: (state, action) => {
       state.userState.email = action.payload;
     },
-    clearUserData: (state) => {
-      state = initialState;
-    },
 
     setLastRoomVisited: (
       state,
@@ -123,7 +120,6 @@ const userSlice = createSlice({
 export const {
   changeStatus,
   setStatus,
-  clearUserData,
   incrementNotification,
   decrementNotification,
   addRoom,

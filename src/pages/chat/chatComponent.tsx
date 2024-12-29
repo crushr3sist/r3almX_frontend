@@ -5,10 +5,7 @@ import {
   CardHeader,
   Divider,
   CardBody,
-  Popover,
-  PopoverTrigger,
   Button,
-  PopoverContent,
   Input,
   Dropdown,
   DropdownItem,
@@ -23,11 +20,9 @@ import {
   ModalBody,
 } from "@nextui-org/react";
 import axios from "axios";
-import EmojiPicker from "emoji-picker-react";
 
 import {
   BsPaperclip,
-  BsEmojiSmile,
   BsChevronRight,
   BsPlusCircleDotted,
 } from "react-icons/bs";

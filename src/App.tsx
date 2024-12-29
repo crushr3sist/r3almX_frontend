@@ -105,9 +105,7 @@ const ClientController = () => {
   const router = createBrowserRouter([
     {
       path: "/room/:room_id",
-      element: (
-        <AuthProvider ProtectedPage={<Socket connection={connection} />} />
-      ),
+      element: <AuthProvider ProtectedPage={<Socket />} />,
     },
     {
       path: "/profile",
