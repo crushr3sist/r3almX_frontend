@@ -4,11 +4,7 @@ import { Button } from "@nextui-org/react";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {
-  setToken,
-  setTokenExpire,
-  fetchToken,
-} from "@/utils/login";
+import { setToken, setTokenExpire, fetchToken } from "@/utils/login";
 import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
 import { setAuthenticated } from "@/state/userSlice";

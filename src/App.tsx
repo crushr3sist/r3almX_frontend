@@ -45,7 +45,8 @@ const ClientController = () => {
 
   useEffect(() => {
     const initializeData = async () => {
-      if (isAuthenticated) {
+      if (isAuthenticated === true) {
+        console.log("auth check isnt working");
         await dispatch(fetchUserDataThunk());
         await dispatch(fetchRoomsThunk());
         await dispatch(fetchFriendsThunk());
@@ -93,6 +94,7 @@ const ClientController = () => {
           setConnectionInstance(null); // Clear connection instance
         };
       } else {
+        console.log("token check is working properly");
         dispatch(checkAuthenticationThunk());
       }
     };
