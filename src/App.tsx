@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import AuthProvider from "@/providers/AuthProviders";
-import LoggedOutUserProvider from "./providers/NonAuthProvider";
 import LoginPage from "./pages/auth/Login";
 import ProfilePage from "./pages/personal/profile";
 import Socket from "./pages/chat/main";
@@ -12,21 +11,61 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AppDispatch, RootState } from "./state/store";
 import { incrementRoomNotification } from "./state/userSlice";
 import { addNotification } from "./state/connectionSlice";
-import {
-  fetchUserDataThunk,
-  fetchRoomsThunk,
-  fetchFriendsThunk,
-  fetchStatusThunk,
-  checkAuthenticationThunk,
-} from "./state/userThunks";
+import { fetchStatusThunk } from "./state/userThunks";
+
+const Router = () => {
+  const router = createBrowserRouter([
+    {
+      path: "/room/:room_id",
+      element: (
+        <AuthProvider requireAuth={true}>
+          <Socket />
+        </AuthProvider>
+      ),
+    },
+    {
+      path: "/profile",
+      element: (
+        <AuthProvider requireAuth={true}>
+          <ProfilePage connection={null} />
+        </AuthProvider>
+      ),
+    },
+    {
+      path: "/@/:username",
+      element: (
+        <AuthProvider requireAuth={true}>
+          <ProfilePageFactory connection={null} />
+        </AuthProvider>
+      ),
+    },
+    {
+      path: "/",
+      element: (
+        <AuthProvider requireAuth={true}>
+          <HomePage connection={null} />
+        </AuthProvider>
+      ),
+    },
+    {
+      path: "/auth/login",
+      element: (
+        <AuthProvider requireAuth={false}>
+          <LoginPage />
+        </AuthProvider>
+      ),
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
+};
 
 const ClientController = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [connection, setConnectionInstance] = useState<Worker | null>(null); // Ensure null is an acceptable type
+  const [connection, setConnectionInstance] = useState<Worker | null>(null);
   const isAuthenticated = useSelector(
     (state: RootState) => state.userState.userState.isAuthenticated
   );
-
   const statusDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
@@ -44,16 +83,18 @@ const ClientController = () => {
   );
 
   useEffect(() => {
-    const initializeData = async () => {
-      if (isAuthenticated === true) {
-        console.log("auth check isnt working");
-        await dispatch(fetchUserDataThunk());
-        await dispatch(fetchRoomsThunk());
-        await dispatch(fetchFriendsThunk());
-        await dispatch(fetchStatusThunk());
+    // Only set up WebSocket if authenticated
+    if (!isAuthenticated) return;
 
+    const setupWebSocket = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        // No need to verify token or fetch data here - AuthProvider already did that
+
+        // Just set up the WebSocket connection
         const WEBSOCKET_URL = `${routes.connectionSocket}`;
-
         const wsService = new Worker(
           new URL("utils/webSocketWorker.js", import.meta.url)
         );
@@ -66,15 +107,12 @@ const ClientController = () => {
 
         wsService.onmessage = (e) => {
           const { type, payload } = e.data;
-
           if (type === "STATUS_UPDATE") {
             debounceFetchStatus(dispatch);
           }
-
           if (type === "WEBSOCKET_MESSAGE" && payload.message) {
             const { room_id, channel_id, mid } = payload.message;
             const sender = payload.sender;
-
             dispatch(incrementRoomNotification(room_id));
             dispatch(
               addNotification({
@@ -87,60 +125,24 @@ const ClientController = () => {
             );
           }
         };
-
-        // Ensure worker is properly terminated on cleanup
-        return () => {
-          wsService.terminate(); // Ensure the WebSocket worker is terminated
-          setConnectionInstance(null); // Clear connection instance
-        };
-      } else {
-        console.log("token check is working properly");
-        dispatch(checkAuthenticationThunk());
+      } catch (error) {
+        console.error("Failed to set up WebSocket:", error);
       }
     };
 
-    initializeData();
+    setupWebSocket();
 
-    // Cleanup debounce timeout on unmount
     return () => {
-      if (statusDebounceTimeout) {
-        clearTimeout(statusDebounceTimeout.current as NodeJS.Timeout);
+      if (statusDebounceTimeout.current) {
+        clearTimeout(statusDebounceTimeout.current);
+      }
+      if (connection) {
+        connection.terminate();
       }
     };
-  }, [debounceFetchStatus, dispatch, isAuthenticated, statusDebounceTimeout]);
+  }, [isAuthenticated, debounceFetchStatus, dispatch]);
 
-  const router = createBrowserRouter([
-    {
-      path: "/room/:room_id",
-      element: <AuthProvider ProtectedPage={<Socket />} />,
-    },
-    {
-      path: "/profile",
-      element: (
-        <AuthProvider ProtectedPage={<ProfilePage connection={connection} />} />
-      ),
-    },
-    {
-      path: "/@/:username",
-      element: (
-        <AuthProvider
-          ProtectedPage={<ProfilePageFactory connection={connection} />}
-        />
-      ),
-    },
-    {
-      path: "/",
-      element: (
-        <AuthProvider ProtectedPage={<HomePage connection={connection} />} />
-      ),
-    },
-    {
-      path: "/auth/login",
-      element: <LoggedOutUserProvider Children={<LoginPage />} />,
-    },
-  ]);
-
-  return <RouterProvider router={router} />;
+  return <Router />;
 };
 
 export default ClientController;

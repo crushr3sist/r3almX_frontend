@@ -34,8 +34,8 @@ const userSlice = createSlice({
     incrementNotification: (state) => {
       state.userState.notifications++;
     },
-    setAuthenticated: (state) => {
-      state.userState.isAuthenticated = true;
+    setIsAuthenticated: (state, action: PayloadAction<boolean>) => {
+      state.userState.isAuthenticated = action.payload;
     },
     decrementNotification: (state) => {
       state.userState.notifications = 0;
@@ -127,7 +127,7 @@ export const {
   removeRoom,
   setPic,
   setRooms,
-  setAuthenticated,
+  setIsAuthenticated,
   setUsername,
   addPinnedFriends,
   setEmail,

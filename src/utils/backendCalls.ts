@@ -58,16 +58,31 @@ export const fetchRooms = async (): Promise<{
     console.error("Error fetching rooms:", error);
   }
 };
+
 interface IUserStub {
   status: string;
   is_user_logged_in: boolean;
   user: string[];
 }
-export const verifyToken = async (token) => {
-  const response = axios.get<IUserStub>(`${routes.checkToken}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response;
+
+export const verifyToken = async (token: string) => {
+  try {
+    const response = await axios.get<IUserStub>(`${routes.checkToken}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.data.is_user_logged_in) {
+      localStorage.removeItem("token");
+      window.location.href = "/auth/login";
+      return null;
+    }
+    
+    return response;
+  } catch (error) {
+    localStorage.removeItem("token");
+    window.location.href = "/auth/login";
+    return null;
+  }
 };

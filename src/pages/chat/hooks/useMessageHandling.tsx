@@ -42,7 +42,21 @@ export const useMessageHandling = (
           const parsedMessages = response.data.map((msg) => ({
             data: JSON.stringify(msg),
           }));
-          setMessageHistory(parsedMessages);
+
+          // Sort the initial messages by timestamp
+          const sortedMessages = parsedMessages.sort((a, b) => {
+            // Parse the data payloads to access the timestamp
+            const msgA = JSON.parse(a.data);
+            const msgB = JSON.parse(b.data);
+
+            // Compare timestamps
+            const timeA = new Date(msgA.timestamp).getTime();
+            const timeB = new Date(msgB.timestamp).getTime();
+
+            return timeA - timeB; // Ascending order (oldest first)
+          });
+
+          setMessageHistory(sortedMessages);
           setInitialCacheLoaded(true);
         }
       } catch (error) {
@@ -60,7 +74,24 @@ export const useMessageHandling = (
       );
 
       if (!messageExists) {
-        setMessageHistory((prev) => [...prev, lastMessage]);
+        setMessageHistory((prev) => {
+          // Add the new message to the array
+          const updatedMessages = [...prev, lastMessage];
+
+          // Sort messages by timestamp in the data payload
+          return updatedMessages.sort((a, b) => {
+            // Parse the data payloads to access the timestamp
+            const msgA = JSON.parse(a.data);
+            const msgB = JSON.parse(b.data);
+
+            // Compare timestamps - newest messages last (for scrolling to bottom)
+            // If timestamps are dates, convert them to comparable values
+            const timeA = new Date(msgA.timestamp).getTime();
+            const timeB = new Date(msgB.timestamp).getTime();
+
+            return timeA - timeB; // Ascending order (oldest first)
+          });
+        });
       }
     }
   }, [lastMessage, initialCacheLoaded, messageHistory, roomId]);

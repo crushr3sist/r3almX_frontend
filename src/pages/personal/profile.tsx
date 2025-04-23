@@ -1,9 +1,16 @@
 import { Avatar, Button } from "@nextui-org/react";
 import { RootState } from "@/state/store";
 import { useSelector } from "react-redux";
+import axios from "axios"
 
 interface ProfilePageProps {
   connection: Worker;
+}
+
+const FriendsList = () =>{
+
+  
+
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = () => {

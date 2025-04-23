@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { setToken, setTokenExpire, fetchToken } from "@/utils/login";
 import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
-import { setAuthenticated } from "@/state/userSlice";
+import { setIsAuthenticated } from "@/state/userSlice";
 import routes from "@/utils/routes";
 
 function LoginPage() {
@@ -67,7 +67,7 @@ function LoginPage() {
 
       if (response.data.username_set) {
         await handleLoginSuccess(response.data);
-        await dispatch(setAuthenticated());
+        await dispatch(setIsAuthenticated(true));
 
         navigate("/");
       } else {
@@ -87,7 +87,7 @@ function LoginPage() {
     if (verifyTokenStatus.status === 200) {
       await setToken(tokenResponse.access_token);
       await setTokenExpire(tokenResponse.expire_time.toString());
-      await dispatch(setAuthenticated());
+      await dispatch(setIsAuthenticated(true));
     }
   };
 
@@ -106,7 +106,7 @@ function LoginPage() {
         );
         if (response.status === 200) {
           await setToken(response.data.access_token);
-          await dispatch(setAuthenticated());
+          await dispatch(setIsAuthenticated(true));
           navigate("/");
         }
       } catch (error) {

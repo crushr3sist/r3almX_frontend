@@ -15,7 +15,7 @@ import {
   setRooms,
   setStatus,
   addPinnedFriends,
-  setAuthenticated,
+  setIsAuthenticated,
 } from "./userSlice";
 
 import { TSstatus } from "./userSliceInterfaces";
@@ -38,10 +38,11 @@ export const checkAuthenticationThunk = createAsyncThunk(
     const token = await fetchToken();
     const tokenValidation = (await verifyToken(token)).data.is_user_logged_in;
     if (token === null) {
+      dispatch(setIsAuthenticated(false));
       return false;
     }
     if (tokenValidation) {
-      dispatch(setAuthenticated());
+      dispatch(setIsAuthenticated(true));
       return tokenValidation;
     }
   }

@@ -24,3 +24,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </GoogleOAuthProvider>
   </React.StrictMode>
 );
+
+// 127.0.0.1 - GET /auth/token/check   checkToken
+// 127.0.0.1 - GET /auth/fetch         userFetch
+// 127.0.0.1 - GET /rooms/fetch        roomFetch
+// 127.0.0.1 - GET /status             statusFetch
+// 127.0.0.1 - GET /friends/get        friendsGet
