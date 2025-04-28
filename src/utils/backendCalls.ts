@@ -72,17 +72,13 @@ export const verifyToken = async (token: string) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    
+
     if (!response.data.is_user_logged_in) {
-      localStorage.removeItem("token");
-      window.location.href = "/auth/login";
-      return null;
+      return false;
+    } else {
+      return true;
     }
-    
-    return response;
   } catch (error) {
-    localStorage.removeItem("token");
-    window.location.href = "/auth/login";
-    return null;
+    return false;
   }
 };

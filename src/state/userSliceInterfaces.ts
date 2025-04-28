@@ -2,7 +2,6 @@ export type TSstatus = "online" | "idle" | "dnd" | "offline";
 
 export interface IUserState {
   userStatus: TSstatus;
-  tokenChecked: boolean;
   isAuthenticated: boolean;
   notifications: number;
   username: string;
@@ -48,7 +47,6 @@ export interface IUserFetch {
 export interface IUserStateSlice {
   userState: {
     userStatus: "online" | "idle" | "dnd" | "offline";
-    tokenChecked: boolean;
     isAuthenticated: boolean;
     notifications: number;
     username: string;

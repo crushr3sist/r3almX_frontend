@@ -29,62 +29,93 @@ const AuthProvider = ({ children, requireAuth = true }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Create an async function to handle auth and data loading
+    console.log(`AuthProvider useEffect running. isAuthenticated=${isAuthenticated}, requireAuth=${requireAuth}`);
+
     const initializeAuth = async () => {
+      console.log("initializeAuth called");
+      setIsLoading(true); // Start loading
       try {
-        // Skip auth check if auth is not required
-        if (!requireAuth) {
-          setIsLoading(false);
-          return;
+        // If auth is not required OR user is already authenticated, handle data loading/skipping
+        if (!requireAuth || isAuthenticated) {
+          console.log(
+            `Early exit condition met: requireAuth=${requireAuth}, isAuthenticated=${isAuthenticated}`
+          );
+          // If authenticated, ensure data is loaded
+          if (isAuthenticated && requireAuth) {
+            console.log("User authenticated, ensuring data is loaded...");
+            try {
+              await Promise.all([
+                dispatch(fetchUserDataThunk()),
+                dispatch(fetchRoomsThunk()),
+                dispatch(fetchFriendsThunk()),
+                dispatch(fetchStatusThunk()),
+              ]);
+              console.log("Data fetched for already authenticated user.");
+            } catch (err) {
+              console.error(
+                `Data loading error for already authenticated user: ${err}`
+              );
+            }
+          }
+          setIsLoading(false); // Stop loading
+          return; // Exit early
         }
 
+        // If we reach here, auth is required and user is not authenticated in state
         const token = localStorage.getItem("token");
+        console.log(`Token found: ${token ? 'Yes' : 'No'}`);
 
-        // If no token exists, redirect to login
         if (!token) {
-          setIsLoading(false);
-          navigate("/auth/login");
-          return;
-        }
-
-        // Verify token first
-        const response = await verifyToken(token);
-
-        if (!response) {
-          // Token is invalid
+          console.log("No token found, redirecting to login");
           dispatch(setIsAuthenticated(false));
           setIsLoading(false);
           navigate("/auth/login");
           return;
         }
 
-        // Token is valid, set auth state first
-        dispatch(setIsAuthenticated(true));
+        // Verify the token
+        console.log("Verifying token...");
+        const response = await verifyToken(token);
+        console.log(`Token verification response: ${response ? 'Valid' : 'Invalid'}`);
 
-        // Then load all required data in parallel
-        await Promise.all([
-          dispatch(fetchUserDataThunk()),
-          dispatch(fetchRoomsThunk()),
-          dispatch(fetchFriendsThunk()),
-          dispatch(fetchStatusThunk()),
-        ]);
+        if (!response) {
+          console.log("Token verification failed, redirecting to login");
+          localStorage.removeItem("token");
+          dispatch(setIsAuthenticated(false));
+          setIsLoading(false);
+          navigate("/auth/login");
+          return;
+        }
+
+        // Token is valid, set auth state and fetch data
+        console.log("Token verified. Setting auth state and fetching data...");
+        dispatch(setIsAuthenticated(true));
+        try {
+          await Promise.all([
+            dispatch(fetchUserDataThunk()),
+            dispatch(fetchRoomsThunk()),
+            dispatch(fetchFriendsThunk()),
+            dispatch(fetchStatusThunk()),
+          ]);
+          console.log("Data fetched after token verification.");
+        } catch (err) {
+          console.error(`Data loading error after token verification: ${err}`);
+        }
+
       } catch (error) {
-        // On error, assume invalid token
+        console.error("Error during auth initialization:", error);
         localStorage.removeItem("token");
         dispatch(setIsAuthenticated(false));
         navigate("/auth/login");
       } finally {
-        // Always set loading to false when done
+        console.log("initializeAuth finished, setting isLoading to false.");
         setIsLoading(false);
       }
     };
 
-    // Run the auth initialization
     initializeAuth();
 
-    // Only re-run if requireAuth or navigate/dispatch changes
-    // Removed token dependency to prevent re-runs when token changes
-  }, [requireAuth, navigate, dispatch]);
+  }, [requireAuth, navigate, dispatch, isAuthenticated]);
 
   // Show loading spinner while initializing
   if (isLoading) {

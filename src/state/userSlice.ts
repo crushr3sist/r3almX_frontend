@@ -10,7 +10,6 @@ import {
 const initialState: IUserStateSlice = {
   userState: {
     userStatus: "offline",
-    tokenChecked: false,
     isAuthenticated: false,
     notifications: 0,
     username: "",

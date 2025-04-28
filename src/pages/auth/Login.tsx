@@ -67,9 +67,6 @@ function LoginPage() {
 
       if (response.data.username_set) {
         await handleLoginSuccess(response.data);
-        await dispatch(setIsAuthenticated(true));
-
-        navigate("/");
       } else {
         await setToken(response.data.access_token);
         setAuthPhase(2); // Set authPhase to 2 using state setter
@@ -88,6 +85,7 @@ function LoginPage() {
       await setToken(tokenResponse.access_token);
       await setTokenExpire(tokenResponse.expire_time.toString());
       await dispatch(setIsAuthenticated(true));
+      setTimeout(async () => await navigate("/"), 100);
     }
   };
 

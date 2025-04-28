@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import AuthProvider from "@/providers/AuthProviders";
 import LoginPage from "./pages/auth/Login";
 import ProfilePage from "./pages/personal/profile";
@@ -19,7 +19,9 @@ const Router = () => {
       path: "/room/:room_id",
       element: (
         <AuthProvider requireAuth={true}>
-          <Socket />
+          <Suspense>
+            <Socket />
+          </Suspense>
         </AuthProvider>
       ),
     },
@@ -27,7 +29,9 @@ const Router = () => {
       path: "/profile",
       element: (
         <AuthProvider requireAuth={true}>
-          <ProfilePage connection={null} />
+          <Suspense>
+            <ProfilePage connection={null} />
+          </Suspense>
         </AuthProvider>
       ),
     },
@@ -43,7 +47,9 @@ const Router = () => {
       path: "/",
       element: (
         <AuthProvider requireAuth={true}>
-          <HomePage connection={null} />
+          <Suspense>
+            <HomePage connection={null} />
+          </Suspense>
         </AuthProvider>
       ),
     },
@@ -51,7 +57,9 @@ const Router = () => {
       path: "/auth/login",
       element: (
         <AuthProvider requireAuth={false}>
-          <LoginPage />
+          <Suspense>
+            <LoginPage />
+          </Suspense>
         </AuthProvider>
       ),
     },
