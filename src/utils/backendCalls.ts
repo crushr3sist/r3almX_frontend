@@ -1,51 +1,28 @@
-import axios from "axios";
 import routes from "./routes";
-import { fetchToken } from "./login";
 import { IRoom, IUserFetch } from "@/state/userSliceInterfaces";
+import instance from "./axios_instance";
 
 export const fetchFriends = async () => {
-  const token = await fetchToken();
-
-  const response = await axios.get(`${routes.friendsGet}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await instance.get(`${routes.friendsGet}`);
   return response.data;
 };
 
 export const userDataFetcher = async (): Promise<IUserFetch> => {
-  const token = await fetchToken();
-  const response = await axios.get(`${routes.userFetch}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await instance.get(`${routes.userFetch}`);
   const user = response.data.user;
   return user;
 };
 
 export const statusFetcher = async (): Promise<string> => {
-  const token = await fetchToken();
-  const response = await axios.get(`${routes.statusFetch}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const response = await instance.get(`${routes.statusFetch}`);
   return response.data;
 };
 
 export const fetchRooms = async (): Promise<{
   rooms: IRoom[] | null;
 }> => {
-  const token = await fetchToken();
   try {
-    const response = await axios.get(routes.roomFetch, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await instance.get(routes.roomFetch);
 
     if (response.data.status === 200) {
       return {
@@ -65,13 +42,9 @@ interface IUserStub {
   user: string[];
 }
 
-export const verifyToken = async (token: string) => {
+export const verifyToken = async () => {
   try {
-    const response = await axios.get<IUserStub>(`${routes.checkToken}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await instance.get<IUserStub>(`${routes.checkToken}`);
 
     if (!response.data.is_user_logged_in) {
       return false;

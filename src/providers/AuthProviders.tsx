@@ -29,7 +29,9 @@ const AuthProvider = ({ children, requireAuth = true }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log(`AuthProvider useEffect running. isAuthenticated=${isAuthenticated}, requireAuth=${requireAuth}`);
+    console.log(
+      `AuthProvider useEffect running. isAuthenticated=${isAuthenticated}, requireAuth=${requireAuth}`
+    );
 
     const initializeAuth = async () => {
       console.log("initializeAuth called");
@@ -63,7 +65,7 @@ const AuthProvider = ({ children, requireAuth = true }: AuthProviderProps) => {
 
         // If we reach here, auth is required and user is not authenticated in state
         const token = localStorage.getItem("token");
-        console.log(`Token found: ${token ? 'Yes' : 'No'}`);
+        console.log(`Token found: ${token ? "Yes" : "No"}`);
 
         if (!token) {
           console.log("No token found, redirecting to login");
@@ -76,7 +78,9 @@ const AuthProvider = ({ children, requireAuth = true }: AuthProviderProps) => {
         // Verify the token
         console.log("Verifying token...");
         const response = await verifyToken(token);
-        console.log(`Token verification response: ${response ? 'Valid' : 'Invalid'}`);
+        console.log(
+          `Token verification response: ${response ? "Valid" : "Invalid"}`
+        );
 
         if (!response) {
           console.log("Token verification failed, redirecting to login");
@@ -91,17 +95,10 @@ const AuthProvider = ({ children, requireAuth = true }: AuthProviderProps) => {
         console.log("Token verified. Setting auth state and fetching data...");
         dispatch(setIsAuthenticated(true));
         try {
-          await Promise.all([
-            dispatch(fetchUserDataThunk()),
-            dispatch(fetchRoomsThunk()),
-            dispatch(fetchFriendsThunk()),
-            dispatch(fetchStatusThunk()),
-          ]);
           console.log("Data fetched after token verification.");
         } catch (err) {
           console.error(`Data loading error after token verification: ${err}`);
         }
-
       } catch (error) {
         console.error("Error during auth initialization:", error);
         localStorage.removeItem("token");
@@ -114,7 +111,6 @@ const AuthProvider = ({ children, requireAuth = true }: AuthProviderProps) => {
     };
 
     initializeAuth();
-
   }, [requireAuth, navigate, dispatch, isAuthenticated]);
 
   // Show loading spinner while initializing
@@ -140,5 +136,3 @@ const AuthProvider = ({ children, requireAuth = true }: AuthProviderProps) => {
     </div>
   );
 };
-
-export default AuthProvider;

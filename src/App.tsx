@@ -12,55 +12,57 @@ import { AppDispatch, RootState } from "./state/store";
 import { incrementRoomNotification } from "./state/userSlice";
 import { addNotification } from "./state/connectionSlice";
 import { fetchStatusThunk } from "./state/userThunks";
+import ProtectedRoute from "./providers/ProtectedRoute";
+import GuestRoute from "./providers/GuestRoute";
 
 const Router = () => {
   const router = createBrowserRouter([
     {
       path: "/room/:room_id",
       element: (
-        <AuthProvider requireAuth={true}>
+        <ProtectedRoute>
           <Suspense>
             <Socket />
           </Suspense>
-        </AuthProvider>
+        </ProtectedRoute>
       ),
     },
     {
       path: "/profile",
       element: (
-        <AuthProvider requireAuth={true}>
+        <ProtectedRoute>
           <Suspense>
             <ProfilePage connection={null} />
           </Suspense>
-        </AuthProvider>
+        </ProtectedRoute>
       ),
     },
     {
       path: "/@/:username",
       element: (
-        <AuthProvider requireAuth={true}>
+        <ProtectedRoute>
           <ProfilePageFactory connection={null} />
-        </AuthProvider>
+        </ProtectedRoute>
       ),
     },
     {
       path: "/",
       element: (
-        <AuthProvider requireAuth={true}>
+        <ProtectedRoute>
           <Suspense>
             <HomePage connection={null} />
           </Suspense>
-        </AuthProvider>
+        </ProtectedRoute>
       ),
     },
     {
       path: "/auth/login",
       element: (
-        <AuthProvider requireAuth={false}>
+        <GuestRoute>
           <Suspense>
             <LoginPage />
           </Suspense>
-        </AuthProvider>
+        </GuestRoute>
       ),
     },
   ]);

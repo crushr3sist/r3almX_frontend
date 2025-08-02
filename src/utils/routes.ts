@@ -3,7 +3,7 @@
 const authRoutes = {
   googleCallback: "http://localhost:8080/auth/google/callback",
   createToken: "http://localhost:8080/auth/token",
-  checkToken: "http://localhost:8080/auth/token/check",
+  checkToken: "http://localhost:8080/auth/token/verify",
   fetchUser: "http://localhost:8080/auth/fetch/user",
   userFetch: "http://localhost:8080/auth/fetch",
 };

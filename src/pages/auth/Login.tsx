@@ -9,6 +9,8 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
 import { setIsAuthenticated } from "@/state/userSlice";
 import routes from "@/utils/routes";
+import instance from "@/utils/axios_instance";
+import { useAuth } from "@/utils/AuthContext";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -18,22 +20,20 @@ function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const auth = useAuth();
   // Handle input changes
-  const handleInputChange = (setter) => (event) => {
-    setter(event.target.value);
-  };
 
   // Function to handle login with username and password
   const loginUser = async ({ username, password }) => {
     try {
-      const response = await axios.post(routes.createToken, {
+      const response = await instance.post(routes.createToken, {
         username: username,
         password: password,
       });
 
       if (response.status === 200) {
         await handleLoginSuccess(response.data.access_token);
-        navigate("/");
+        window.location.href = "/";
       }
     } catch (error) {
       console.error(error);
@@ -42,22 +42,14 @@ function LoginPage() {
   };
 
   // Function to verify the token
-  const verifyToken = (token: string) => {
-    return axios.get(
-      routes.checkToken,
-
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  const verifyToken = () => {
+    return instance.get(routes.checkToken);
   };
 
   // Function to handle Google login
   const handleGoogleLogin = async (credentialResponse) => {
     try {
-      const response = await axios.post(
+      const response = await instance.post(
         routes.googleCallback,
         {
           code: credentialResponse.credential,
@@ -68,7 +60,10 @@ function LoginPage() {
       if (response.data.username_set) {
         await handleLoginSuccess(response.data);
       } else {
-        await setToken(response.data.access_token);
+        await auth?.login(
+          response.data.access_token,
+          localStorage.getItem("expire")
+        );
         setAuthPhase(2); // Set authPhase to 2 using state setter
       }
     } catch (error) {
@@ -79,11 +74,13 @@ function LoginPage() {
 
   // Function to handle login success
   const handleLoginSuccess = async (tokenResponse) => {
-    const verifyTokenStatus = await verifyToken(tokenResponse.access_token);
+    const verifyTokenStatus = await verifyToken();
 
     if (verifyTokenStatus.status === 200) {
-      await setToken(tokenResponse.access_token);
-      await setTokenExpire(tokenResponse.expire_time.toString());
+      auth?.login(
+        tokenResponse.access_token,
+        tokenResponse.expire_time.toString()
+      );
       await dispatch(setIsAuthenticated(true));
       setTimeout(async () => await navigate("/"), 100);
     }
@@ -92,18 +89,14 @@ function LoginPage() {
   const finaliseAuth = async () => {
     if (newUsername) {
       try {
-        const token = await fetchToken();
-        const response = await axios.post(
-          `${routes.changeUsername}?username=${newUsername}`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await instance.post(
+          `${routes.changeUsername}?username=${newUsername}`
         );
         if (response.status === 200) {
-          await setToken(response.data.access_token);
+          auth?.login(
+            response.data.access_token,
+            localStorage.getItem("expire")
+          );
           await dispatch(setIsAuthenticated(true));
           navigate("/");
         }
@@ -127,14 +120,14 @@ function LoginPage() {
                 type="username"
                 label="Username"
                 placeholder="Enter your username"
-                onChange={handleInputChange(setUsername)}
+                onChange={(e) => setUsername(e.target.value)}
               />
               <Input
                 className="pt-2"
                 type="password"
                 label="Password"
                 placeholder="Enter your password"
-                onChange={handleInputChange(setPassword)}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <Button
                 onClick={() => loginUser({ username, password })}
@@ -171,7 +164,11 @@ function LoginPage() {
               </Button>
             </>
           )}
-          {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
+          {errorMessage !== "" ? (
+            <p className="text-red-500 mt-4">{errorMessage}</p>
+          ) : (
+            <></>
+          )}
         </CardBody>
       </Card>
     </div>
