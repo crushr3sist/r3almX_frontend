@@ -16,6 +16,7 @@ const NavbarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const drawerTrigger = document.getElementById("drawer-trigger");
     if (drawerTrigger) {
+      console.log("triggered");
       drawerTrigger.addEventListener("mouseenter", handleMouseEnter);
       drawerTrigger.addEventListener("mouseleave", handleMouseLeave);
     }

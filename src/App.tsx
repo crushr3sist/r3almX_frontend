@@ -97,8 +97,6 @@ const ClientController = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        // No need to verify token or fetch data here - AuthProvider already did that
-
         // Just set up the WebSocket connection
         const WEBSOCKET_URL = `${routes.connectionSocket}`;
         const wsService = new Worker(

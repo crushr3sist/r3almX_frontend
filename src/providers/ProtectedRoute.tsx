@@ -10,6 +10,8 @@ import {
   fetchFriendsThunk,
   fetchStatusThunk,
 } from "@/state/userThunks";
+import { NavbarProvider } from "./NavbarProvider";
+import NavBar from "@/components/navbar";
 export default function ProtectedRoute({
   children,
 }: {
@@ -18,7 +20,6 @@ export default function ProtectedRoute({
   const dispatch = useDispatch<AppDispatch>();
 
   const auth = useAuth();
-  console.log(auth?.token);
   if (auth?.authLoading) {
     return <Spinner size="lg" />;
   }
@@ -36,5 +37,12 @@ export default function ProtectedRoute({
     })();
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <NavbarProvider>
+        {children}
+        <NavBar />
+      </NavbarProvider>
+    </>
+  );
 }
