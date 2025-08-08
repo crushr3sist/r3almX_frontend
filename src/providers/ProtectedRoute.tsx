@@ -18,6 +18,7 @@ export default function ProtectedRoute({
   const dispatch = useDispatch<AppDispatch>();
 
   const auth = useAuth();
+  console.log(auth?.token);
   if (auth?.authLoading) {
     return <Spinner size="lg" />;
   }

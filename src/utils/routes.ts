@@ -2,7 +2,11 @@
 
 const authRoutes = {
   googleCallback: "http://localhost:8080/auth/google/callback",
-  createToken: "http://localhost:8080/auth/token",
+  // New explicit routes matching backend
+  login: "http://localhost:8080/auth/login",
+  register: "http://localhost:8080/auth/register",
+  // Backward-compatible alias (old name pointed to /auth/token)
+  createToken: "http://localhost:8080/auth/login",
   checkToken: "http://localhost:8080/auth/token/verify",
   fetchUser: "http://localhost:8080/auth/fetch/user",
   userFetch: "http://localhost:8080/auth/fetch",

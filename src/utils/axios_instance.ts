@@ -13,10 +13,16 @@ const instance = axios.create({
 
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token && !config.url?.includes("/auth")) {
-    config.headers.Authorization = token;
+  const url = (config.baseURL || "") + (config.url || "");
+  const isPublic =
+    url.includes("/auth/login") ||
+    url.includes("/auth/register") ||
+    url.includes("/auth/google/callback");
 
-    config.headers["Content-Type"] = "application/json";
+  if (token && !isPublic) {
+    if (config.headers) {
+      (config.headers as any).Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
@@ -24,12 +30,7 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response.status == 401) {
-      localStorage.removeItem("token");
-      console.error(err.response);
-      window.location.href = "/auth/login";
-    }
-    return Promise.reject(err);
+    if (!err.response) return Promise.reject(err);
   }
 );
 

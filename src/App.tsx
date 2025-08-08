@@ -1,14 +1,13 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import AuthProvider from "@/providers/AuthProviders";
 import LoginPage from "./pages/auth/Login";
 import ProfilePage from "./pages/personal/profile";
 import Socket from "./pages/chat/main";
 import ProfilePageFactory from "./pages/personal/profileRender";
 import routes from "./utils/routes";
 import HomePage from "./pages/personal/home";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { AppDispatch, RootState } from "./state/store";
+import { AppDispatch } from "./state/store";
 import { incrementRoomNotification } from "./state/userSlice";
 import { addNotification } from "./state/connectionSlice";
 import { fetchStatusThunk } from "./state/userThunks";
@@ -73,9 +72,7 @@ const Router = () => {
 const ClientController = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [connection, setConnectionInstance] = useState<Worker | null>(null);
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.userState.userState.isAuthenticated
-  );
+
   const statusDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
@@ -94,7 +91,6 @@ const ClientController = () => {
 
   useEffect(() => {
     // Only set up WebSocket if authenticated
-    if (!isAuthenticated) return;
 
     const setupWebSocket = async () => {
       try {
@@ -150,7 +146,7 @@ const ClientController = () => {
         connection.terminate();
       }
     };
-  }, [isAuthenticated, debounceFetchStatus, dispatch]);
+  }, [debounceFetchStatus, dispatch]);
 
   return <Router />;
 };
