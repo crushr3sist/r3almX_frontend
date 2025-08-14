@@ -1,9 +1,7 @@
-import { useState, useRef } from "react";
-
-import { useParams } from "react-router-dom";
-
-import { useNavbarContext } from "@/providers/NavbarContext";
 import ChatComponent from "./chatComponent";
+import { useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { useNavbarContext } from "@/providers/NavbarContext";
 import { useWebSocketConnection } from "./hooks/useWebSocketConnection";
 import { useChannelManagement } from "./hooks/useChannelManagement";
 import { useMessageHandling } from "./hooks/useMessageHandling";
@@ -45,31 +43,37 @@ const Socket: React.FC = () => {
 
   return (
     <ChatComponent
-      message={message}
-      roomName={roomName}
-      roomId={room_id}
-      channelId={channelId}
-      channels={channels}
-      channelName={lastVisitedChannelName}
-      channelDesc={lastVisitedChannelDesc}
+      // scroll ref
       scrollRef={scrollRef}
-      readyState={readyState}
-      setMessage={setMessage}
-      messageErr={messageErr}
-      handleClick={handleClick}
-      isNavbarOpen={isNavbarOpen}
-      isSidebarOpen={isSidebarOpen}
-      messageHistory={messageHistory}
-      flagMessageErr={flagMessageErr}
+      // room id
+      roomId={room_id}
+      // useWebsocketConnection
       connectionStatus={connectionStatus}
-      setIsSidebarOpen={setIsSidebarOpen}
-      handleSendMessage={handleSendMessage}
-      setNewChannelName={setNewChannelName}
-      setNewChannelDescription={setNewChannelDescription}
-      newChannelName={newChannelName}
-      newChannelDescription={newChannelDescription}
+      readyState={readyState}
+      // useChannelManagement
+      channels={channels}
+      channelId={channelId}
+      handleClick={handleClick}
       createNewChannel={createNewChannel}
       updateRoom={updateRoom}
+      channelName={lastVisitedChannelName}
+      channelDesc={lastVisitedChannelDesc}
+      roomName={roomName}
+      // useMessageHandling
+      message={message}
+      messageErr={messageErr}
+      messageHistory={messageHistory}
+      handleSendMessage={handleSendMessage}
+      setMessage={setMessage}
+      flagMessageErr={flagMessageErr}
+      // component hooks
+      isSidebarOpen={isSidebarOpen}
+      setIsSidebarOpen={setIsSidebarOpen}
+      isNavbarOpen={isNavbarOpen}
+      newChannelName={newChannelName}
+      newChannelDescription={newChannelDescription}
+      setNewChannelName={setNewChannelName}
+      setNewChannelDescription={setNewChannelDescription}
     />
   );
 };

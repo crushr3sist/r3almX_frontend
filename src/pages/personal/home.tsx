@@ -3,8 +3,7 @@ import { Card, CardHeader, CardBody, Divider, Image } from "@nextui-org/react";
 import logo from "../../assets/logo.gif";
 import { useNavbarContext } from "@/providers/NavbarContext";
 import RoomsRender from "./RoomsRender";
-import { useSelector } from "react-redux";
-import { RootState } from "@/state/store";
+import { useUserState } from "@/providers/UserProvider";
 import { SearchComponent } from "./search/component";
 
 const NewsRender: React.FC = () => {
@@ -29,14 +28,13 @@ interface HomePageProps {
 }
 const HomePage: React.FC<HomePageProps> = () => {
   const { isNavbarOpen } = useNavbarContext();
-  const username = useSelector(
-    (state: RootState) => state.userState.userState.username
-  );
+  const { userState } = useUserState();
+  const { username } = userState;
 
   return (
     <div
       className={`w-screen h-screen transition-padding grain-bg duration-300 ${
-        isNavbarOpen ? "pb-28" : "pb-5"
+        isNavbarOpen ? "pb-20" : ""
       } flex flex-col text-sepia relative`}
     >
       <div className="flex  w-full h-full p-5">

@@ -11,27 +11,25 @@ const instance = axios.create({
   baseURL: "http://localhost:8080",
 });
 
-instance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  const url = (config.baseURL || "") + (config.url || "");
-  const isPublic =
-    url.includes("/auth/login") ||
-    url.includes("/auth/register") ||
-    url.includes("/auth/google/callback");
+export const setupAxiosInterceptors = (logout: () => void) => {
+  instance.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
 
-  if (token && !isPublic) {
-    if (config.headers) {
+    if (token) {
       (config.headers as any).Authorization = `Bearer ${token}`;
     }
-  }
-  return config;
-});
+    return config;
+  });
 
-instance.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (!err.response) return Promise.reject(err);
-  }
-);
+  instance.interceptors.response.use(
+    (res) => res,
+    (err) => {
+      if (err.response?.status === 401) {
+        logout();
+      }
+      return Promise.reject(err);
+    }
+  );
+};
 
 export default instance;

@@ -12,28 +12,27 @@ import {
   Button,
   Spinner,
 } from "@nextui-org/react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/state/store";
-import { clearRoomNotifications } from "@/state/connectionSlice";
+import { useUserState } from "@/providers/UserProvider";
+import { useNotifications } from "@/providers/NotificationProvider";
+import { fetchRoomsData } from "@/utils/dataFetchers";
 import { useNavigate } from "react-router-dom";
 import { BsPlusCircle } from "react-icons/bs";
 import axios from "axios";
 import routes from "@/utils/routes";
-import { fetchRoomsThunk } from "@/state/userThunks";
 import { fetchToken } from "@/utils/login";
 
 const handleRoomNavigation = (
   roomId: string,
   navigate: (path: string) => void,
-  dispatch: AppDispatch
+  clearRoomNotifications: (roomId: string) => void
 ) => {
-  dispatch(clearRoomNotifications(roomId));
+  clearRoomNotifications(roomId);
   navigate(`/room/${roomId}`);
 };
 
 const createRoomRequest = async (
   newRoomName: string,
-  dispatch: AppDispatch
+  addRoom: (room: any) => void
 ) => {
   try {
     const token = await fetchToken();
@@ -49,113 +48,99 @@ const createRoomRequest = async (
     );
 
     const newRoom = response.data;
-
-    dispatch({
-      type: "user/addRoom",
-      payload: newRoom,
-    });
-  } catch (e) {
-    console.error(e);
+    addRoom(newRoom);
+  } catch (error) {
+    console.error("Failed to create room:", error);
   }
 };
 
 const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
   onRoomCreated,
 }) => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const dispatch = useDispatch<AppDispatch>();
-  const [roomName, setRoomName] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [newRoomName, setNewRoomName] = useState("");
+  const { addRoom } = useUserState();
+
+  const handleCreate = async () => {
+    if (newRoomName.trim()) {
+      await createRoomRequest(newRoomName, addRoom);
+      onRoomCreated(newRoomName);
+      setNewRoomName("");
+      onClose();
+    }
+  };
 
   return (
     <>
       <Card
-        className={`
-          border
-          border-[#f4ecd8] 
-          rounded-sm 
-          shadow-lg 
-          m-1 
-          bg-black/50 
-          hover:bg-black/70 
-          text-sepia 
-          hover:shadow-lg  
-          cursor-pointer
-          h-full
-          w-60
-        `}
+        onClick={onOpen}
+        className="border border-[#f4ecd8] rounded-sm shadow-lg m-1 bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg cursor-pointer h-60 w-60"
       >
-        <CardBody>
-          <div
-            className="flex flex-col justify-center items-center pb-5"
-            onClick={onOpen}
-          >
-            <div className="pb-5 text-large">Create a New Room</div>
-            <div>
-              <BsPlusCircle size={50} />
-            </div>
-          </div>
-          <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-            <ModalContent>
-              {(_onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Modal Title
-                  </ModalHeader>
-                  <ModalBody>
-                    <div></div>
-                    <div className="pb-1">
-                      <h1>Customize your room</h1>
-                      <Input
-                        id="room-name"
-                        label="Enter Room Name"
-                        onChange={(e) => {
-                          setRoomName(e.target.value);
-                        }}
-                      />
-                      <Button
-                        onClick={async () => {
-                          await createRoomRequest(roomName, dispatch);
-                          onRoomCreated(roomName);
-                          onOpenChange();
-                        }}
-                      >
-                        Create
-                      </Button>
-                    </div>
-                  </ModalBody>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
+        <CardBody className="flex items-center justify-center">
+          <BsPlusCircle size={64} className="text-sepia/70" />
+          <p className="mt-4 text-center text-sepia/70">Create New Room</p>
         </CardBody>
       </Card>
+
+      <Modal isOpen={isOpen} onClose={onClose} placement="center">
+        <ModalContent>
+          <ModalHeader>Create New Room</ModalHeader>
+          <ModalBody>
+            <Input
+              placeholder="Enter room name"
+              value={newRoomName}
+              onChange={(e) => setNewRoomName(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleCreate()}
+            />
+            <div className="flex justify-end gap-2 pb-4">
+              <Button variant="light" onPress={onClose}>
+                Cancel
+              </Button>
+              <Button color="primary" onPress={handleCreate}>
+                Create
+              </Button>
+            </div>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
 
 const RoomsRender: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const { roomsJoined, setRooms } = useUserState();
+  const { clearRoomNotifications } = useNotifications();
   const [loading, setLoading] = useState(true);
-
-  const roomsJoined = useSelector(
-    (state: RootState) => state.userState.roomsJoined
-  );
 
   useEffect(() => {
     const fetchAndSetRooms = async () => {
-      await dispatch(fetchRoomsThunk());
-
-      setLoading(false); // Set loading to false after rooms are fetched and set in state
+      try {
+        const rooms = await fetchRoomsData();
+        if (rooms && Array.isArray(rooms) && rooms.length > 0) {
+          setRooms(rooms);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch rooms:", error);
+        setLoading(false);
+      }
     };
 
     fetchAndSetRooms();
-  }, [dispatch]);
+  }, [setRooms]);
 
   const handleRoomCreated = async () => {
-    setLoading(true); // Set loading to true when a new room is created
-    await dispatch(fetchRoomsThunk());
-    setLoading(false); // Set loading to false after rooms are updated
+    setLoading(true);
+    try {
+      const rooms = await fetchRoomsData();
+      if (rooms && Array.isArray(rooms) && rooms.length > 0) {
+        setRooms(rooms);
+      }
+    } catch (error) {
+      console.error("Failed to refresh rooms:", error);
+    }
+    setLoading(false);
   };
 
   if (loading) {
@@ -174,38 +159,33 @@ const RoomsRender: React.FC = () => {
             return (
               <Card
                 key={room.id}
-                className={`
-                  border
-          border-[#f4ecd8] 
-                  rounded-sm 
-                  shadow-lg 
-                  m-1 
-                  bg-black/50 
-                  hover:bg-black/70 
-                  text-sepia 
-                  hover:shadow-lg  
-                  cursor-pointer
-                  h-60
-                  w-60
-                `}
+                className="border border-[#f4ecd8] rounded-sm shadow-lg m-1 bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg cursor-pointer h-60 w-60"
               >
-                <CardHeader className="font-semibold justify-center">
-                  {room.room_name}
-                </CardHeader>
-                <CardBody
-                  onClick={() => {
+                <CardHeader
+                  onClick={() =>
                     handleRoomNavigation(
-                      room.id.toString(),
+                      room.id,
                       navigate,
-                      dispatch
-                    );
-                  }}
+                      clearRoomNotifications
+                    )
+                  }
+                  className="flex-col items-start px-4 pb-0 pt-2 h-full"
                 >
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ac
-                    purus in massa egestas mollis varius; dignissim elementum.
-                  </p>
-                </CardBody>
+                  <h4 className="font-bold text-large text-sepia">
+                    {room.room_name}
+                  </h4>
+                  <small className="text-default-500">
+                    Members: {room.members.length}
+                  </small>
+                  <small className="text-default-500">
+                    Owner: {room.room_owner}
+                  </small>
+                  {room.notifications > 0 && (
+                    <div className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                      {room.notifications}
+                    </div>
+                  )}
+                </CardHeader>
               </Card>
             );
           })}

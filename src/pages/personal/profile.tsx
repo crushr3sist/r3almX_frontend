@@ -1,23 +1,16 @@
 import { Avatar, Button } from "@nextui-org/react";
-import { RootState } from "@/state/store";
-import { useSelector } from "react-redux";
-import axios from "axios"
+import { useUserState } from "@/providers/UserProvider";
+import axios from "axios";
 
 interface ProfilePageProps {
   connection: Worker;
 }
 
-const FriendsList = () =>{
-
-  
-
-}
+const FriendsList = () => {};
 
 const ProfilePage: React.FC<ProfilePageProps> = () => {
-  const pfp = useSelector((state: RootState) => state.userState.userState.pic);
-  const username = useSelector(
-    (state: RootState) => state.userState.userState.username
-  );
+  const { userState } = useUserState();
+  const { pic: pfp, username } = userState;
 
   return (
     <div className="flex flex-col items-center p-8 bg-black text-white min-h-screen">

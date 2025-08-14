@@ -6,15 +6,7 @@
   .grain-bg {
     @apply relative bg-black overflow-hidden;
   }
-
-  .grain-bg::before {
-    content: "";
-    @apply absolute inset-0 pointer-events-none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><rect width="1" height="1" fill="rgba(255,255,255,0.05)"/></svg>');
-    background-size: 3px 3px;
-    opacity: 0.4; /* Slightly less opaque for subtle texture */
-    z-index: 1;
-  }
+ 
 }
 
 @font-face {
@@ -22,21 +14,11 @@
   src: url('./fonts/bianzhidai_noBG-Bubble.otf');
   font-weight: normal;
   font-style: normal;
-  
-
 }
 .text-glow {
   background:#000000;
   color:#fff;
   text-shadow:1px 1px 10px #fff, 1px 1px 10px #ccc;
-}
-
-/* Frosted glass effect with refined borders */
-.frosted-glass {
-  backdrop-filter: blur(12px); /* Slightly more blur for softness */
-  background-color: rgba(255, 255, 255, 0.2); /* Softer transparency */
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius); /* Adds smooth curves to the corners */
 }
 
 /* Sepia tones for text and accents */

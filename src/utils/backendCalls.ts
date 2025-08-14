@@ -1,6 +1,13 @@
 import routes from "./routes";
-import { IRoom, IUserFetch } from "@/state/userSliceInterfaces";
+import { IRoom } from "@/providers/UserProvider";
 import instance from "./axios_instance";
+
+// Define user fetch interface locally since it was in the deleted Redux files
+interface IUserFetch {
+  username: string;
+  email: string;
+  pic: string;
+}
 
 export const fetchFriends = async () => {
   const response = await instance.get(`${routes.friendsGet}`);
@@ -18,6 +25,10 @@ export const statusFetcher = async (): Promise<string> => {
   return response.data;
 };
 
+export const updateUserStatus = async (status: string): Promise<void> => {
+  await instance.post(`${routes.statusChange}?new_status=${status}`);
+};
+
 export const fetchRooms = async (): Promise<{
   rooms: IRoom[] | null;
 }> => {
@@ -29,10 +40,12 @@ export const fetchRooms = async (): Promise<{
         rooms: response.data.rooms,
       };
     } else {
-      console.error("Failed to fetch rooms");
+      console.error("Failed to fetch rooms, status:", response.data.status);
+      return { rooms: null };
     }
   } catch (error) {
     console.error("Error fetching rooms:", error);
+    return { rooms: null };
   }
 };
 

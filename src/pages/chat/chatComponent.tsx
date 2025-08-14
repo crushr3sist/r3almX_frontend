@@ -22,20 +22,17 @@ import {
 
 import axios from "axios";
 
-import {
-  BsPaperclip,
-  BsChevronRight,
-  BsPlusCircleDotted,
-} from "react-icons/bs";
+import { BsPaperclip, BsPlusCircleDotted } from "react-icons/bs";
 
 import { ReadyState } from "react-use-websocket";
+import { IChannels } from "./hooks/useChannelManagement";
 
 interface ICHatProps {
   message: string;
   roomName: string;
   roomId: string;
   channelId: string;
-  channels: string;
+  channels: IChannels[];
   channelName: string;
   channelDesc: string;
   scrollRef: React.MutableRefObject<HTMLUListElement>;
@@ -48,11 +45,9 @@ interface ICHatProps {
     channelDesc: string
   ) => void;
   isNavbarOpen: boolean;
-  isSidebarOpen: boolean;
   messageHistory: MessageEvent<string>[];
   flagMessageErr: React.Dispatch<React.SetStateAction<boolean>>;
   connectionStatus: string;
-  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleSendMessage: () => void;
   setNewChannelName: React.Dispatch<React.SetStateAction<string>>;
   setNewChannelDescription: React.Dispatch<React.SetStateAction<string>>;
@@ -80,11 +75,9 @@ const ChatComponent = ({
   messageErr,
   handleClick,
   isNavbarOpen,
-  isSidebarOpen,
   messageHistory,
   flagMessageErr,
   connectionStatus,
-  setIsSidebarOpen,
   handleSendMessage,
   setNewChannelName,
   setNewChannelDescription,
@@ -114,17 +107,17 @@ const ChatComponent = ({
     );
     updateRoom();
   };
+
   return (
     <div
       className={`w-screen h-screen transition-padding duration-300 ${
-        isNavbarOpen ? "pb-28" : "pb-20"
+        isNavbarOpen ? "pb-20" : ""
       } flex flex-col bg-black text-sepia relative`}
     >
-      <div className="flex w-full h-full p-5">
+      <div className="flex w-full h-full p-5 gap-5">
         <Card
-          className={`flex flex-col h-full ${
-            isSidebarOpen ? "w-3/4" : "w-full"
-          } rounded-lg shadow-lg bg-black/90 border
+          className={`flex flex-col h-full w-2/3
+           rounded-lg shadow-lg bg-black/90 border
           border-[#f4ecd8]  text-sepia backdrop-blur-md transition-width duration-300`}
         >
           <CardHeader className="flex items-center justify-between px-4 py-2 bg-black/80 rounded-t-lg">
@@ -147,6 +140,7 @@ const ChatComponent = ({
           <CardBody className="flex-1 flex flex-col overflow-hidden p-4 space-y-4">
             {channels && !channelId ? (
               <>
+                {/* channel selector */}
                 {channels.map((channel) => (
                   <li
                     key={channel.id}
@@ -192,6 +186,7 @@ const ChatComponent = ({
               </>
             ) : (
               <>
+                {/* chat interface */}
                 <ul
                   ref={scrollRef}
                   className="flex-1 overflow-y-auto space-y-4 pr-4 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50"
@@ -263,21 +258,10 @@ const ChatComponent = ({
             )}
           </CardBody>
         </Card>
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className={`absolute right-0 top-0 mt-20 p-2 bg-sepia rounded-l-lg text-black hover:bg-sepia/80 transition-all duration-300 ${
-            isSidebarOpen ? "mr-64" : ""
-          }`}
-        >
-          <BsChevronRight
-            size={24}
-            className={`${isSidebarOpen ? "" : "rotate-180"}`}
-          />
-        </button>
+        {/* sidebar */}
         <div
-          className={`fixed top-0 right-0 h-full w-64 bg-black/90 text-sepia shadow-lg rounded-l-lg transition-transform duration-300 ${
-            isSidebarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+          className="border 
+          border-[#f4ecd8] focus:ring-0 rounded-lg top-0 right-0 h-full w-1/3 bg-black/90 text-sepia shadow-lg rounded-l-lg transition-transform duration-300"
         >
           <div className="p-4">
             <Input
@@ -326,6 +310,7 @@ const ChatComponent = ({
               </ModalContent>
             </Modal>
           </div>
+          {/* channels render */}
           <ul className="flex-1 overflow-y-auto space-y-2 p-4 pr-2 scrollbar-thin scrollbar-thumb-sepia scrollbar-track-black/50">
             {channels &&
               channels.map((channel) => (

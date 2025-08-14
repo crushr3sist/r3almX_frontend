@@ -5,14 +5,13 @@ import Socket from "./pages/chat/main";
 import ProfilePageFactory from "./pages/personal/profileRender";
 import routes from "./utils/routes";
 import HomePage from "./pages/personal/home";
-import { useDispatch } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { AppDispatch } from "./state/store";
-import { incrementRoomNotification } from "./state/userSlice";
-import { addNotification } from "./state/connectionSlice";
-import { fetchStatusThunk } from "./state/userThunks";
+import { useUserState } from "./providers/UserProvider";
+import { useNotifications } from "./providers/NotificationProvider";
+import { fetchStatusData, setUserStatus } from "./utils/dataFetchers";
 import ProtectedRoute from "./providers/ProtectedRoute";
 import GuestRoute from "./providers/GuestRoute";
+import { useAuth } from "./utils/AuthContext";
 
 const Router = () => {
   const router = createBrowserRouter([
@@ -70,33 +69,36 @@ const Router = () => {
 };
 
 const ClientController = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const { incrementRoomNotification } = useUserState();
+  const { addNotification } = useNotifications();
   const [connection, setConnectionInstance] = useState<Worker | null>(null);
 
   const statusDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
 
-  const debounceFetchStatus = useCallback(
-    (dispatch: AppDispatch, delay = 5000) => {
-      if (statusDebounceTimeout.current) {
-        clearTimeout(statusDebounceTimeout.current);
+  const debounceFetchStatus = useCallback((delay = 5000) => {
+    if (statusDebounceTimeout.current) {
+      clearTimeout(statusDebounceTimeout.current);
+    }
+    statusDebounceTimeout.current = setTimeout(async () => {
+      try {
+        await fetchStatusData();
+      } catch (error) {
+        console.error("Failed to fetch status:", error);
       }
-      statusDebounceTimeout.current = setTimeout(() => {
-        dispatch(fetchStatusThunk());
-      }, delay);
-    },
-    []
-  );
+    }, delay);
+  }, []);
+
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    // Only set up WebSocket if authenticated
-
     const setupWebSocket = async () => {
+      // Only set up WebSocket if authenticated and auth loading is complete
+      if (!isAuthenticated || isLoading) {
+        return;
+      }
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
         // Just set up the WebSocket connection
         const WEBSOCKET_URL = `${routes.connectionSocket}`;
         const wsService = new Worker(
@@ -109,24 +111,29 @@ const ClientController = () => {
           JSON.stringify({ type: "connect", url: WEBSOCKET_URL })
         );
 
+        // Set user as online when WebSocket connects
+        try {
+          await setUserStatus("online");
+        } catch (error) {
+          console.error("Failed to set user status to online:", error);
+        }
+
         wsService.onmessage = (e) => {
           const { type, payload } = e.data;
           if (type === "STATUS_UPDATE") {
-            debounceFetchStatus(dispatch);
+            debounceFetchStatus();
           }
           if (type === "WEBSOCKET_MESSAGE" && payload.message) {
             const { room_id, channel_id, mid } = payload.message;
             const sender = payload.sender;
-            dispatch(incrementRoomNotification(room_id));
-            dispatch(
-              addNotification({
-                message: `New message in room ${room_id}, channel ${channel_id}`,
-                hint: `From sender: ${sender}`,
-                roomId: room_id,
-                channelId: channel_id,
-                messageId: mid,
-              })
-            );
+            incrementRoomNotification(room_id);
+            addNotification({
+              message: `New message in room ${room_id}, channel ${channel_id}`,
+              hint: `From sender: ${sender}`,
+              roomId: room_id,
+              channelId: channel_id,
+              messageId: mid,
+            });
           }
         };
       } catch (error) {
@@ -143,8 +150,12 @@ const ClientController = () => {
       if (connection) {
         connection.terminate();
       }
+      // Set user as offline when disconnecting
+      setUserStatus("offline").catch((error) => {
+        console.error("Failed to set user status to offline:", error);
+      });
     };
-  }, [debounceFetchStatus, dispatch]);
+  }, [debounceFetchStatus, incrementRoomNotification, addNotification]);
 
   return <Router />;
 };

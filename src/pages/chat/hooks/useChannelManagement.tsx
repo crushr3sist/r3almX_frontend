@@ -1,23 +1,20 @@
-import { useSelector, useDispatch } from "react-redux";
-import { setLastRoomVisited } from "@/state/userSlice";
+import { useUserState } from "@/providers/UserProvider";
 import { useCallback, useEffect, useState } from "react";
-import { RootState } from "@/state/store";
-import { fetchToken } from "@/utils/login";
-import axios from "axios";
 import routes from "@/utils/routes";
 import { _createNewChannel } from "@/utils/fetchers";
+import instance from "@/utils/axios_instance";
+
+export interface IChannels {
+  author: string;
+  id: string;
+  channel_name: string;
+  time_created: string;
+  channel_description: string;
+}
 
 export const useChannelManagement = (roomId: string) => {
-  const dispatch = useDispatch();
-  const [channels, setChannels] = useState(null);
-
-  const roomsJoined = useSelector(
-    (state: RootState) => state.userState.roomsJoined
-  );
-
-  // const channelSelected = useSelector(
-  //   (state: RootState) => state.appState.channelSelected
-  // );
+  const { roomsJoined, setLastRoomVisited } = useUserState();
+  const [channels, setChannels] = useState<null | IChannels[]>(null);
 
   const currentRoom = roomsJoined.find((room) => room.id === roomId);
 
@@ -28,11 +25,9 @@ export const useChannelManagement = (roomId: string) => {
   useEffect(() => {
     const fetchChannels = async () => {
       if (!roomId) return;
-      const token = await fetchToken();
       try {
-        const response = await axios.get(
-          `${routes.channelFetch}?room_id=${roomId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        const response = await instance.get(
+          `${routes.channelFetch}?room_id=${roomId}`
         );
         setChannels(response.data.channels);
       } catch (error) {
@@ -46,44 +41,35 @@ export const useChannelManagement = (roomId: string) => {
     (newChannelId: string, channelName: string, channelDesc: string) => {
       setChannelId(newChannelId);
 
-      dispatch(
-        setLastRoomVisited({
-          roomId,
-          channelId: newChannelId,
-          channelName,
-          channelDesc,
-        })
-      );
-      // dispatch(setChannelSelected(channelId.toString()));
+      setLastRoomVisited({
+        roomId,
+        channelId: newChannelId,
+        channelName,
+        channelDesc,
+      });
     },
-    [dispatch, roomId]
+    [setLastRoomVisited, roomId]
   );
 
   const updateRoom = async () => {
-    const token = await fetchToken();
-
     if (!roomId) return;
+
     try {
-      const response = await axios.get(
-        `${routes.channelFetch}?room_id=${roomId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await instance.get(
+        `${routes.channelFetch}?room_id=${roomId}`
       );
       setChannels(response.data.channels);
     } catch (error) {
       console.error("Error fetching channels:", error);
     }
   };
+
   return {
     channels,
     channelId,
     handleClick,
     createNewChannel: _createNewChannel,
     updateRoom,
-    // https://claude.site/artifacts/174a1f10-b83a-4b2e-b5a7-d64ed3d88eac
     lastVisitedChannelName: currentRoom?.last_channel_visited_name,
     lastVisitedChannelDesc: currentRoom?.last_channel_visited_desc,
     roomName: currentRoom?.room_name,
