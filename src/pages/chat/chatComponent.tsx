@@ -1,4 +1,3 @@
-import { fetchToken } from "@/utils/login";
 import routes from "@/utils/routes";
 import {
   Card,
@@ -26,6 +25,7 @@ import { BsPaperclip, BsPlusCircleDotted } from "react-icons/bs";
 
 import { ReadyState } from "react-use-websocket";
 import { IChannels } from "./hooks/useChannelManagement";
+import instance from "@/utils/axios_instance";
 
 interface ICHatProps {
   message: string;
@@ -96,14 +96,8 @@ const ChatComponent = ({
   };
 
   const deleteChannel = async (channelId, roomId) => {
-    const token = await fetchToken();
-    await axios.delete(
-      `${routes.channelDelete}?channel_id=${channelId}&room_id=${roomId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+    await instance.delete(
+      `${routes.channelDelete}?channel_id=${channelId}&room_id=${roomId}`
     );
     updateRoom();
   };

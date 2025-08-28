@@ -1,7 +1,6 @@
-import { fetchToken } from "@/utils/login";
+import instance from "@/utils/axios_instance";
 import routes from "@/utils/routes";
 import formatDateTime from "@/utils/timeFormatter";
-import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
 /**
@@ -25,18 +24,19 @@ export const useMessageHandling = (
   );
   const [initialCacheLoaded, setInitialCacheLoaded] = useState(false);
 
+  // so to build the message history, we need to ensure our cache is loaded first
+  // once our cache is loaded, it should be sorted by the time stamp value
+  // once that is done, the message history polling will be fed into a function 
+  // the function will ensure the message history is sorted by the time stamp
+  
+
+
   useEffect(() => {
     const fetchChannelMessages = async () => {
       if (!channelId || !roomId || initialCacheLoaded) return;
-      const token = await fetchToken();
       try {
-        const response = await axios.get(
-          `${routes.channelCache}?room_id=${roomId}&channel_id=${channelId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await instance.get(
+          `${routes.channelCache}?room_id=${roomId}&channel_id=${channelId}`
         );
         if (response.data.status_code !== 500) {
           const parsedMessages = response.data.map((msg) => ({

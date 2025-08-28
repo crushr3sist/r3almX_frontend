@@ -25,8 +25,20 @@ export const statusFetcher = async (): Promise<string> => {
   return response.data;
 };
 
-export const updateUserStatus = async (status: string): Promise<void> => {
-  await instance.post(`${routes.statusChange}?new_status=${status}`);
+export const updateUserStatus = (status: string): void => {
+  const url = `${routes.statusChange}?new_status=${status}`;
+  const token = localStorage.getItem("token"); // Directly get token for keepalive fetch
+
+  // Use fetch with keepalive for reliability on unload
+  // Axios/standard fetch can be cancelled by the browser on page navigation.
+  fetch(url, {
+    method: "POST",
+    headers: {
+      // Manually add the Authorization header
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    keepalive: true,
+  });
 };
 
 export const fetchRooms = async (): Promise<{

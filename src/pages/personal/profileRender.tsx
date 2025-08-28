@@ -1,50 +1,31 @@
 import { useEffect, useState } from "react";
 import { Avatar, Button } from "@nextui-org/react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import routes from "@/utils/routes";
 import { useLocation } from "react-router-dom";
-import { fetchToken } from "@/utils/login";
+import instance from "@/utils/axios_instance";
 
 const fetchUserInfo = async (
   username: string,
   userId: string
 ): Promise<any> => {
-  const token = await fetchToken();
-  const response = await axios.get(
-    `${routes.fetchUser}?username=${username}&userid=${userId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+  const response = await instance.get(
+    `${routes.fetchUser}?username=${username}&userid=${userId}`
   );
   return response.data;
 };
 
 const sendFriendRequest = async (username: string, userId: string) => {
-  const token = await fetchToken();
-
-  const response = await axios.post(
-    `${routes.friendRequest}?username=${username}&user_id=${userId}`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+  const response = await instance.post(
+    `${routes.friendRequest}?username=${username}&user_id=${userId}`
   );
   return response.data;
 };
 
 const checkFriendStatus = async (userId: string) => {
-  const token = await fetchToken();
-
-  const response = await axios.get(`${routes.friendStatus}?user_id=${userId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await instance.get(
+    `${routes.friendStatus}?user_id=${userId}`
+  );
   return response.data;
 };
 interface ProfilePageProps {

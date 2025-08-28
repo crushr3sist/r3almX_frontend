@@ -26,8 +26,7 @@ import { BsArrowBarRight, BsGear, BsHouseExclamation } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useNavbarContext } from "../providers/NavbarContext";
 import { IPinnedFriends, TSstatus } from "@/providers/UserProvider";
-import { fetchToken } from "@/utils/login";
-import axios from "axios";
+
 import routes from "@/utils/routes";
 import { useAuth } from "@/utils/AuthContext";
 import instance from "@/utils/axios_instance";
@@ -83,10 +82,10 @@ export default function NavBar() {
   return (
     <div
       id="drawer-trigger"
-      className={`fixed inset-x-0 bottom-0 flex ${
-        isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"
-      } p-2 justify-center items-center transition-transform duration-300`}
-    >
+      className={`fixed inset-x-0 bottom-0 flex 
+        ${isNavbarOpen ? "translate-y-0" : "translate-y-[80%]"} 
+        p-2 justify-center items-center transition-transform duration-300`}
+        >
       <div
         id="drawer-trigger"
         className="isolate flex justify-between items-center p-2 gap-2 w-full max-w-7xl rounded-lg border border-[#f4ecd8] transition-shadow duration-300 hover:shadow-lg bg-black/20 backdrop-blur-sm overflow-hidden"

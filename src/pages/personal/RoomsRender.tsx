@@ -17,9 +17,8 @@ import { useNotifications } from "@/providers/NotificationProvider";
 import { fetchRoomsData } from "@/utils/dataFetchers";
 import { useNavigate } from "react-router-dom";
 import { BsPlusCircle } from "react-icons/bs";
-import axios from "axios";
 import routes from "@/utils/routes";
-import { fetchToken } from "@/utils/login";
+import instance from "@/utils/axios_instance";
 
 const handleRoomNavigation = (
   roomId: string,
@@ -35,16 +34,8 @@ const createRoomRequest = async (
   addRoom: (room: any) => void
 ) => {
   try {
-    const token = await fetchToken();
-
-    const response = await axios.post(
-      `${routes.createRoom}?room_name=${newRoomName}`,
-      null,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+    const response = await instance.post(
+      `${routes.createRoom}?room_name=${newRoomName}`
     );
 
     const newRoom = response.data;
@@ -73,7 +64,8 @@ const CreationBox: React.FC<{ onRoomCreated: (roomName: string) => void }> = ({
   return (
     <>
       <Card
-        onClick={onOpen}
+        isPressable
+        onPress={onOpen}
         className="border border-[#f4ecd8] rounded-sm shadow-lg m-1 bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg cursor-pointer h-60 w-60"
       >
         <CardBody className="flex items-center justify-center">
@@ -159,18 +151,17 @@ const RoomsRender: React.FC = () => {
             return (
               <Card
                 key={room.id}
+                isPressable
+                onPress={() =>
+                  handleRoomNavigation(
+                    room.id,
+                    navigate,
+                    clearRoomNotifications
+                  )
+                }
                 className="border border-[#f4ecd8] rounded-sm shadow-lg m-1 bg-black/50 hover:bg-black/70 text-sepia hover:shadow-lg cursor-pointer h-60 w-60"
               >
-                <CardHeader
-                  onClick={() =>
-                    handleRoomNavigation(
-                      room.id,
-                      navigate,
-                      clearRoomNotifications
-                    )
-                  }
-                  className="flex-col items-start px-4 pb-0 pt-2 h-full"
-                >
+                <CardHeader className="flex-col items-start px-4 pb-0 pt-2 h-full">
                   <h4 className="font-bold text-large text-sepia">
                     {room.room_name}
                   </h4>

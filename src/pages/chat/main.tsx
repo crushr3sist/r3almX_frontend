@@ -67,8 +67,6 @@ const Socket: React.FC = () => {
       setMessage={setMessage}
       flagMessageErr={flagMessageErr}
       // component hooks
-      isSidebarOpen={isSidebarOpen}
-      setIsSidebarOpen={setIsSidebarOpen}
       isNavbarOpen={isNavbarOpen}
       newChannelName={newChannelName}
       newChannelDescription={newChannelDescription}

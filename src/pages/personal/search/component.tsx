@@ -1,12 +1,11 @@
 import { Card, CardBody, Input, Avatar, Spinner } from "@nextui-org/react";
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
 import routes from "@/utils/routes";
 import { debounce } from "lodash";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 import { Divider } from "@nextui-org/divider";
 import { useNavigate } from "react-router-dom";
-import { fetchToken } from "@/utils/login";
+import instance from "@/utils/axios_instance";
 
 export const SearchComponent = () => {
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -37,15 +36,8 @@ export const SearchComponent = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = await fetchToken();
-
-      const response = await axios.get(
-        `${routes.friendsSearch}?query=${queryText}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await instance.get(
+        `${routes.friendsSearch}?query=${queryText}`
       );
       setResults(response.data.results || []);
     } catch (err) {

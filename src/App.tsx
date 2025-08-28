@@ -90,7 +90,7 @@ const ClientController = () => {
     }, delay);
   }, []);
 
-  const { isAuthenticated, isLoading } = useAuth();
+  const { token, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     const setupWebSocket = async () => {
@@ -100,11 +100,10 @@ const ClientController = () => {
       }
       try {
         // Just set up the WebSocket connection
-        const WEBSOCKET_URL = `${routes.connectionSocket}`;
+        const WEBSOCKET_URL = `${routes.connectionSocket}?token=${token}`;
         const wsService = new Worker(
           new URL("utils/webSocketWorker.js", import.meta.url)
         );
-
         setConnectionInstance(wsService);
 
         wsService.postMessage(
@@ -150,12 +149,29 @@ const ClientController = () => {
       if (connection) {
         connection.terminate();
       }
-      // Set user as offline when disconnecting
+    };
+  }, [
+    isAuthenticated,
+    isLoading,
+    token,
+    debounceFetchStatus,
+    incrementRoomNotification,
+    addNotification,
+  ]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
       setUserStatus("offline").catch((error) => {
-        console.error("Failed to set user status to offline:", error);
+        console.error("Failed to set user status to offline on unload:", error);
       });
     };
-  }, [debounceFetchStatus, incrementRoomNotification, addNotification]);
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   return <Router />;
 };
